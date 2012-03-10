@@ -31,30 +31,22 @@ public:
   static void Unindent() { CurrIndent++; }
 };
 
-// A unique (in a function) numerical identifier for this block. Must be
-// different than NULL_BLOCKID for valid blocks.
-typedef unsigned int BlockId;
-const BlockId NULL_BLOCKID = 0;
-
 // Represents a basic block of code - some instructions that end with a
 // control flow modifier (a branch, return or throw).
 class Block {
-  BlockId Id;
-
-  std::vector<BlockId> BranchesOut, BranchesIn;
+  std::vector<Block*> BranchesOut, BranchesIn;
 
 public:
-  Block(int Id_, int BranchesOutHint, int BranchesInHint) : Id(Id_) {
-    assert(Id != NULL_BLOCKID);
-    BranchesOut.reserve(BranchesOutHint);
-    BranchesIn.reserve(BranchesInHint);
+  Block(int BranchesOutHint, int BranchesInHint) {
+    if (BranchesOutHint) BranchesOut.reserve(BranchesOutHint);
+    if (BranchesInHint) BranchesIn.reserve(BranchesInHint);
   }
 
-  void AddBranchOut(int OtherId) {
-    BranchesOut.push_back(OtherId);
+  void AddBranchOut(Block *Other) {
+    BranchesOut.push_back(Other);
   }
-  void AddBranchIn(int OtherId) {
-    BranchesIn.push_back(OtherId);
+  void AddBranchIn((Block *Other) {
+    BranchesIn.push_back(Other);
   }
 
   // Prints out the instructions (but not the find control flow modifier)
@@ -63,8 +55,8 @@ public:
 
 // Represents a structured control flow shape, one of
 //
-//  Simple: If just one block, then no control flow at all. If several
-//          blocks, then control flow is managed by a switch in a loop.
+//  Simple: No control flow at all, just instructions. If several
+//          blocks, then 
 //
 //  Multiple: A shape with more than one entry. If the next block to
 //            be entered is among them, we run it and continue to
@@ -72,6 +64,11 @@ public:
 //            next shape.
 //
 //  Loop: An infinite loop.
+//
+//  Emulated: Control flow is managed by a switch in a loop. This
+//            is necessary in some cases, for example when control
+//            flow is not known until runtime (indirect branches,
+//            setjmp returns, etc.)
 //
 class Shape {
 protected:
@@ -84,6 +81,8 @@ public:
   virtual void Render() = 0;
 };
 
+typedef std::map<Block*, Shape*> BlockShapeMap;
+
 class SimpleShape : public Shape {
   Block *Inner;
 public:
@@ -95,8 +94,6 @@ public:
 };
 
 class MultipleShape : public Shape {
-  typedef std::map<BlockId, Shape*> BlockShapeMap;
-
   BlockShapeMap InnerMap;
 public:
   void AddInner(Block *InnerBlock, Shape *InnerShape);
@@ -127,8 +124,13 @@ public:
 // The Relooper instance does maintain ownership of all the shapes
 // it creates, and releases them when destroyed.
 class Relooper {
+  std::vector<Block*> Blocks;
+  std::vector<Shape*> Shapes;
+
 public:
-  Relooper();
+  Relooper(int NumBlocksHint = 0) {
+    if (NumBlocksHint) Blocks.reserve(NumBlocksHint);
+  }
   ~Relooper();
 
   // Adds a block to the calculation.
