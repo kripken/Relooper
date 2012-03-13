@@ -118,6 +118,22 @@ void Relooper::Calculate() {
     }
 
     Shape *MakeLoop(BlockSet &Blocks, BlockVec& Entries) {
+      // Find the inner blocks in this loop. Proceed backwards from the entries until
+      // you reach a seen block, collecting as you go.
+      BlockSet InnerBlocks, Seen;
+      while (Entries.size() > 0) {
+        // Process the final element
+        Block *Curr = Entries.back();
+        Entries.pop_back();
+        if (Seen.find(Curr) != Seen.end()) {
+        }
+      }
+
+      // Solipsize the loop:
+      //   Branches to the loop entries become a continue to this shape
+      //   Branches to outside the loop become breaks on this shape
+      Shape *Inner = 
+      Shape *Ret = new LoopShape
       return NULL;
     }
 
@@ -133,7 +149,7 @@ void Relooper::Calculate() {
     Shape *Process(BlockSet &Blocks, BlockVec& Entries) {
       if (Entries.size() == 1) {
         Block *Curr = Entries[0];
-        if (Curr->BranchesIn.size() == 0) {
+        if (Curr->BranchesIn.size() == 0) { // XXX do we remove branches when we convert to continue/break? Or mark as modified?
           // One entry, no looping ==> Simple
           Shape *Ret = Notice(new SimpleShape(Curr));
           if (Blocks.size() > 1) {

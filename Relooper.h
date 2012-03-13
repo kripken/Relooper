@@ -35,7 +35,7 @@ struct Branch {
   bool Break; // If Ancestor is not NULL, this says whether to break or continue
   bool Set; // Set the label variable
 
-  Branch(Block *BlockInit) : Target(BlockInit), Ancestor(NULL), Set(false) {}
+  Branch(Block *BlockInit) : Target(BlockInit), Ancestor(NULL), Set(true) {}
 
   // Prints out the branch
   void Render();
@@ -45,7 +45,7 @@ struct Branch {
 // control flow modifier (a branch, return or throw).
 struct Block {
   std::vector<Branch*> BranchesOut, BranchesIn; // weak
-  Shape *Parent;
+  Shape *Parent; // The shape we are directly inside
   int Id; // A unique identifier
 
   Block() : Id(Block::IdCounter++) {}
@@ -105,8 +105,8 @@ struct MultipleShape : public Shape {
 };
 
 struct LoopShape : public Shape {
-  Block *Inner;
-  LoopShape(Block *Inner_) : Inner(Inner_) {}
+  Shape *Inner;
+  LoopShape(Shape *Inner_) : Inner(Inner_) {}
   void Render();
 };
 
