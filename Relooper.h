@@ -95,7 +95,7 @@ struct Shape {
 struct SimpleShape : public Shape {
   Block *Inner;
 
-  SimpleShape(Block *Inner_) : Inner(Inner_) {}
+  SimpleShape() : Inner(NULL) {}
   void Render() {
     Inner->Render();
     if (Next) Next->Render();

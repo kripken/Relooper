@@ -116,6 +116,19 @@ void Relooper::Calculate(Block *Entry) {
       }
     }
 
+    Shape *MakeSimple(BlockSet &Blocks, Block *Entry) {
+      SimpleShape *Simple = new SimpleShape;
+      Simple->Inner = Entry;
+      Notice(Simple);
+      if (Blocks.size() > 1) {
+        Blocks.erase(Entry);
+        BlockSet Entries;
+        GetBlocksOut(Entry, Entries);
+        Simple->Next = Process(Blocks, Entries);
+      }
+      return Simple;
+    }
+
     // Converts/processes all branchings to a specific target
     void Solipsize(Block *Target, Branch::FlowType Type, Shape *Ancestor) {
       for (BlockBranchMap::iterator iter = Target->BranchesIn.begin(); iter != Target->BranchesIn.end();) {
@@ -197,15 +210,7 @@ void Relooper::Calculate(Block *Entry) {
         Block *Curr = *(Entries.begin());
         if (Curr->BranchesIn.size() == 0) {
           // One entry, no looping ==> Simple
-          SimpleShape *Ret = new SimpleShape(Curr);
-          Notice(Ret);
-          if (Blocks.size() > 1) {
-            Blocks.erase(Curr);
-            Entries.clear();
-            GetBlocksOut(Curr, Entries);
-            Ret->Next = Process(Blocks, Entries);
-          }
-          return Ret;
+          return MakeSimple(Blocks, Curr);
         }
         // One entry, looping ==> Loop
         return MakeLoop(Blocks, Entries);
