@@ -14,6 +14,7 @@ LLVM.
 #include <map>
 #include <string>
 #include <vector>
+#include <set>
 
 struct Indenter {
   static int CurrIndent;
@@ -147,5 +148,13 @@ struct Relooper {
 
   // Renders the result.
   void Render() { Root->Render(); }
+};
+
+typedef std::set<Block*> BlockSet;
+typedef std::vector<Block*> BlockVec; // needed?
+typedef std::vector<BlockVec> BlockBlockVec; // needed?
+
+struct Debugging {
+  static void Dump(BlockSet &Blocks, const char *prefix=NULL);
 };
 

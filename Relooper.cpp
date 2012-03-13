@@ -1,6 +1,4 @@
 
-#include <set>
-
 #include "Relooper.h"
 
 // TODO: move all set to unorderedset
@@ -102,10 +100,6 @@ void Relooper::Calculate(Block *Entry) {
 
   // Recursively process the graph
 
-  typedef std::set<Block*> BlockSet;
-  typedef std::vector<Block*> BlockVec; // needed?
-  typedef std::vector<BlockVec> BlockBlockVec; // needed?
-
   struct Recursor {
     Relooper *Parent;
     Recursor(Relooper *ParentInit) : Parent(ParentInit) {}
@@ -146,7 +140,7 @@ void Relooper::Calculate(Block *Entry) {
       while (Queue.size() > 0) {
         Block *Curr = *(Queue.begin());
         Queue.erase(Queue.begin());
-        if (InnerBlocks.find(Curr) != InnerBlocks.end()) {
+        if (InnerBlocks.find(Curr) == InnerBlocks.end()) {
           // This element is new, mark it as inner and remove from outer
           InnerBlocks.insert(Curr);
           Blocks.erase(Curr);
@@ -240,5 +234,12 @@ void Relooper::Calculate(Block *Entry) {
   BlockSet Entries;
   Entries.insert(Entry);
   Root = Recursor(this).Process(AllBlocks, Entries);
+}
+
+void Debugging::Dump(BlockSet &Blocks, const char *prefix) {
+  printf("Dumping BlockSet%s%s, size %d\n", prefix ? " " : "", prefix ? prefix : "", Blocks.size());
+  for (BlockSet::iterator iter = Blocks.begin(); iter != Blocks.end(); iter++) {
+    printf("  %d\n", (*iter)->Id);
+  }
 }
 
