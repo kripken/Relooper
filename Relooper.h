@@ -14,10 +14,9 @@ LLVM.
 #include <stdio.h>
 #include <stdarg.h>
 
-class Renderer {
+struct Renderer {
   static int CurrIndent;
 
-public:
   // Renders a line of text, with proper indentation
   static void Print(const char *Format, ..) {
     for (int i = 0; i < CurrIndent*2; i++) putc(' ', stdout);
@@ -31,26 +30,32 @@ public:
   static void Unindent() { CurrIndent++; }
 };
 
+// A branching from one block to another
+struct Branch {
+  Block *Target; // The block we branch to
+  Shape *Ancestor; // If not NULL, this shape is the relevant one for purposes of getting to the target block. We break or continue on it
+  bool Break; // If Ancestor is not NULL, this says whether to break or continue
+  bool Set; // Set the label variable
+
+  Branch(Block *BlockInit) Block(BlockInit), Ancestor(NULL), Set(false) {}
+
+  // Prints out the branch
+  void Render();
+};
+
 // Represents a basic block of code - some instructions that end with a
 // control flow modifier (a branch, return or throw).
-class Block {
-  std::vector<Block*> BranchesOut, BranchesIn;
+struct Block {
+  std::vector<Branch> BranchesOut, BranchesIn;
+  Shape *Parent;
+  int Id; // A unique identifier
 
-public:
-  Block(int BranchesOutHint, int BranchesInHint) {
-    if (BranchesOutHint) BranchesOut.reserve(BranchesOutHint);
-    if (BranchesInHint) BranchesIn.reserve(BranchesInHint);
-  }
+  Block() : Id(Block::IdCounter++) {}
 
-  void AddBranchOut(Block *Other) {
-    BranchesOut.push_back(Other);
-  }
-  void AddBranchIn((Block *Other) {
-    BranchesIn.push_back(Other);
-  }
+  // Prints out the instructions.
+  virtual void Render() = 0;
 
-  // Prints out the instructions (but not the find control flow modifier)
-  virtual void RenderInstructions() = 0;
+  static int IdCounter;
 };
 
 // Represents a structured control flow shape, one of
@@ -70,39 +75,39 @@ public:
 //            flow is not known until runtime (indirect branches,
 //            setjmp returns, etc.)
 //
-class Shape {
-protected:
-  enum Type { Simple = 0, Multiple = 1, Loop = 2 };
+struct Shape {
+  enum Type { Simple = 0, Multiple = 1, Loop = 2, Emulated = 3};
 
-  Shape *Next;
+  int Id; // A unique identifier. Used to identify loops, labels are Lx where x is the Id.
+  Shape *Next; // The shape that will appear in the code right after this one
 
-public:
-  Shape() : Next(NULL) {}
+  Shape() : Id(Shape::IdCounter++), Next(NULL) {}
   virtual void Render() = 0;
+
+  static int IdCounter;
 };
 
-typedef std::map<Block*, Shape*> BlockShapeMap;
-
-class SimpleShape : public Shape {
+struct SimpleShape : public Shape {
   Block *Inner;
-public:
+
   SimpleShape(Block *Inner_) : Inner(Inner_) {}
   void Render() {
-    Inner->Render();
+    Inner->Render(this);
     if (Next) Next->Render();
   }
 };
 
-class MultipleShape : public Shape {
+typedef std::map<Block*, Shape*> BlockShapeMap;
+
+struct MultipleShape : public Shape {
   BlockShapeMap InnerMap;
-public:
+
   void AddInner(Block *InnerBlock, Shape *InnerShape);
   void Render();
 };
 
-class LoopShape : public Shape {
+struct LoopShape : public Shape {
   Block *Inner;
-public:
   LoopShape(Block *Inner_) : Inner(Inner_) {}
   void Render() {
     Inner->Render();
@@ -110,10 +115,15 @@ public:
   }
 };
 
+struct EmulatedShape : public Shape {
+  std::vector<Block*> Blocks;
+  void Render();
+}
+
 // Implements the relooper algorithm for a function's blocks.
 //
 // Usage:
-//  1. Instantiate this class.
+//  1. Instantiate this struct.
 //  2. Call AddBlock with the blocks you have. Each should already
 //     have its branchings in specified (the branchings out will
 //     be calculated by the relooper).
@@ -123,14 +133,10 @@ public:
 // ownership of the blocks, it and the shapes just point to them.
 // The Relooper instance does maintain ownership of all the shapes
 // it creates, and releases them when destroyed.
-class Relooper {
+struct Relooper {
   std::vector<Block*> Blocks;
   std::vector<Shape*> Shapes;
 
-public:
-  Relooper(int NumBlocksHint = 0) {
-    if (NumBlocksHint) Blocks.reserve(NumBlocksHint);
-  }
   ~Relooper();
 
   // Adds a block to the calculation.
