@@ -120,21 +120,33 @@ void Relooper::Calculate() {
     Shape *MakeLoop(BlockSet &Blocks, BlockVec& Entries) {
       // Find the inner blocks in this loop. Proceed backwards from the entries until
       // you reach a seen block, collecting as you go.
-      BlockSet InnerBlocks, Seen;
-      while (Entries.size() > 0) {
-        // Process the final element
-        Block *Curr = Entries.back();
-        Entries.pop_back();
-        if (Seen.find(Curr) != Seen.end()) {
+      BlockSet InnerBlocks;
+      BlockVec Queue = Entries, NextEntrie;
+      while (Queue.size() > 0) {
+        Block *Curr = Queue.back();
+        Queue.pop_back();
+        if (InnerBlocks.find(Curr) != InnerBlocks.end()) {
+          // This element is new, mark it as inner and remove from outer
+          InnerBlocks.insert(Curr);
+          Blocks.erase(Curr);
+          // Add the elements prior to it
+          for (int i = 0; i < Curr.BranchesIn.size(); i++) {
+            Queue.push_back(Curr.BranchesIn[i]->Target);
+          }
         }
       }
+      // TODO: Hoist additional blocks into the loop
 
-      // Solipsize the loop:
-      //   Branches to the loop entries become a continue to this shape
-      //   Branches to outside the loop become breaks on this shape
-      Shape *Inner = 
-      Shape *Ret = new LoopShape
-      return NULL;
+      // Solipsize the loop, replacing with break/continue and marking branches as Processed (will not affect later calculations)
+      // A. Branches to the loop entries become a continue to this shape
+      ...
+      // B. Branches to outside the loop become breaks on this shape
+      ...
+      // Finish up
+      Shape *Inner = MakeBlock(InnerBlocks, Entries);
+      Shape *Loop = Notice(new LoopShape(Inner));
+      Loop->Next = MakeBlock(Blocks, NextEntries);
+      return Loop;
     }
 
     void FindIndependentGroups(BlockSet &Blocks, BlockVec &Entries, BlockBlockVec& IndependentGroups) {
@@ -149,7 +161,7 @@ void Relooper::Calculate() {
     Shape *Process(BlockSet &Blocks, BlockVec& Entries) {
       if (Entries.size() == 1) {
         Block *Curr = Entries[0];
-        if (Curr->BranchesIn.size() == 0) { // XXX do we remove branches when we convert to continue/break? Or mark as modified?
+        if (Curr->BranchesIn.size() == 0) {
           // One entry, no looping ==> Simple
           Shape *Ret = Notice(new SimpleShape(Curr));
           if (Blocks.size() > 1) {

@@ -44,7 +44,11 @@ struct Branch {
 // Represents a basic block of code - some instructions that end with a
 // control flow modifier (a branch, return or throw).
 struct Block {
-  std::vector<Branch*> BranchesOut, BranchesIn; // weak
+  // Branches become processed after we finish the shape relevant to them. For example,
+  // when we recreate a loop, branches to the loop start become continues and are now
+  // processed. When we calculate what shape to generate from a set of blocks, we ignore
+  // processed branches.
+  std::vector<Branch*> BranchesOut, BranchesIn, ProcessedBranchesOut, ProcessedBranchesIn; // Weak
   Shape *Parent; // The shape we are directly inside
   int Id; // A unique identifier
 
