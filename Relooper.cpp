@@ -1,6 +1,7 @@
 
 #include "Relooper.h"
 
+// TODO: move all set to unorderedset
 
 void PrintIndented(const char *Format, ...) {
   for (int i = 0; i < Indenter::CurrIndent*2; i++) putc(' ', stdout);
@@ -92,16 +93,17 @@ void Relooper::Calculate() {
   // Add incoming branches
   for (int i = 0; i < Blocks.size(); i++) {
     Block *Curr = Blocks[i];
-    for (int j = 0; j < Curr->BranchesOut.size(); j++) {
-      Curr->BranchesOut[j]->Target->BranchesIn.push_back(new Branch(Curr)); // XXX leaky
+    for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
+      iter->first->BranchesIn[Curr] = new Branch(Curr); // XXX leaky
     }
   }
 
   // Recursively process the graph
 
   typedef std::set<Block*> BlockSet;
-  typedef std::vector<Block*> BlockVec;
-  typedef std::vector<BlockVec> BlockBlockVec;
+  typedef std::vector<Block*> BlockVec; // needed?
+  typedef std::set<Block*> BlockSet;
+  typedef std::vector<BlockVec> BlockBlockVec; // needed?
 
   struct Recursor {
     Relooper *Parent;
@@ -111,17 +113,33 @@ void Relooper::Calculate() {
     void Notice(Shape *New) { Parent->Shapes.push_back(New); }
 
     // Create a list of entries from a block
-    void GetBlocksOut(Block *Source, BlockVec& Entries) {
-      for (int i = 0; i < Source->BranchesOut.size(); i++) {
-        Entries.push_back(Source->BranchesOut[i]->Target);
+    void GetBlocksOut(Block *Source, BlockSet& Entries) {
+      for (BlockBranchMap::iterator iter = Source->BranchesOut.begin(); iter != Source->BranchesOut.end(); iter++) {
+        Entries.insert(iter->first);
       }
     }
 
-    Shape *MakeLoop(BlockSet &Blocks, BlockVec& Entries) {
+    // Converts/processes all branchings to a specific target
+    void Solipsize(Block *Target, Branch::FlowType Type) {
+      for (BlockBranchMap::iterator iter = Target->BranchesIn.begin(); iter != Target->BranchesIn.end();) {
+        Block *Prior = iter->first;
+        Branch *TargetIn = iter->second;
+        Branch *PriorOut = Prior->BranchesOut[Target];
+        PriorOut->Ancestor = Loop; // Do we need this info on TargetIn too?
+        PriorOut->Break = false;
+        iter++; // carefully increment iter before erasing
+        Target->BranchesIn->erase(Prior);
+        Target->ProcessedBranchesIn[Prior] = TargetIn;
+        Prior->BranchesIn->Erase(Target);
+        Prior->ProcessedBranchesIn[Target] = PriorOut;
+      }
+    }
+
+    Shape *MakeLoop(BlockSet &Blocks, BlockSet& Entries) {
       // Find the inner blocks in this loop. Proceed backwards from the entries until
       // you reach a seen block, collecting as you go.
       BlockSet InnerBlocks;
-      BlockVec Queue = Entries;
+      BlockSet Queue = Entries;
       while (Queue.size() > 0) {
         Block *Curr = Queue.back();
         Queue.pop_back();
@@ -130,49 +148,36 @@ void Relooper::Calculate() {
           InnerBlocks.insert(Curr);
           Blocks.erase(Curr);
           // Add the elements prior to it
-          for (int i = 0; i < Curr->BranchesIn.size(); i++) {
-            Queue.push_back(Curr.BranchesIn[i]->Target);
+          for (BlockBranchMap::iterator iter = Curr->BranchesIn.begin(); iter != Curr->BranchesIn.end(); iter++) {
+            Queue.push_back(iter->first);
           }
         }
       }
-      BlockVec NextEntries;
-      BlockSet NextEntriesSet;
+      BlockSet NextEntries;
       for (BlockSet::iterator iter = InnerBlocks.begin(); iter != InnerBlocks.end(); iter++) {
         Block *Curr = *iter;
-        for (int i = 0; i < Curr->BranchesOut.size(); i++) {
-          Block *Possible = Curr->BranchesOut[i]->Target;
+        for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
+          Block *Possible = iter->first;
           if (InnerBlocks.find(Possible) == InnerBlocks().end() &&
               NextEntriesSet.find(Possible) == NextEntriesSet.find(Possible)) {
-            NextEntries.push_back(Possible);
-            NextEntriesSet.insert(Possible);
+            NextEntries.insert(Possible);
           }
         }
       }
-      // TODO: Hoist additional blocks into the loop
+
+      // TODO: Optionally hoist additional blocks into the loop
+
       Shape *Loop = Notice(new LoopShape());
+
       // Solipsize the loop, replacing with break/continue and marking branches as Processed (will not affect later calculations)
       // A. Branches to the loop entries become a continue to this shape
-      for (int i = 0; i < Entries.size(); i++) {
-        Block *Entry = Entries[i];
-        for (int j = 0; j < Entry->BranchesIn.size(); j++) {
-          Block *Prior = Entry->BranchesIn[j];
-          for (int k = 0; k < Prior->BranchesOut.size(); k++) {
-            Branch *Curr = Prior->BranchesOut[k];
-            if (Curr->Target == Entry) {
-              Curr->Ancestor = Loop;
-              Curr->Break = false;
-              Prior->ProcessedBranchesIn.push_back(Curr);
-              if (k < Prior->BranchesOut.size()-1) {
-                Prior->BranchesOut[k] = Prior->BranchesOut[Prior->BranchesOut.size()-1];
-              }
-              Prior->BranchesOut.pop_back();
-              break; // each target can only appear once in Prior's branches out
-            }
-          }
-        }
+      for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
+        Solipsize(*iter, Branch::FlowType::Continue);
       }
       // B. Branches to outside the loop (a next entry) become breaks on this shape
-      ...
+      for (BlockSet::iterator iter = NextEntries.begin(); iter != NextEntries.end(); iter++) {
+        Solipsize(*iter, Branch::FlowType::Break);
+      }
       // Finish up
       Shape *Inner = MakeBlock(InnerBlocks, Entries);
       Loop->Inner = Inner;
@@ -180,8 +185,8 @@ void Relooper::Calculate() {
       return Loop;
     }
 
-    void FindIndependentGroups(BlockSet &Blocks, BlockVec &Entries, BlockBlockVec& IndependentGroups) {
-    }
+    //void FindIndependentGroups(BlockSet &Blocks, BlockVec &Entries, BlockBlockVec& IndependentGroups) {
+    //}
 
     Shape *MakeMultiple(BlockSet &Blocks, BlockVec &Entries, BlockBlockVec& IndependentGroups) {
       return NULL;
@@ -206,6 +211,9 @@ void Relooper::Calculate() {
         // One entry, looping ==> Loop
         return MakeLoop(Blocks, Entries);
       }
+      assert(0);
+      return NULL;
+      /*
       // More than one entry, try to eliminate through a Multiple groups of
       // independent blocks from an entry/ies
       BlockBlockVec IndependentGroups;
@@ -216,6 +224,7 @@ void Relooper::Calculate() {
       }
       // No independent groups, must be loopable ==> Loop
       return MakeLoop(Blocks, Entries);
+      */
     }
   }
 

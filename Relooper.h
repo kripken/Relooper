@@ -28,18 +28,20 @@ void PrintIndented(const char *Format, ...);
 struct Block;
 struct Shape;
 
-// A branching from one block to another
+// Info about a branching from one block to another
 struct Branch {
-  Block *Target; // The block we branch to
+  enum FlowType = { Break = 0, Continue = 1 };
   Shape *Ancestor; // If not NULL, this shape is the relevant one for purposes of getting to the target block. We break or continue on it
-  bool Break; // If Ancestor is not NULL, this says whether to break or continue
+  FlowType Type; // If Ancestor is not NULL, this says whether to break or continue
   bool Set; // Set the label variable
 
-  Branch(Block *BlockInit) : Target(BlockInit), Ancestor(NULL), Set(true) {}
+  Branch() : Ancestor(NULL), Set(true) {}
 
   // Prints out the branch
-  void Render();
+  void Render(Block *Parent); // We do not store the parent permanently to save memory, it is only used here
 };
+
+typedef std::map<Block*, Branch*> BlockBranchMap;
 
 // Represents a basic block of code - some instructions that end with a
 // control flow modifier (a branch, return or throw).
@@ -48,11 +50,11 @@ struct Block {
   // when we recreate a loop, branches to the loop start become continues and are now
   // processed. When we calculate what shape to generate from a set of blocks, we ignore
   // processed branches.
-  std::vector<Branch*> BranchesOut, BranchesIn, ProcessedBranchesOut, ProcessedBranchesIn; // Weak
+  BlockBranchMap BranchesOut, BranchesIn, ProcessedBranchesOut, ProcessedBranchesIn; // Weak
   Shape *Parent; // The shape we are directly inside
   int Id; // A unique identifier
 
-  Block() : Id(Block::IdCounter++) {}
+  Block() : Parent(NULL), Id(Block::IdCounter++) {}
 
   // Prints out the instructions.
   virtual void Render() = 0;
