@@ -1,5 +1,14 @@
 #include "Relooper.h"
 
+
+void PrintIndented(const char *Format, ...) {
+  for (int i = 0; i < Indenter::CurrIndent*2; i++) putc(' ', stdout);
+  va_list Args;
+  va_start(Args, Format);
+  vprintf(Format, Args);
+  va_end(Args);
+}
+
 // Indenter
 
 int Indenter::CurrIndent = 0;

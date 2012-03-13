@@ -23,13 +23,7 @@ struct Indenter {
 };
 
 // Renders a line of text, with proper indentation
-void PrintIndented(const char *Format, ...) {
-  for (int i = 0; i < Indenter::CurrIndent*2; i++) putc(' ', stdout);
-  va_list Args;
-  va_start(Args, Format);
-  vprintf(Format, Args);
-  va_end(Args);
-}
+void PrintIndented(const char *Format, ...);
 
 struct Block;
 struct Shape;

@@ -30,6 +30,8 @@ int main() {
   r.Blocks.push_back(&b3);
   r.Blocks.push_back(&b4);
 
+  r.Calculate();
+
   r.Render();
 }
 
