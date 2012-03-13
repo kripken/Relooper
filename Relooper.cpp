@@ -1,27 +1,15 @@
 #include "Relooper.h"
 
-// Renderer
+// Indenter
 
-static int Renderer::CurrIndent = 0;
+int Indenter::CurrIndent = 0;
 
 // Branch
 
-struct Branch {
-  Block *Target; // The block we branch to
-  Shape *Ancestor; // If not NULL, this shape is the relevant one for purposes of getting to the target block. We break or continue on it
-  bool Break; // If Ancestor is not NULL, this says whether to break or continue
-  bool Set; // Set the label variable
-
-  Branch(Block *BlockInit) Block(BlockInit), Ancestor(NULL), Set(false) {}
-
-  // Prints out the branch
-  void Render();
-};
-
 void Branch::Render() {
-  if (Set) Renderer::Print("label = %d;\n", Target->Id);
+  if (Set) PrintIndented("label = %d;\n", Target->Id);
   if (Ancestor) {
-    Renderer::Print("%s L%d;\n", Break ? "break" : "continue", Ancestor->Id);
+    PrintIndented("%s L%d;\n", Break ? "break" : "continue", Ancestor->Id);
   }
 }
 
@@ -37,13 +25,13 @@ int Shape::IdCounter = 0;
 
 void MultipleShape::Render() {
   bool First = true;
-  for (BlockIdShapeMap::iterator iter = InnerMap.begin(); iter != InnerMap.end(); iter++) {
-    Renderer::Print("%s if (label == %d) {\n", First ? "" : "else ", iter->first);
+  for (BlockShapeMap::iterator iter = InnerMap.begin(); iter != InnerMap.end(); iter++) {
+    PrintIndented("%s if (label == %d) {\n", First ? "" : "else ", iter->first);
     First = false;
-    Renderer::Indent();
+    Indenter::Indent();
     iter->second->Render();
-    Renderer::Unindent();
-    Relooper::Print("}\n");
+    Indenter::Unindent();
+    PrintIndented("}\n");
   }
   if (Next) Next->Render();
 };
@@ -51,60 +39,55 @@ void MultipleShape::Render() {
 // LoopShape
 
 void LoopShape::Render() {
-  Renderer::Print("while(1) {\n");
-  Renderer::Indent();
+  PrintIndented("while(1) {\n");
+  Indenter::Indent();
   Inner->Render();
-  Renderer::Unindent();
-  Relooper::Print("}\n");
+  Indenter::Unindent();
+  PrintIndented("}\n");
   if (Next) Next->Render();
 };
 
 // EmulatedShape
 
-void MultipleShape::Render() {
-  Renderer::Print("while(1) {\n");
-  Renderer::Indent();
-  Renderer::Print("switch(label) {\n");
-  Renderer::Indent();
+void EmulatedShape::Render() {
+  PrintIndented("while(1) {\n");
+  Indenter::Indent();
+  PrintIndented("switch(label) {\n");
+  Indenter::Indent();
   for (int i = 0; i < Blocks.size(); i++) {
-    Block &Curr = Blocks[i];
-    Renderer::Print("case %d: {\n", Curr->Id);
-    Renderer::Indent();
+    Block *Curr = Blocks[i];
+    PrintIndented("case %d: {\n", Curr->Id);
+    Indenter::Indent();
     Curr->Render();
-    Renderer::Print("break;\n");
-    Renderer::Unindent();
-    Relooper::Print("}\n");
+    PrintIndented("break;\n");
+    Indenter::Unindent();
+    PrintIndented("}\n");
   }
-  Renderer::Unindent();
-  Relooper::Print("}\n");
-  Renderer::Unindent();
-  Relooper::Print("}\n");
+  Indenter::Unindent();
+  PrintIndented("}\n");
+  Indenter::Unindent();
+  PrintIndented("}\n");
   if (Next) Next->Render();
 };
 
 // Relooper
 
-Relooper::Relooper() : NumBlocks(0) {
-}
-
 Relooper::~Relooper() {
+  // Delete shapes..
 }
 
-void Relooper::AddBlock(Block *NewBlock) {
-  Blocks[NewBlock->Id] = NewBlock;
-}
-
-void Relooper::Render() {
+void Relooper::Calculate() {
   Shapes.reserve(Blocks.size()/2); // vague heuristic, better than nothing
 
   // Add incoming branches
   for (int i = 0; i < Blocks.size(); i++) {
-    Block &Curr = *Blocks[i];
-    for (int j = 0; j < Curr.BranchesOut.size(); j++) {
-      Curr.BranchesOut[j]->BranchesIn.push_back(Curr);
+    Block *Curr = Blocks[i];
+    for (int j = 0; j < Curr->BranchesOut.size(); j++) {
+      Curr->BranchesOut[j]->Target->BranchesIn.push_back(new Branch(Curr)); // leaky?
     }
   }
 
-  
+  // ...
+
 }
 

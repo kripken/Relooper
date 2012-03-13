@@ -8,27 +8,31 @@ LLVM.
 [1] Alon Zakai. 2011. Emscripten: an LLVM-to-JavaScript compiler. In Proceedings of the ACM international conference companion on Object oriented programming systems languages and applications companion (SPLASH '11). ACM, New York, NY, USA, 301-312. DOI=10.1145/2048147.2048224 http://doi.acm.org/10.1145/2048147.2048224
 */
 
-#include <map>
-#include <string>
 #include <assert.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <map>
+#include <string>
+#include <vector>
 
-struct Renderer {
+struct Indenter {
   static int CurrIndent;
-
-  // Renders a line of text, with proper indentation
-  static void Print(const char *Format, ..) {
-    for (int i = 0; i < CurrIndent*2; i++) putc(' ', stdout);
-    va_list Args;
-    va_start(Args, Format);
-    vprintf(Format, Args);
-    va_end(Args);
-  }
 
   static void Indent() { CurrIndent--; }
   static void Unindent() { CurrIndent++; }
 };
+
+// Renders a line of text, with proper indentation
+void PrintIndented(const char *Format, ...) {
+  for (int i = 0; i < Indenter::CurrIndent*2; i++) putc(' ', stdout);
+  va_list Args;
+  va_start(Args, Format);
+  vprintf(Format, Args);
+  va_end(Args);
+}
+
+struct Block;
+struct Shape;
 
 // A branching from one block to another
 struct Branch {
@@ -37,7 +41,7 @@ struct Branch {
   bool Break; // If Ancestor is not NULL, this says whether to break or continue
   bool Set; // Set the label variable
 
-  Branch(Block *BlockInit) Block(BlockInit), Ancestor(NULL), Set(false) {}
+  Branch(Block *BlockInit) : Target(BlockInit), Ancestor(NULL), Set(false) {}
 
   // Prints out the branch
   void Render();
@@ -46,7 +50,7 @@ struct Branch {
 // Represents a basic block of code - some instructions that end with a
 // control flow modifier (a branch, return or throw).
 struct Block {
-  std::vector<Branch> BranchesOut, BranchesIn;
+  std::vector<Branch*> BranchesOut, BranchesIn; // weak
   Shape *Parent;
   int Id; // A unique identifier
 
@@ -92,7 +96,7 @@ struct SimpleShape : public Shape {
 
   SimpleShape(Block *Inner_) : Inner(Inner_) {}
   void Render() {
-    Inner->Render(this);
+    Inner->Render();
     if (Next) Next->Render();
   }
 };
@@ -109,16 +113,13 @@ struct MultipleShape : public Shape {
 struct LoopShape : public Shape {
   Block *Inner;
   LoopShape(Block *Inner_) : Inner(Inner_) {}
-  void Render() {
-    Inner->Render();
-    if (Next) Next->Render();
-  }
+  void Render();
 };
 
 struct EmulatedShape : public Shape {
   std::vector<Block*> Blocks;
   void Render();
-}
+};
 
 // Implements the relooper algorithm for a function's blocks.
 //
@@ -136,13 +137,15 @@ struct EmulatedShape : public Shape {
 struct Relooper {
   std::vector<Block*> Blocks;
   std::vector<Shape*> Shapes;
+  Shape *RootShape;
 
+  Relooper() : RootShape(NULL) {}
   ~Relooper();
 
-  // Adds a block to the calculation.
-  void AddBlock(Block *NewBlock);
+  // Calculates the shapes
+  void Calculate();
 
-  // Calculates the shapes and renders the result.
-  void Render();
+  // Renders the result.
+  void Render() { RootShape->Render(); }
 };
 
