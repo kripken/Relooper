@@ -121,7 +121,7 @@ void Relooper::Calculate() {
       // Find the inner blocks in this loop. Proceed backwards from the entries until
       // you reach a seen block, collecting as you go.
       BlockSet InnerBlocks;
-      BlockVec Queue = Entries, NextEntrie;
+      BlockVec Queue = Entries;
       while (Queue.size() > 0) {
         Block *Curr = Queue.back();
         Queue.pop_back();
@@ -130,22 +130,34 @@ void Relooper::Calculate() {
           InnerBlocks.insert(Curr);
           Blocks.erase(Curr);
           // Add the elements prior to it
-          for (int i = 0; i < Curr.BranchesIn.size(); i++) {
+          for (int i = 0; i < Curr->BranchesIn.size(); i++) {
             Queue.push_back(Curr.BranchesIn[i]->Target);
           }
         }
       }
+      BlockVec NextEntries;
+      BlockSet NextEntriesSet;
+      for (BlockSet::iterator iter = InnerBlocks.begin(); iter != InnerBlocks.end(); iter++) {
+        Block *Curr = *iter;
+        for (int i = 0; i < Curr->BranchesOut.size(); i++) {
+          Block *Possible = Curr->BranchesOut[i]->Target;
+          if (InnerBlocks.find(Possible) == InnerBlocks().end() &&
+              NextEntriesSet.find(Possible) == NextEntriesSet.find(Possible)) {
+            NextEntries.push_back(Possible);
+            NextEntriesSet.insert(Possible);
+          }
+        }
+      }
       // TODO: Hoist additional blocks into the loop
-
       // Solipsize the loop, replacing with break/continue and marking branches as Processed (will not affect later calculations)
       // A. Branches to the loop entries become a continue to this shape
       ...
-      // B. Branches to outside the loop become breaks on this shape
+      // B. Branches to outside the loop (a next entry) become breaks on this shape
       ...
       // Finish up
       Shape *Inner = MakeBlock(InnerBlocks, Entries);
       Shape *Loop = Notice(new LoopShape(Inner));
-      Loop->Next = MakeBlock(Blocks, NextEntries);
+      Loop->Next = NextEntries.size() > 0 ? MakeBlock(Blocks, NextEntries) : NULL;
       return Loop;
     }
 
