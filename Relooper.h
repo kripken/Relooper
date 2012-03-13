@@ -150,7 +150,7 @@ struct Relooper {
 };
 
 typedef std::set<Block*> BlockSet;
-typedef std::map<Block*, BlockSet> BlockBlockSet;
+typedef std::map<Block*, BlockSet> BlockBlockSetMap;
 
 struct Debugging {
   static bool On;

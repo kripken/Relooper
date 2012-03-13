@@ -205,15 +205,51 @@ void Relooper::Calculate(Block *Entry) {
     // For each entry, find the independent group reachable by it. The independent group is
     // the entry itself, plus all the blocks it can reach that cannot be directly reached by another entry. Note that we
     // ignore directly reaching the entry itself by another entry.
-    void FindIndependentGroups(BlockSet &Blocks, BlockSet &Entries, BlockBlockSet& IndependentGroups) {
-      ..
+    void FindIndependentGroups(BlockSet &Blocks, BlockSet &Entries, BlockBlockSetMap& IndependentGroups) {
+      BlockBlockSetMap Dangerous; // For each block, a set of branchings that are dangerous, and until they
+                                  // are resolved, we cannot declare it as independent
+      for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
+        Block *Entry = *iter;
+        BlockSet Possibles; // Blocks who we still need to make sure are not reachable by an outside block
+        BlockSet Independents; // Blocks who we know are ok;
+        BlockSet Queue;
+        Independents.insert(Entry); // entry is defined independent
+        for (BlockBranchMap::iterator iter = Entry->BranchesOut.begin(); iter != Entry->BranchesOut.end(); iter++) {
+          Queue.insert(iter->first);
+          Possibles.insert(iter->first);
+        }
+        while (Queue.size() > 0) {
+          Block *Curr = *(Queue.begin());
+          Queue.erase(Queue.begin());
+          if (Dangerous.find(Curr) == Dangerous.end()) {
+            // Add all branches in as dangerous
+            Dangerous.insert(Curr);
+            for (BlockBranchMap::iterator iter = Curr->BranchesIn.begin(); iter != Curr->BranchesIn.end(); iter++) {
+              Dangerous[Curr].insert(*iter);
+            }
+          }
+          // If no dangerous incoming branches, make independent
+          if (Dangerous[Curr].size() == 0) {
+            Possibles.erase(Curr);
+            Independents.insert(Curr);
+            for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
+              Block *Target = *iter;
+              Dangerous::iterator Incoming = Dangerous.find(Target);
+              if (Incoming != Dangerous.end()) {
+                (*Incoming).erase(Curr); // Curr is no longer a problem
+                Queue.insert(Target);
+              }
+            }
+          }
+        }
+      }
     }
 
-    Shape *MakeMultiple(BlockSet &Blocks, BlockBlockSet& IndependentGroups) {
+    Shape *MakeMultiple(BlockSet &Blocks, BlockBlockSetMap& IndependentGroups) {
       PrintDebug("creating multiple block with %d inner groups\n", IndependentGroups.size());
       MultipleShape *Multiple = new MultipleShape();
       BlockSet NextEntries, CurrEntries;
-      for (BlockBlockSet::iterator iter = IndependentGroups.begin(); iter != IndependentGroups.end(); iter++) {
+      for (BlockBlockSetMap::iterator iter = IndependentGroups.begin(); iter != IndependentGroups.end(); iter++) {
         Block *CurrEntry = iter->first;
         BlockSet &CurrBlocks = iter->second;
         // Create inner block
@@ -259,7 +295,19 @@ void Relooper::Calculate(Block *Entry) {
         // We can handle a group in a multiple if its entry cannot be reached by another group.
         // Note that it might be reachable by itself - a loop. But that is fine, we will create
         // a loop inside the multiple block (which is the performant order to do it).
-        ..
+        for (BlockBlockSetMap::iterator iter = IndependentGroups.begin(); iter != IndependentGroups.end();) {
+          Block *Entry = iter->first;
+          BlockSet &Group = iter->second;
+          BlockBlockSetMap::iterator curr = iter++; // iterate carefully, we may delete
+          for (BlockBranchMap::iterator iterBranch = Entry->BranchesIn.begin(); iterBranch != Entry->BranchesIn.end(); iterBranch++) {
+            Block *Origin = iterBranch->first;
+            if (Group.find(Origin) == Group.end()) {
+              // Reached from outside the group, so we cannot handle this
+              IndependentGroups.erase(curr);
+              break;
+            }
+          }
+        }
         if (IndependentGroups.size() > 0) {
           // Some groups removable ==> Multiple
           return MakeMultiple(Blocks, IndependentGroups);
