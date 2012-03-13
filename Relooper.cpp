@@ -117,8 +117,10 @@ void Relooper::Calculate(Block *Entry) {
     }
 
     Shape *MakeSimple(BlockSet &Blocks, Block *Entry) {
+      PrintDebug("creating simple block with block #%d\n", Entry->Id);
       SimpleShape *Simple = new SimpleShape;
       Simple->Inner = Entry;
+      Entry->Parent = Simple;
       Notice(Simple);
       if (Blocks.size() > 1) {
         Blocks.erase(Entry);
@@ -174,6 +176,8 @@ void Relooper::Calculate(Block *Entry) {
           }
         }
       }
+
+      PrintDebug("creating loop block with %d inner blocks and %d outer blocks\n", InnerBlocks.size(), Blocks.size());
 
       // TODO: Optionally hoist additional blocks into the loop
 
@@ -241,10 +245,23 @@ void Relooper::Calculate(Block *Entry) {
   Root = Recursor(this).Process(AllBlocks, Entries);
 }
 
+// Debugging
+
+bool Debugging::On = false;
+
 void Debugging::Dump(BlockSet &Blocks, const char *prefix) {
   printf("Dumping BlockSet%s%s, size %d\n", prefix ? " " : "", prefix ? prefix : "", Blocks.size());
   for (BlockSet::iterator iter = Blocks.begin(); iter != Blocks.end(); iter++) {
     printf("  %d\n", (*iter)->Id);
+  }
+}
+
+void PrintDebug(const char *Format, ...) {
+  if (Debugging::On) {
+    va_list Args;
+    va_start(Args, Format);
+    vprintf(Format, Args);
+    va_end(Args);
   }
 }
 

@@ -155,6 +155,9 @@ typedef std::vector<Block*> BlockVec; // needed?
 typedef std::vector<BlockVec> BlockBlockVec; // needed?
 
 struct Debugging {
+  static bool On;
   static void Dump(BlockSet &Blocks, const char *prefix=NULL);
 };
+
+void PrintDebug(const char *Format, ...);
 

@@ -13,41 +13,47 @@ struct SimpleBlock : public Block {
 };
 
 int main() {
-  /*
-  // Diamond pattern
+  Debugging::On = true;
 
-  SimpleBlock b1, b2, b3, b4;
+  {
+    printf("\n-- Diamond pattern --\n");
 
-  b1.BranchesOut.push_back(new Branch(&b2));
-  b1.BranchesOut.push_back(new Branch(&b3));
+    SimpleBlock b1, b2, b3, b4;
 
-  b2.BranchesOut.push_back(new Branch(&b4));
+    b1.BranchesOut[&b2] = new Branch;
+    b1.BranchesOut[&b3] = new Branch;
 
-  b3.BranchesOut.push_back(new Branch(&b4));
+    b2.BranchesOut[&b4] = new Branch;
 
-  Relooper r;
-  r.Blocks.push_back(&b1);
-  r.Blocks.push_back(&b2);
-  r.Blocks.push_back(&b3);
-  r.Blocks.push_back(&b4);
-  */
+    b3.BranchesOut[&b4] = new Branch;
 
-  // Loop + tail pattern
+    Relooper r;
+    r.Blocks.push_back(&b1);
+    r.Blocks.push_back(&b2);
+    r.Blocks.push_back(&b3);
+    r.Blocks.push_back(&b4);
 
-  SimpleBlock b1, b2, b3;
+    r.Calculate(&b1);
+    r.Render();
+  }
 
-  b1.BranchesOut[&b2] = new Branch;
+  {
+    printf("\n-- Loop + tail pattern --\n");
 
-  b2.BranchesOut[&b1] = new Branch;
-  b2.BranchesOut[&b3] = new Branch;
+    SimpleBlock b1, b2, b3;
 
-  Relooper r;
-  r.Blocks.push_back(&b1);
-  r.Blocks.push_back(&b2);
-  r.Blocks.push_back(&b3);
+    b1.BranchesOut[&b2] = new Branch;
 
-  r.Calculate(&b1);
+    b2.BranchesOut[&b1] = new Branch;
+    b2.BranchesOut[&b3] = new Branch;
 
-  r.Render();
+    Relooper r;
+    r.Blocks.push_back(&b1);
+    r.Blocks.push_back(&b2);
+    r.Blocks.push_back(&b3);
+
+    r.Calculate(&b1);
+    r.Render();
+  }
 }
 
