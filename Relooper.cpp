@@ -149,14 +149,33 @@ void Relooper::Calculate() {
         }
       }
       // TODO: Hoist additional blocks into the loop
+      Shape *Loop = Notice(new LoopShape());
       // Solipsize the loop, replacing with break/continue and marking branches as Processed (will not affect later calculations)
       // A. Branches to the loop entries become a continue to this shape
-      ...
+      for (int i = 0; i < Entries.size(); i++) {
+        Block *Entry = Entries[i];
+        for (int j = 0; j < Entry->BranchesIn.size(); j++) {
+          Block *Prior = Entry->BranchesIn[j];
+          for (int k = 0; k < Prior->BranchesOut.size(); k++) {
+            Branch *Curr = Prior->BranchesOut[k];
+            if (Curr->Target == Entry) {
+              Curr->Ancestor = Loop;
+              Curr->Break = false;
+              Prior->ProcessedBranchesIn.push_back(Curr);
+              if (k < Prior->BranchesOut.size()-1) {
+                Prior->BranchesOut[k] = Prior->BranchesOut[Prior->BranchesOut.size()-1];
+              }
+              Prior->BranchesOut.pop_back();
+              break; // each target can only appear once in Prior's branches out
+            }
+          }
+        }
+      }
       // B. Branches to outside the loop (a next entry) become breaks on this shape
       ...
       // Finish up
       Shape *Inner = MakeBlock(InnerBlocks, Entries);
-      Shape *Loop = Notice(new LoopShape(Inner));
+      Loop->Inner = Inner;
       Loop->Next = NextEntries.size() > 0 ? MakeBlock(Blocks, NextEntries) : NULL;
       return Loop;
     }
