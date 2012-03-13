@@ -18,8 +18,8 @@ LLVM.
 struct Indenter {
   static int CurrIndent;
 
-  static void Indent() { CurrIndent--; }
-  static void Unindent() { CurrIndent++; }
+  static void Indent() { CurrIndent++; }
+  static void Unindent() { CurrIndent--; }
 };
 
 // Renders a line of text, with proper indentation

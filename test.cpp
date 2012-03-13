@@ -3,7 +3,7 @@
 
 struct SimpleBlock : public Block {
   void Render() {
-    PrintIndented("Block: %d\n", Id);
+    PrintIndented("// Block: %d\n", Id);
 
     // Normally we would connect branchings with conditions, etc., here we just show them simply
     for (BlockBranchMap::iterator iter = BranchesOut.begin(); iter != BranchesOut.end(); iter++) {
