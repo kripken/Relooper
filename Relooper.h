@@ -131,15 +131,15 @@ struct EmulatedShape : public Shape {
 struct Relooper {
   std::vector<Block*> Blocks;
   std::vector<Shape*> Shapes;
-  Shape *RootShape;
+  Shape *Root;
 
   Relooper() : RootShape(NULL) {}
   ~Relooper();
 
   // Calculates the shapes
-  void Calculate();
+  void Calculate(Block *Entry);
 
   // Renders the result.
-  void Render() { RootShape->Render(); }
+  void Render() { Root->Render(); }
 };
 
