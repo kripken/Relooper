@@ -107,7 +107,6 @@ typedef std::map<Block*, Shape*> BlockShapeMap;
 struct MultipleShape : public Shape {
   BlockShapeMap InnerMap;
 
-  void AddInner(Block *InnerBlock, Shape *InnerShape);
   void Render();
 };
 
@@ -151,8 +150,7 @@ struct Relooper {
 };
 
 typedef std::set<Block*> BlockSet;
-typedef std::vector<Block*> BlockVec; // needed?
-typedef std::vector<BlockVec> BlockBlockVec; // needed?
+typedef std::map<Block*, BlockSet> BlockBlockSet;
 
 struct Debugging {
   static bool On;

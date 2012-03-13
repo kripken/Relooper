@@ -165,6 +165,10 @@ void Relooper::Calculate(Block *Entry) {
           }
         }
       }
+
+      assert(InnerBlocks.size() > 0);
+      PrintDebug("creating loop block with %d inner blocks and %d outer blocks\n", InnerBlocks.size(), Blocks.size());
+
       BlockSet NextEntries;
       for (BlockSet::iterator iter = InnerBlocks.begin(); iter != InnerBlocks.end(); iter++) {
         Block *Curr = *iter;
@@ -176,8 +180,6 @@ void Relooper::Calculate(Block *Entry) {
           }
         }
       }
-
-      PrintDebug("creating loop block with %d inner blocks and %d outer blocks\n", InnerBlocks.size(), Blocks.size());
 
       // TODO: Optionally hoist additional blocks into the loop
 
@@ -196,20 +198,49 @@ void Relooper::Calculate(Block *Entry) {
       // Finish up
       Shape *Inner = Process(InnerBlocks, Entries);
       Loop->Inner = Inner;
-      Loop->Next = NextEntries.size() > 0 ? Process(Blocks, NextEntries) : NULL;
+      Loop->Next = Process(Blocks, NextEntries);
       return Loop;
     }
 
-    //void FindIndependentGroups(BlockSet &Blocks, BlockVec &Entries, BlockBlockVec& IndependentGroups) {
-    //}
+    // For each entry, find the independent group reachable by it. The independent group is
+    // the entry itself, plus all the blocks it can reach that cannot be directly reached by another entry. Note that we
+    // ignore directly reaching the entry itself by another entry.
+    void FindIndependentGroups(BlockSet &Blocks, BlockSet &Entries, BlockBlockSet& IndependentGroups) {
+      ..
+    }
 
-    Shape *MakeMultiple(BlockSet &Blocks, BlockVec &Entries, BlockBlockVec& IndependentGroups) {
-      return NULL;
+    Shape *MakeMultiple(BlockSet &Blocks, BlockBlockSet& IndependentGroups) {
+      PrintDebug("creating multiple block with %d inner groups\n", IndependentGroups.size());
+      MultipleShape *Multiple = new MultipleShape();
+      BlockSet NextEntries, CurrEntries;
+      for (BlockBlockSet::iterator iter = IndependentGroups.begin(); iter != IndependentGroups.end(); iter++) {
+        Block *CurrEntry = iter->first;
+        BlockSet &CurrBlocks = iter->second;
+        // Create inner block
+        CurrEntries.clear();
+        CurrEntries.insert(CurrEntry);
+        Multiple->InnerMap[CurrEntry] = Process(iter->second, CurrEntries);
+        for (BlockSet::iterator iter = CurrBlocks.begin(); iter != CurrBlocks.end(); iter++) {
+          Block *CurrInner = *iter;
+          // Remove the block from the remaining blocks
+          Blocks.remove(CurrInner);
+          // Find new next entries and fix branches to them
+          for (BlockBranchMap::iterator iter = CurrInner->BranchesOut.begin(); iter != CurrInner->BranchesOut.end(); iter++) {
+            Block *CurrTarget = iter->first;
+            if (CurrBlocks.find(CurrTarget) == CurrBlocks.end()) {
+              NewEntries.insert(CurrTarget);
+              Solipsize(Target, Branch::Break, Multiple); 
+            }
+          }
+        }
+      }
+      Multiple->Next = Process(Blocks, NextEntries);
     }
 
     // Main function.
     // Process a set of blocks with specified entries, returns a shape
     Shape *Process(BlockSet &Blocks, BlockSet& Entries) {
+      if (Entries.size() == 0) return NULL;
       if (Entries.size() == 1) {
         Block *Curr = *(Entries.begin());
         if (Curr->BranchesIn.size() == 0) {
@@ -219,20 +250,23 @@ void Relooper::Calculate(Block *Entry) {
         // One entry, looping ==> Loop
         return MakeLoop(Blocks, Entries);
       }
-      assert(0);
-      return NULL;
-      /*
       // More than one entry, try to eliminate through a Multiple groups of
-      // independent blocks from an entry/ies
+      // independent blocks from an entry/ies. It is important to remove through
+      // multiples as opposed to looping since the former is more performant.
       BlockBlockVec IndependentGroups;
       FindIndependentGroups(Blocks, Entries, IndependentGroups);
       if (IndependentGroups.size() > 0) {
-        // Independent groups removable ==> Multiple
-        return MakeMultiple(Blocks, Entries, IndependentGroups);
+        // We can handle a group in a multiple if its entry cannot be reached by another group.
+        // Note that it might be reachable by itself - a loop. But that is fine, we will create
+        // a loop inside the multiple block (which is the performant order to do it).
+        ..
+        if (IndependentGroups.size() > 0) {
+          // Some groups removable ==> Multiple
+          return MakeMultiple(Blocks, IndependentGroups);
+        }
       }
       // No independent groups, must be loopable ==> Loop
       return MakeLoop(Blocks, Entries);
-      */
     }
   };
 
