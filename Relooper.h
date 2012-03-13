@@ -30,7 +30,7 @@ struct Shape;
 
 // Info about a branching from one block to another
 struct Branch {
-  enum FlowType = { Break = 0, Continue = 1 };
+  enum FlowType { Break = 0, Continue = 1 };
   Shape *Ancestor; // If not NULL, this shape is the relevant one for purposes of getting to the target block. We break or continue on it
   FlowType Type; // If Ancestor is not NULL, this says whether to break or continue
   bool Set; // Set the label variable
@@ -38,7 +38,7 @@ struct Branch {
   Branch() : Ancestor(NULL), Set(true) {}
 
   // Prints out the branch
-  void Render(Block *Parent); // We do not store the parent permanently to save memory, it is only used here
+  void Render(Block *Target); // We do not store the target permanently to save memory, it is only used here
 };
 
 typedef std::map<Block*, Branch*> BlockBranchMap;
@@ -112,7 +112,7 @@ struct MultipleShape : public Shape {
 
 struct LoopShape : public Shape {
   Shape *Inner;
-  LoopShape(Shape *Inner_) : Inner(Inner_) {}
+  LoopShape() : Inner(NULL) {}
   void Render();
 };
 
@@ -139,7 +139,7 @@ struct Relooper {
   std::vector<Shape*> Shapes;
   Shape *Root;
 
-  Relooper() : RootShape(NULL) {}
+  Relooper() : Root(NULL) {}
   ~Relooper();
 
   // Calculates the shapes

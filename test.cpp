@@ -7,7 +7,7 @@ struct SimpleBlock : public Block {
 
     // Normally we would connect branchings with conditions, etc., here we just show them simply
     for (BlockBranchMap::iterator iter = BranchesOut.begin(); iter != BranchesOut.end(); iter++) {
-      BranchesOut[i]->second->Render(iter->first);
+      iter->second->Render(iter->first);
     }
   }
 };

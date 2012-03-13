@@ -1,4 +1,6 @@
 
+#include <set>
+
 #include "Relooper.h"
 
 // TODO: move all set to unorderedset
@@ -17,7 +19,7 @@ int Indenter::CurrIndent = 0;
 
 // Branch
 
-void Branch::Render() {
+void Branch::Render(Block *Target) {
   if (Set) PrintIndented("label = %d;\n", Target->Id);
   if (Ancestor) {
     PrintIndented("%s L%d;\n", Break ? "break" : "continue", Ancestor->Id);
@@ -87,14 +89,14 @@ Relooper::~Relooper() {
   // Delete shapes..
 }
 
-void Relooper::Calculate() {
+void Relooper::Calculate(Block *Entry) {
   Shapes.reserve(Blocks.size()/2); // vague heuristic, better than nothing
 
   // Add incoming branches
   for (int i = 0; i < Blocks.size(); i++) {
     Block *Curr = Blocks[i];
     for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
-      iter->first->BranchesIn[Curr] = new Branch(Curr); // XXX leaky
+      iter->first->BranchesIn[Curr] = new Branch(); // XXX leaky
     }
   }
 
@@ -102,7 +104,6 @@ void Relooper::Calculate() {
 
   typedef std::set<Block*> BlockSet;
   typedef std::vector<Block*> BlockVec; // needed?
-  typedef std::set<Block*> BlockSet;
   typedef std::vector<BlockVec> BlockBlockVec; // needed?
 
   struct Recursor {
@@ -110,7 +111,9 @@ void Relooper::Calculate() {
     Recursor(Relooper *ParentInit) : Parent(ParentInit) {}
 
     // Add a shape to the list of shapes in this Relooper calculation
-    void Notice(Shape *New) { Parent->Shapes.push_back(New); }
+    void Notice(Shape *New) {
+      Parent->Shapes.push_back(New);
+    }
 
     // Create a list of entries from a block
     void GetBlocksOut(Block *Source, BlockSet& Entries) {
@@ -120,17 +123,17 @@ void Relooper::Calculate() {
     }
 
     // Converts/processes all branchings to a specific target
-    void Solipsize(Block *Target, Branch::FlowType Type) {
+    void Solipsize(Block *Target, Branch::FlowType Type, Shape *Ancestor) {
       for (BlockBranchMap::iterator iter = Target->BranchesIn.begin(); iter != Target->BranchesIn.end();) {
         Block *Prior = iter->first;
         Branch *TargetIn = iter->second;
         Branch *PriorOut = Prior->BranchesOut[Target];
-        PriorOut->Ancestor = Loop; // Do we need this info on TargetIn too?
-        PriorOut->Break = false;
+        PriorOut->Ancestor = Ancestor; // Do we need this info
+        PriorOut->Type = Type;         // on TargetIn too?
         iter++; // carefully increment iter before erasing
-        Target->BranchesIn->erase(Prior);
+        Target->BranchesIn.erase(Prior);
         Target->ProcessedBranchesIn[Prior] = TargetIn;
-        Prior->BranchesIn->Erase(Target);
+        Prior->BranchesIn.erase(Target);
         Prior->ProcessedBranchesIn[Target] = PriorOut;
       }
     }
@@ -141,15 +144,15 @@ void Relooper::Calculate() {
       BlockSet InnerBlocks;
       BlockSet Queue = Entries;
       while (Queue.size() > 0) {
-        Block *Curr = Queue.back();
-        Queue.pop_back();
+        Block *Curr = *(Queue.begin());
+        Queue.erase(Queue.begin());
         if (InnerBlocks.find(Curr) != InnerBlocks.end()) {
           // This element is new, mark it as inner and remove from outer
           InnerBlocks.insert(Curr);
           Blocks.erase(Curr);
           // Add the elements prior to it
           for (BlockBranchMap::iterator iter = Curr->BranchesIn.begin(); iter != Curr->BranchesIn.end(); iter++) {
-            Queue.push_back(iter->first);
+            Queue.insert(iter->first);
           }
         }
       }
@@ -158,8 +161,8 @@ void Relooper::Calculate() {
         Block *Curr = *iter;
         for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
           Block *Possible = iter->first;
-          if (InnerBlocks.find(Possible) == InnerBlocks().end() &&
-              NextEntriesSet.find(Possible) == NextEntriesSet.find(Possible)) {
+          if (InnerBlocks.find(Possible) == InnerBlocks.end() &&
+              NextEntries.find(Possible) == NextEntries.find(Possible)) {
             NextEntries.insert(Possible);
           }
         }
@@ -167,21 +170,22 @@ void Relooper::Calculate() {
 
       // TODO: Optionally hoist additional blocks into the loop
 
-      Shape *Loop = Notice(new LoopShape());
+      LoopShape *Loop = new LoopShape();
+      Notice(Loop);
 
       // Solipsize the loop, replacing with break/continue and marking branches as Processed (will not affect later calculations)
       // A. Branches to the loop entries become a continue to this shape
       for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
-        Solipsize(*iter, Branch::FlowType::Continue);
+        Solipsize(*iter, Branch::Continue, Loop);
       }
       // B. Branches to outside the loop (a next entry) become breaks on this shape
       for (BlockSet::iterator iter = NextEntries.begin(); iter != NextEntries.end(); iter++) {
-        Solipsize(*iter, Branch::FlowType::Break);
+        Solipsize(*iter, Branch::Break, Loop);
       }
       // Finish up
-      Shape *Inner = MakeBlock(InnerBlocks, Entries);
+      Shape *Inner = Process(InnerBlocks, Entries);
       Loop->Inner = Inner;
-      Loop->Next = NextEntries.size() > 0 ? MakeBlock(Blocks, NextEntries) : NULL;
+      Loop->Next = NextEntries.size() > 0 ? Process(Blocks, NextEntries) : NULL;
       return Loop;
     }
 
@@ -194,16 +198,17 @@ void Relooper::Calculate() {
 
     // Main function.
     // Process a set of blocks with specified entries, returns a shape
-    Shape *Process(BlockSet &Blocks, BlockVec& Entries) {
+    Shape *Process(BlockSet &Blocks, BlockSet& Entries) {
       if (Entries.size() == 1) {
-        Block *Curr = Entries[0];
+        Block *Curr = *(Entries.begin());
         if (Curr->BranchesIn.size() == 0) {
           // One entry, no looping ==> Simple
-          Shape *Ret = Notice(new SimpleShape(Curr));
+          SimpleShape *Ret = new SimpleShape(Curr);
+          Notice(Ret);
           if (Blocks.size() > 1) {
             Blocks.erase(Curr);
             Entries.clear();
-            GetEntries(Curr, Entries);
+            GetBlocksOut(Curr, Entries);
             Ret->Next = Process(Blocks, Entries);
           }
           return Ret;
@@ -226,12 +231,14 @@ void Relooper::Calculate() {
       return MakeLoop(Blocks, Entries);
       */
     }
-  }
+  };
 
   BlockSet AllBlocks;
   for (int i = 0; i < Blocks.size(); i++) {
     AllBlocks.insert(Blocks[i]);
   }
-  Root = Recursor(this)::Process(AllBlocks);
+  BlockSet Entries;
+  Entries.insert(Entry);
+  Root = Recursor(this).Process(AllBlocks, Entries);
 }
 
