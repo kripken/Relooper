@@ -69,9 +69,7 @@ struct Block {
   Block(const char *CodeInit, const char *ConditionInit);
   ~Block();
 
-  void AddBranchTo(Block *Target, int ConditionValue) {
-    BranchesOut[Target] = new Branch(ConditionValue);
-  }
+  void AddBranchTo(Block *Target, int ConditionValue);
 
   // Prints out the instructions code and branchings
   void Render();
@@ -155,7 +153,7 @@ struct Relooper {
   std::vector<Shape*> Shapes;
   Shape *Root;
 
-  Relooper() : Root(NULL) {}
+  Relooper();
   ~Relooper();
 
   // Calculates the shapes

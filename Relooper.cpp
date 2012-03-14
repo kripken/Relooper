@@ -59,6 +59,10 @@ Block::~Block() {
   assert(BranchesOut.size() == 0);
 }
 
+void Block::AddBranchTo(Block *Target, int ConditionValue) {
+  BranchesOut[Target] = new Branch(ConditionValue);
+}
+
 void Block::Render() {
   if (Code) {
     // Print code in an indented manner, even over multiple lines
@@ -157,6 +161,9 @@ void EmulatedShape::Render() {
 };
 
 // Relooper
+
+Relooper::Relooper() : Root(NULL) {
+}
 
 Relooper::~Relooper() {
   for (int i = 0; i < Blocks.size(); i++) delete Blocks[i];
