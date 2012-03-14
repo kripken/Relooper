@@ -170,7 +170,7 @@ void Relooper::Calculate(Block *Entry) {
   for (int i = 0; i < Blocks.size(); i++) {
     Block *Curr = Blocks[i];
     for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
-      iter->first->BranchesIn[Curr] = new Branch(iter->second->ConditionValue); // XXX leaky
+      iter->first->BranchesIn[Curr] = new Branch(iter->second->ConditionValue);
     }
   }
 
@@ -218,9 +218,9 @@ void Relooper::Calculate(Block *Entry) {
     Shape *MakeSimple(BlockSet &Blocks, Block *Inner) {
       PrintDebug("creating simple block with block #%d\n", Inner->Id);
       SimpleShape *Simple = new SimpleShape;
+      Notice(Simple);
       Simple->Inner = Inner;
       Inner->Parent = Simple;
-      Notice(Simple);
       if (Blocks.size() > 1) {
         Blocks.erase(Inner);
         BlockSet Entries;
@@ -375,6 +375,7 @@ void Relooper::Calculate(Block *Entry) {
     Shape *MakeMultiple(BlockSet &Blocks, BlockBlockSetMap& IndependentGroups) {
       PrintDebug("creating multiple block with %d inner groups\n", IndependentGroups.size());
       MultipleShape *Multiple = new MultipleShape();
+      Notice(Multiple);
       BlockSet NextEntries, CurrEntries;
       for (BlockBlockSetMap::iterator iter = IndependentGroups.begin(); iter != IndependentGroups.end(); iter++) {
         Block *CurrEntry = iter->first;
