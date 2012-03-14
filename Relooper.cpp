@@ -57,7 +57,7 @@ void MultipleShape::Render() {
   }
   if (NeedLoop) {
     Indenter::Unindent();
-    PrintIndented("} while(0)\n");
+    PrintIndented("} while(0);\n");
   }
   if (Next) Next->Render();
 };
@@ -132,10 +132,14 @@ void Relooper::Calculate(Block *Entry) {
     }
 
     // Converts/processes all branchings to a specific target
-    void Solipsize(Block *Target, Branch::FlowType Type, Shape *Ancestor) {
+    void Solipsize(Block *Target, Branch::FlowType Type, Shape *Ancestor, BlockSet &From) {
       PrintDebug("Solipsizing branches into %d\n", Target->Id);
       for (BlockBranchMap::iterator iter = Target->BranchesIn.begin(); iter != Target->BranchesIn.end();) {
         Block *Prior = iter->first;
+        if (From.find(Prior) == From.end()) {
+          iter++;
+          continue;
+        }
         Branch *TargetIn = iter->second;
         Branch *PriorOut = Prior->BranchesOut[Target];
         PriorOut->Ancestor = Ancestor; // Do we need this info
@@ -149,20 +153,21 @@ void Relooper::Calculate(Block *Entry) {
       }
     }
 
-    Shape *MakeSimple(BlockSet &Blocks, Block *Entry) {
-      PrintDebug("creating simple block with block #%d\n", Entry->Id);
+    Shape *MakeSimple(BlockSet &Blocks, Block *Inner) {
+      PrintDebug("creating simple block with block #%d\n", Inner->Id);
       SimpleShape *Simple = new SimpleShape;
-      Simple->Inner = Entry;
-      Entry->Parent = Simple;
+      Simple->Inner = Inner;
+      Inner->Parent = Simple;
       Notice(Simple);
       if (Blocks.size() > 1) {
-        Blocks.erase(Entry);
+        Blocks.erase(Inner);
         BlockSet Entries;
-        GetBlocksOut(Entry, Entries);
+        GetBlocksOut(Inner, Entries);
+        BlockSet JustInner;
+        JustInner.insert(Inner);
         for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
-          Solipsize(*iter, Branch::Direct, Simple);
+          Solipsize(*iter, Branch::Direct, Simple, JustInner);
         }
-        assert(Entry->BranchesOut.size() == 0); // At this point, all branches should be processed
         Simple->Next = Process(Blocks, Entries);
       }
       return Simple;
@@ -214,11 +219,11 @@ void Relooper::Calculate(Block *Entry) {
       // Solipsize the loop, replacing with break/continue and marking branches as Processed (will not affect later calculations)
       // A. Branches to the loop entries become a continue to this shape
       for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
-        Solipsize(*iter, Branch::Continue, Loop);
+        Solipsize(*iter, Branch::Continue, Loop, InnerBlocks);
       }
       // B. Branches to outside the loop (a next entry) become breaks on this shape
       for (BlockSet::iterator iter = NextEntries.begin(); iter != NextEntries.end(); iter++) {
-        Solipsize(*iter, Branch::Break, Loop);
+        Solipsize(*iter, Branch::Break, Loop, InnerBlocks);
       }
       // Finish up
       Shape *Inner = Process(InnerBlocks, Entries);
@@ -322,7 +327,7 @@ void Relooper::Calculate(Block *Entry) {
             Next++;
             if (CurrBlocks.find(CurrTarget) == CurrBlocks.end()) {
               NextEntries.insert(CurrTarget);
-              Solipsize(CurrTarget, Branch::Break, Multiple); 
+              Solipsize(CurrTarget, Branch::Break, Multiple, Blocks); 
             }
             iter = Next; // increment carefully because Solipsize can remove us
           }

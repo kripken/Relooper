@@ -21,7 +21,27 @@ int main() {
   Debugging::On = 0;
 
   if (1) {
-    printf("\n-- Diamond pattern --\n");
+    printf("\n\n-- If pattern --\n");
+
+    SimpleBlock b1, b2, b3;
+
+    b1.AddBranchTo(&b2);
+    b1.AddBranchTo(&b3);
+
+    b2.AddBranchTo(&b3);
+
+    Relooper r;
+    r.Blocks.push_back(&b1);
+    r.Blocks.push_back(&b2);
+    r.Blocks.push_back(&b3);
+
+    r.Calculate(&b1);
+    printf("\n\n");
+    r.Render();
+  }
+
+  if (1) {
+    printf("\n\n-- If-else pattern --\n");
 
     SimpleBlock b1, b2, b3, b4;
 
@@ -39,11 +59,12 @@ int main() {
     r.Blocks.push_back(&b4);
 
     r.Calculate(&b1);
+    printf("\n\n");
     r.Render();
   }
 
   if (1) {
-    printf("\n-- Loop + tail pattern --\n");
+    printf("\n\n-- Loop + tail pattern --\n");
 
     SimpleBlock b1, b2, b3;
 
@@ -58,6 +79,7 @@ int main() {
     r.Blocks.push_back(&b3);
 
     r.Calculate(&b1);
+    printf("\n\n");
     r.Render();
   }
 }
