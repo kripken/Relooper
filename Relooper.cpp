@@ -22,7 +22,11 @@ int Indenter::CurrIndent = 0;
 void Branch::Render(Block *Target) {
   if (Set) PrintIndented("label = %d;\n", Target->Id);
   if (Ancestor) {
-    PrintIndented("%s L%d;\n", Type != Direct ? (Type == Break ? "break" : "continue") : "[direct]", Ancestor->Id);
+    if (Type == Direct) {
+      PrintIndented("[direct]\n");
+    } else {
+      PrintIndented("%s L%d;\n", Type == Break ? "break" : "continue", Ancestor->Id);
+    }
   }
 }
 
@@ -37,6 +41,11 @@ int Shape::IdCounter = 0;
 // MultipleShape
 
 void MultipleShape::Render() {
+  bool NeedLoop = true; // TODO
+  if (NeedLoop) {
+    PrintIndented("L%d: do {\n", Id);
+    Indenter::Indent();
+  }
   bool First = true;
   for (BlockShapeMap::iterator iter = InnerMap.begin(); iter != InnerMap.end(); iter++) {
     PrintIndented("%sif (label == %d) {\n", First ? "" : "else ", iter->first->Id);
@@ -46,13 +55,17 @@ void MultipleShape::Render() {
     Indenter::Unindent();
     PrintIndented("}\n");
   }
+  if (NeedLoop) {
+    Indenter::Unindent();
+    PrintIndented("} while(0)\n");
+  }
   if (Next) Next->Render();
 };
 
 // LoopShape
 
 void LoopShape::Render() {
-  PrintIndented("while(1) {\n");
+  PrintIndented("L%d: while(1) {\n", Id);
   Indenter::Indent();
   Inner->Render();
   Indenter::Unindent();

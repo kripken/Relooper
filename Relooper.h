@@ -61,6 +61,10 @@ struct Block {
 
   Block() : Parent(NULL), Id(Block::IdCounter++) {}
 
+  void AddBranchTo(Block *Target) {
+    BranchesOut[Target] = new Branch;
+  }
+
   // Prints out the instructions.
   virtual void Render() = 0;
 

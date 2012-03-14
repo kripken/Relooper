@@ -25,12 +25,12 @@ int main() {
 
     SimpleBlock b1, b2, b3, b4;
 
-    b1.BranchesOut[&b2] = new Branch;
-    b1.BranchesOut[&b3] = new Branch;
+    b1.AddBranchTo(&b2);
+    b1.AddBranchTo(&b3);
 
-    b2.BranchesOut[&b4] = new Branch;
+    b2.AddBranchTo(&b4);
 
-    b3.BranchesOut[&b4] = new Branch;
+    b3.AddBranchTo(&b4);
 
     Relooper r;
     r.Blocks.push_back(&b1);
@@ -47,10 +47,10 @@ int main() {
 
     SimpleBlock b1, b2, b3;
 
-    b1.BranchesOut[&b2] = new Branch;
+    b1.AddBranchTo(&b2);
 
-    b2.BranchesOut[&b1] = new Branch;
-    b2.BranchesOut[&b3] = new Branch;
+    b2.AddBranchTo(&b1);
+    b2.AddBranchTo(&b3);
 
     Relooper r;
     r.Blocks.push_back(&b1);
