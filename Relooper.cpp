@@ -8,7 +8,7 @@
 // TODO: move all set to unorderedset
 
 void PrintIndented(const char *Format, ...) {
-  for (int i = 0; i < Indenter::CurrIndent*2; i++) putc(' ', stdout);
+  for (int i = 0; i < Indenter::CurrIndent*2; i++) putchar(' ');
   va_list Args;
   va_start(Args, Format);
   vprintf(Format, Args);
@@ -16,7 +16,7 @@ void PrintIndented(const char *Format, ...) {
 }
 
 void PutIndented(const char *String) {
-  for (int i = 0; i < Indenter::CurrIndent*2; i++) putc(' ', stdout);
+  for (int i = 0; i < Indenter::CurrIndent*2; i++) putchar(' ');
   puts(String);
 }
 
