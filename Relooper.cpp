@@ -22,7 +22,7 @@ int Indenter::CurrIndent = 0;
 void Branch::Render(Block *Target) {
   if (Set) PrintIndented("label = %d;\n", Target->Id);
   if (Ancestor) {
-    PrintIndented("%s L%d;\n", Break ? "break" : "continue", Ancestor->Id);
+    PrintIndented("%s L%d;\n", Type != Direct ? (Type == Break ? "break" : "continue") : "[direct]", Ancestor->Id);
   }
 }
 
@@ -39,7 +39,7 @@ int Shape::IdCounter = 0;
 void MultipleShape::Render() {
   bool First = true;
   for (BlockShapeMap::iterator iter = InnerMap.begin(); iter != InnerMap.end(); iter++) {
-    PrintIndented("%s if (label == %d) {\n", First ? "" : "else ", iter->first);
+    PrintIndented("%s if (label == %d) {\n", First ? "" : "else ", iter->first->Id);
     First = false;
     Indenter::Indent();
     iter->second->Render();
@@ -118,23 +118,9 @@ void Relooper::Calculate(Block *Entry) {
       }
     }
 
-    Shape *MakeSimple(BlockSet &Blocks, Block *Entry) {
-      PrintDebug("creating simple block with block #%d\n", Entry->Id);
-      SimpleShape *Simple = new SimpleShape;
-      Simple->Inner = Entry;
-      Entry->Parent = Simple;
-      Notice(Simple);
-      if (Blocks.size() > 1) {
-        Blocks.erase(Entry);
-        BlockSet Entries;
-        GetBlocksOut(Entry, Entries);
-        Simple->Next = Process(Blocks, Entries);
-      }
-      return Simple;
-    }
-
     // Converts/processes all branchings to a specific target
     void Solipsize(Block *Target, Branch::FlowType Type, Shape *Ancestor) {
+      PrintDebug("Solipsizing branches into %d\n", Target->Id);
       for (BlockBranchMap::iterator iter = Target->BranchesIn.begin(); iter != Target->BranchesIn.end();) {
         Block *Prior = iter->first;
         Branch *TargetIn = iter->second;
@@ -146,7 +132,26 @@ void Relooper::Calculate(Block *Entry) {
         Target->ProcessedBranchesIn[Prior] = TargetIn;
         Prior->BranchesIn.erase(Target);
         Prior->ProcessedBranchesIn[Target] = PriorOut;
+        PrintDebug("  eliminated branch from %d\n", Prior->Id);
       }
+    }
+
+    Shape *MakeSimple(BlockSet &Blocks, Block *Entry) {
+      PrintDebug("creating simple block with block #%d\n", Entry->Id);
+      SimpleShape *Simple = new SimpleShape;
+      Simple->Inner = Entry;
+      Entry->Parent = Simple;
+      Notice(Simple);
+      if (Blocks.size() > 1) {
+        Blocks.erase(Entry);
+        BlockSet Entries;
+        GetBlocksOut(Entry, Entries);
+        for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
+          Solipsize(*iter, Branch::Direct, Simple);
+        }
+        Simple->Next = Process(Blocks, Entries);
+      }
+      return Simple;
     }
 
     Shape *MakeLoop(BlockSet &Blocks, BlockSet& Entries) {
@@ -167,9 +172,7 @@ void Relooper::Calculate(Block *Entry) {
           }
         }
       }
-
       assert(InnerBlocks.size() > 0);
-      PrintDebug("creating loop block with %d inner blocks and %d outer blocks\n", InnerBlocks.size(), Blocks.size());
 
       BlockSet NextEntries;
       for (BlockSet::iterator iter = InnerBlocks.begin(); iter != InnerBlocks.end(); iter++) {
@@ -182,6 +185,12 @@ void Relooper::Calculate(Block *Entry) {
           }
         }
       }
+
+      PrintDebug("creating loop block:\n");
+      Debugging::Dump(InnerBlocks, "  inner blocks:");
+      Debugging::Dump(Entries, "  inner entries:");
+      Debugging::Dump(Blocks, "  outer blocks:");
+      Debugging::Dump(NextEntries, "  outer entries:");
 
       // TODO: Optionally hoist additional blocks into the loop
 
@@ -266,6 +275,13 @@ void Relooper::Calculate(Block *Entry) {
           // otherwise, we have the same owner, so do nothing
         }
       }
+
+      if (Debugging::On) {
+        PrintDebug("Investigated independent groups:\n");
+        for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
+          Debugging::Dump(IndependentGroups[*iter], " group: ");
+        }
+      }
     }
 
     Shape *MakeMultiple(BlockSet &Blocks, BlockBlockSetMap& IndependentGroups) {
@@ -275,6 +291,8 @@ void Relooper::Calculate(Block *Entry) {
       for (BlockBlockSetMap::iterator iter = IndependentGroups.begin(); iter != IndependentGroups.end(); iter++) {
         Block *CurrEntry = iter->first;
         BlockSet &CurrBlocks = iter->second;
+        PrintDebug("  group with entry %d:\n", CurrEntry->Id);
+        Debugging::Dump(CurrBlocks, "    ");
         // Create inner block
         CurrEntries.clear();
         CurrEntries.insert(CurrEntry);
@@ -293,6 +311,7 @@ void Relooper::Calculate(Block *Entry) {
           }
         }
       }
+      Debugging::Dump(Blocks, "  remaining blocks:");
       Multiple->Next = Process(Blocks, NextEntries);
       return Multiple;
     }
@@ -300,6 +319,10 @@ void Relooper::Calculate(Block *Entry) {
     // Main function.
     // Process a set of blocks with specified entries, returns a shape
     Shape *Process(BlockSet &Blocks, BlockSet& Entries) {
+      PrintDebug("Process() called\n");
+      Debugging::Dump(Blocks, "  blocks : ");
+      Debugging::Dump(Entries, "  entries: ");
+
       if (Entries.size() == 0) return NULL;
       if (Entries.size() == 1) {
         Block *Curr = *(Entries.begin());
@@ -315,6 +338,9 @@ void Relooper::Calculate(Block *Entry) {
       // multiples as opposed to looping since the former is more performant.
       BlockBlockSetMap IndependentGroups;
       FindIndependentGroups(Blocks, Entries, IndependentGroups);
+
+      PrintDebug("Independent groups: %d\n", IndependentGroups.size());
+
       if (IndependentGroups.size() > 0) {
         // We can handle a group in a multiple if its entry cannot be reached by another group.
         // Note that it might be reachable by itself - a loop. But that is fine, we will create
@@ -327,11 +353,15 @@ void Relooper::Calculate(Block *Entry) {
             Block *Origin = iterBranch->first;
             if (Group.find(Origin) == Group.end()) {
               // Reached from outside the group, so we cannot handle this
+              PrintDebug("Cannot handle group with entry %d because of incoming branch from %d\n", Entry->Id, Origin->Id);
               IndependentGroups.erase(curr);
               break;
             }
           }
         }
+
+        PrintDebug("Handleable independent groups: %d\n", IndependentGroups.size());
+
         if (IndependentGroups.size() > 0) {
           // Some groups removable ==> Multiple
           return MakeMultiple(Blocks, IndependentGroups);
@@ -345,6 +375,12 @@ void Relooper::Calculate(Block *Entry) {
   BlockSet AllBlocks;
   for (int i = 0; i < Blocks.size(); i++) {
     AllBlocks.insert(Blocks[i]);
+    if (Debugging::On) {
+      PrintDebug("Adding block %d\n", Blocks[i]->Id);
+      for (BlockBranchMap::iterator iter = Blocks[i]->BranchesOut.begin(); iter != Blocks[i]->BranchesOut.end(); iter++) {
+        PrintDebug("  with branch out to %d\n", iter->first->Id);
+      }
+    }
   }
   BlockSet Entries;
   Entries.insert(Entry);
@@ -353,12 +389,15 @@ void Relooper::Calculate(Block *Entry) {
 
 // Debugging
 
-bool Debugging::On = false;
+bool Debugging::On = false; // TODO: make this a compile-time #define
 
 void Debugging::Dump(BlockSet &Blocks, const char *prefix) {
-  printf("Dumping BlockSet%s%s, size %d\n", prefix ? " " : "", prefix ? prefix : "", Blocks.size());
-  for (BlockSet::iterator iter = Blocks.begin(); iter != Blocks.end(); iter++) {
-    printf("  %d\n", (*iter)->Id);
+  if (Debugging::On) {
+    if (prefix) printf("%s ", prefix);
+    for (BlockSet::iterator iter = Blocks.begin(); iter != Blocks.end(); iter++) {
+      printf("%d ", (*iter)->Id);
+    }
+    printf("\n");
   }
 }
 

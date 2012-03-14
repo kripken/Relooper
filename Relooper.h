@@ -31,7 +31,11 @@ struct Shape;
 
 // Info about a branching from one block to another
 struct Branch {
-  enum FlowType { Break = 0, Continue = 1 };
+  enum FlowType {
+    Direct = 0, // We will directly reach the right location through other means, no need for continue or break
+    Break = 1,
+    Continue = 2
+  };
   Shape *Ancestor; // If not NULL, this shape is the relevant one for purposes of getting to the target block. We break or continue on it
   FlowType Type; // If Ancestor is not NULL, this says whether to break or continue
   bool Set; // Set the label variable

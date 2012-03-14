@@ -13,9 +13,9 @@ struct SimpleBlock : public Block {
 };
 
 int main() {
-  Debugging::On = true;
+  Debugging::On = 0;
 
-  {
+  if (1) {
     printf("\n-- Diamond pattern --\n");
 
     SimpleBlock b1, b2, b3, b4;
@@ -37,7 +37,7 @@ int main() {
     r.Render();
   }
 
-  {
+  if (1) {
     printf("\n-- Loop + tail pattern --\n");
 
     SimpleBlock b1, b2, b3;
