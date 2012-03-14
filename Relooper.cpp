@@ -240,7 +240,7 @@ void Relooper::Calculate(Block *Entry) {
             Queue.push_back(New);
             continue;
           }
-          Block *NewOwner = *Known;
+          Block *NewOwner = Known->second;
           if (!NewOwner) continue; // We reached an invalidated node
           if (NewOwner != Owner) {
             // Invalidate this and all reachable that we have seen - we reached this from two locations
@@ -255,7 +255,7 @@ void Relooper::Calculate(Block *Entry) {
                 Block *Target = iter->first;
                 BlockBlockMap::iterator Known = Ownership.find(Target);
                 if (Known != Ownership.end()) {
-                  Block *TargetOwner = *Known;
+                  Block *TargetOwner = Known->second;
                   if (TargetOwner) {
                     ToInvalidate.push_back(Target);
                   }
@@ -282,18 +282,19 @@ void Relooper::Calculate(Block *Entry) {
         for (BlockSet::iterator iter = CurrBlocks.begin(); iter != CurrBlocks.end(); iter++) {
           Block *CurrInner = *iter;
           // Remove the block from the remaining blocks
-          Blocks.remove(CurrInner);
+          Blocks.erase(CurrInner);
           // Find new next entries and fix branches to them
           for (BlockBranchMap::iterator iter = CurrInner->BranchesOut.begin(); iter != CurrInner->BranchesOut.end(); iter++) {
             Block *CurrTarget = iter->first;
             if (CurrBlocks.find(CurrTarget) == CurrBlocks.end()) {
-              NewEntries.insert(CurrTarget);
-              Solipsize(Target, Branch::Break, Multiple); 
+              NextEntries.insert(CurrTarget);
+              Solipsize(CurrTarget, Branch::Break, Multiple); 
             }
           }
         }
       }
       Multiple->Next = Process(Blocks, NextEntries);
+      return Multiple;
     }
 
     // Main function.
@@ -312,7 +313,7 @@ void Relooper::Calculate(Block *Entry) {
       // More than one entry, try to eliminate through a Multiple groups of
       // independent blocks from an entry/ies. It is important to remove through
       // multiples as opposed to looping since the former is more performant.
-      BlockBlockVec IndependentGroups;
+      BlockBlockSetMap IndependentGroups;
       FindIndependentGroups(Blocks, Entries, IndependentGroups);
       if (IndependentGroups.size() > 0) {
         // We can handle a group in a multiple if its entry cannot be reached by another group.
