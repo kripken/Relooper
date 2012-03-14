@@ -18,7 +18,7 @@ struct SimpleBlock : public Block {
 };
 
 int main() {
-  Debugging::On = 1;
+  Debugging::On = 0;
 
   if (1) {
     printf("\n\n-- If pattern --\n");

@@ -134,6 +134,7 @@ void Relooper::Calculate(Block *Entry) {
     // Converts/processes all branchings to a specific target
     void Solipsize(Block *Target, Branch::FlowType Type, Shape *Ancestor, BlockSet &From) {
       PrintDebug("Solipsizing branches into %d\n", Target->Id);
+      Debugging::Dump(From, "  relevant to solipsize: ");
       for (BlockBranchMap::iterator iter = Target->BranchesIn.begin(); iter != Target->BranchesIn.end();) {
         Block *Prior = iter->first;
         if (From.find(Prior) == From.end()) {
@@ -334,7 +335,7 @@ void Relooper::Calculate(Block *Entry) {
             Next++;
             if (CurrBlocks.find(CurrTarget) == CurrBlocks.end()) {
               NextEntries.insert(CurrTarget);
-              Solipsize(CurrTarget, Branch::Break, Multiple, Blocks); 
+              Solipsize(CurrTarget, Branch::Break, Multiple, CurrBlocks); 
             }
             iter = Next; // increment carefully because Solipsize can remove us
           }
