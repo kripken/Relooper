@@ -55,11 +55,16 @@ struct Block {
   // when we recreate a loop, branches to the loop start become continues and are now
   // processed. When we calculate what shape to generate from a set of blocks, we ignore
   // processed branches.
+  // Blocks own the Branch objects they use, and destroy them when done.
   BlockBranchMap BranchesOut, BranchesIn, ProcessedBranchesOut, ProcessedBranchesIn; // Weak
   Shape *Parent; // The shape we are directly inside
   int Id; // A unique identifier
 
-  Block() : Parent(NULL), Id(Block::IdCounter++) {}
+  char *Code; // The string representation of the code in this block. Owning pointer.
+  char *Condition; // The variable on which we branch. Null if no branches from this block. Owning pointer.
+
+  Block() : Parent(NULL), Id(Block::IdCounter++), Code(NULL), Condition(NULL) {}
+  ~Block();
 
   void AddBranchTo(Block *Target) {
     BranchesOut[Target] = new Branch;
@@ -138,10 +143,8 @@ struct EmulatedShape : public Shape {
 //     be calculated by the relooper).
 //  3. Call Render().
 //
-// Implementation details: The Relooper instances does not maintain
-// ownership of the blocks, it and the shapes just point to them.
-// The Relooper instance does maintain ownership of all the shapes
-// it creates, and releases them when destroyed.
+// Implementation details: The Relooper instance has
+// ownership of the blocks and shapes, and frees them when done.
 struct Relooper {
   std::vector<Block*> Blocks;
   std::vector<Shape*> Shapes;

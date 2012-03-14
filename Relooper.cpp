@@ -34,6 +34,19 @@ void Branch::Render(Block *Target) {
 
 int Block::IdCounter = 0;
 
+Block::~Block() {
+  if (Code) delete Code;
+  if (Condition) delete Condition;
+  for (BlockBranchMap::iterator iter = ProcessedBranchesIn.begin(); iter != ProcessedBranchesIn.end(); iter++) {
+    delete iter->second;
+  }
+  for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
+    delete iter->second;
+  }
+  assert(BranchesIn.size() == 0);
+  assert(BranchesOut.size() == 0);
+}
+
 // Shape
 
 int Shape::IdCounter = 0;
@@ -99,7 +112,8 @@ void EmulatedShape::Render() {
 // Relooper
 
 Relooper::~Relooper() {
-  // Delete shapes..
+  for (int i = 0; i < Blocks.size(); i++) delete Blocks[i];
+  for (int i = 0; i < Shapes.size(); i++) delete Shapes[i];
 }
 
 void Relooper::Calculate(Block *Entry) {
