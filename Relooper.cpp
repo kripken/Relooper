@@ -175,7 +175,7 @@ void Relooper::AddBlock(Block *New) {
 }
 
 void Relooper::Calculate(Block *Entry) {
-  Shapes.reserve(Blocks.size()/2); // vague heuristic, better than nothing
+  Shapes.reserve(Blocks.size()); // vague heuristic, better than nothing
 
   // Add incoming branches
   for (int i = 0; i < Blocks.size(); i++) {
