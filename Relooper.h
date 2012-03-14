@@ -156,6 +156,8 @@ struct Relooper {
   Relooper();
   ~Relooper();
 
+  void AddBlock(Block *New);
+
   // Calculates the shapes
   void Calculate(Block *Entry);
 

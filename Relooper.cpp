@@ -170,6 +170,10 @@ Relooper::~Relooper() {
   for (int i = 0; i < Shapes.size(); i++) delete Shapes[i];
 }
 
+void Relooper::AddBlock(Block *New) {
+  Blocks.push_back(New);
+}
+
 void Relooper::Calculate(Block *Entry) {
   Shapes.reserve(Blocks.size()/2); // vague heuristic, better than nothing
 

@@ -17,9 +17,9 @@ int main() {
     b_b->AddBranchTo(b_c, 30);
 
     Relooper r;
-    r.Blocks.push_back(b_a);
-    r.Blocks.push_back(b_b);
-    r.Blocks.push_back(b_c);
+    r.AddBlock(b_a);
+    r.AddBlock(b_b);
+    r.AddBlock(b_c);
 
     r.Calculate(b_a);
     printf("\n\n");
@@ -42,10 +42,10 @@ int main() {
     b_c->AddBranchTo(b_d, 45);
 
     Relooper r;
-    r.Blocks.push_back(b_a);
-    r.Blocks.push_back(b_b);
-    r.Blocks.push_back(b_c);
-    r.Blocks.push_back(b_d);
+    r.AddBlock(b_a);
+    r.AddBlock(b_b);
+    r.AddBlock(b_c);
+    r.AddBlock(b_d);
 
     r.Calculate(b_a);
     printf("\n\n");
@@ -65,9 +65,9 @@ int main() {
     b_b->AddBranchTo(b_c, 42);
 
     Relooper r;
-    r.Blocks.push_back(b_a);
-    r.Blocks.push_back(b_b);
-    r.Blocks.push_back(b_c);
+    r.AddBlock(b_a);
+    r.AddBlock(b_b);
+    r.AddBlock(b_c);
 
     r.Calculate(b_a);
     printf("\n\n");
