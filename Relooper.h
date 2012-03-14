@@ -38,7 +38,7 @@ struct Branch {
     Continue = 2
   };
   Shape *Ancestor; // If not NULL, this shape is the relevant one for purposes of getting to the target block. We break or continue on it
-  FlowType Type; // If Ancestor is not NULL, this says whether to break or continue
+  Branch::FlowType Type; // If Ancestor is not NULL, this says whether to break or continue
   bool Set; // Set the label variable
   int ConditionValue; // The value for which we branch. TODO: support 64-bit values too
 
@@ -52,13 +52,17 @@ typedef std::map<Block*, Branch*> BlockBranchMap;
 
 // Represents a basic block of code - some instructions that end with a
 // control flow modifier (a branch, return or throw).
-struct Block {
+class Block {
+public:
   // Branches become processed after we finish the shape relevant to them. For example,
   // when we recreate a loop, branches to the loop start become continues and are now
   // processed. When we calculate what shape to generate from a set of blocks, we ignore
   // processed branches.
   // Blocks own the Branch objects they use, and destroy them when done.
-  BlockBranchMap BranchesOut, BranchesIn, ProcessedBranchesOut, ProcessedBranchesIn; // Weak
+  BlockBranchMap BranchesOut;
+  BlockBranchMap BranchesIn;
+  BlockBranchMap ProcessedBranchesOut;
+  BlockBranchMap ProcessedBranchesIn;
   Shape *Parent; // The shape we are directly inside
   int Id; // A unique identifier
 
@@ -74,6 +78,7 @@ struct Block {
   // Prints out the instructions code and branchings
   void Render();
 
+private:
   static int IdCounter;
 };
 
@@ -94,7 +99,8 @@ struct Block {
 //            flow is not known until runtime (indirect branches,
 //            setjmp returns, etc.)
 //
-struct Shape {
+class Shape {
+public:
   enum Type { Simple = 0, Multiple = 1, Loop = 2, Emulated = 3};
 
   int Id; // A unique identifier. Used to identify loops, labels are Lx where x is the Id.
@@ -105,6 +111,7 @@ struct Shape {
 
   virtual void Render() = 0;
 
+private:
   static int IdCounter;
 };
 
