@@ -1,6 +1,8 @@
 
 #include "Relooper.h"
 
+#include <list>
+
 // TODO: move all set to unorderedset
 
 void PrintIndented(const char *Format, ...) {
@@ -206,41 +208,62 @@ void Relooper::Calculate(Block *Entry) {
     // the entry itself, plus all the blocks it can reach that cannot be directly reached by another entry. Note that we
     // ignore directly reaching the entry itself by another entry.
     void FindIndependentGroups(BlockSet &Blocks, BlockSet &Entries, BlockBlockSetMap& IndependentGroups) {
-      BlockBlockSetMap Dangerous; // For each block, a set of branchings that are dangerous, and until they
-                                  // are resolved, we cannot declare it as independent
+      // We flow out from each of the entries, simultaneously.
+      // When we reach a new block, we add it as belonging to the one we got to it from.
+      // If we reach a new block that is already marked as belonging to someone, it is reachable by
+      // two entries and is not valid for any of them. Remove it and all it can reach that have been
+      // visited.
+      typedef std::map<Block*, Block*> BlockBlockMap;
+      typedef std::list<Block*> BlockList;
+
+      BlockBlockMap Ownership; // For each block, Which entry it belongs to. We have reached it from there.
+      BlockList Queue; // Being in the queue means we just added this item, and we need to add its children
       for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
         Block *Entry = *iter;
-        BlockSet Possibles; // Blocks who we still need to make sure are not reachable by an outside block
-        BlockSet Independents; // Blocks who we know are ok;
-        BlockSet Queue;
-        Independents.insert(Entry); // entry is defined independent
-        for (BlockBranchMap::iterator iter = Entry->BranchesOut.begin(); iter != Entry->BranchesOut.end(); iter++) {
-          Queue.insert(iter->first);
-          Possibles.insert(iter->first);
-        }
-        while (Queue.size() > 0) {
-          Block *Curr = *(Queue.begin());
-          Queue.erase(Queue.begin());
-          if (Dangerous.find(Curr) == Dangerous.end()) {
-            // Add all branches in as dangerous
-            Dangerous.insert(Curr);
-            for (BlockBranchMap::iterator iter = Curr->BranchesIn.begin(); iter != Curr->BranchesIn.end(); iter++) {
-              Dangerous[Curr].insert(*iter);
-            }
+        Ownership[Entry] = Entry;
+        IndependentGroups[Entry].insert(Entry);
+        Queue.push_back(Entry);
+      }
+      while (Queue.size() > 0) {
+        Block *Curr = Queue.front();
+        Queue.pop_front();
+        Block *Owner = Ownership[Curr]; // Curr must be in the ownership map if we are in the queue
+        if (!Owner) continue; // we have been invalidated meanwhile after being reached from two entries
+        // Add all children
+        for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
+          Block *New = iter->first;
+          BlockBlockMap::iterator Known = Ownership.find(New);
+          if (Known == Ownership.end()) {
+            // New node. Add it, and put it in the queue
+            Ownership[New] = Owner;
+            IndependentGroups[Owner].insert(New);
+            Queue.push_back(New);
+            continue;
           }
-          // If no dangerous incoming branches, make independent
-          if (Dangerous[Curr].size() == 0) {
-            Possibles.erase(Curr);
-            Independents.insert(Curr);
-            for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
-              Block *Target = *iter;
-              Dangerous::iterator Incoming = Dangerous.find(Target);
-              if (Incoming != Dangerous.end()) {
-                (*Incoming).erase(Curr); // Curr is no longer a problem
-                Queue.insert(Target);
+          Block *NewOwner = *Known;
+          if (!NewOwner) continue; // We reached an invalidated node
+          if (NewOwner != Owner) {
+            // Invalidate this and all reachable that we have seen - we reached this from two locations
+            BlockList ToInvalidate; // Being in the list means you need to be invalidated
+            ToInvalidate.push_back(New);
+            while (ToInvalidate.size() > 0) {
+              Block *Invalidatee = ToInvalidate.front();
+              ToInvalidate.pop_front();
+              IndependentGroups[Ownership[Invalidatee]].erase(Invalidatee);
+              Ownership[Invalidatee] = NULL;
+              for (BlockBranchMap::iterator iter = Invalidatee->BranchesOut.begin(); iter != Invalidatee->BranchesOut.end(); iter++) {
+                Block *Target = iter->first;
+                BlockBlockMap::iterator Known = Ownership.find(Target);
+                if (Known != Ownership.end()) {
+                  Block *TargetOwner = *Known;
+                  if (TargetOwner) {
+                    ToInvalidate.push_back(Target);
+                  }
+                }
               }
             }
           }
+          // otherwise, we have the same owner, so do nothing
         }
       }
     }
