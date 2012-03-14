@@ -18,7 +18,7 @@ struct SimpleBlock : public Block {
 };
 
 int main() {
-  Debugging::On = 0;
+  Debugging::On = 1;
 
   if (1) {
     printf("\n\n-- If pattern --\n");
@@ -39,6 +39,8 @@ int main() {
     printf("\n\n");
     r.Render();
   }
+
+  return 1;
 
   if (1) {
     printf("\n\n-- If-else pattern --\n");

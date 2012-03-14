@@ -295,10 +295,17 @@ void Relooper::Calculate(Block *Entry) {
         }
       }
 
+      // Remove empty groups
+      for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
+        if (IndependentGroups[*iter].size() == 0) {
+          IndependentGroups.erase(*iter);
+        }
+      }
+
       if (Debugging::On) {
         PrintDebug("Investigated independent groups:\n");
-        for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
-          Debugging::Dump(IndependentGroups[*iter], " group: ");
+        for (BlockBlockSetMap::iterator iter = IndependentGroups.begin(); iter != IndependentGroups.end(); iter++) {
+          Debugging::Dump(iter->second, " group: ");
         }
       }
     }
