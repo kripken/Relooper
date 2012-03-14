@@ -40,8 +40,6 @@ int main() {
     r.Render();
   }
 
-  return 1;
-
   if (1) {
     printf("\n\n-- If-else pattern --\n");
 
