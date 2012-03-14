@@ -6,7 +6,7 @@ struct SimpleBlock : public Block {
     PrintIndented("// Block: %d\n", Id);
 
     // Normally we would connect branchings with conditions, etc., here we just show them simply
-    for (BlockBranchMap::iterator iter = BranchesOut.begin(); iter != BranchesOut.end(); iter++) {
+    for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
       iter->second->Render(iter->first);
     }
   }

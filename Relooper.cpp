@@ -39,7 +39,7 @@ int Shape::IdCounter = 0;
 void MultipleShape::Render() {
   bool First = true;
   for (BlockShapeMap::iterator iter = InnerMap.begin(); iter != InnerMap.end(); iter++) {
-    PrintIndented("%s if (label == %d) {\n", First ? "" : "else ", iter->first->Id);
+    PrintIndented("%sif (label == %d) {\n", First ? "" : "else ", iter->first->Id);
     First = false;
     Indenter::Indent();
     iter->second->Render();
@@ -130,8 +130,8 @@ void Relooper::Calculate(Block *Entry) {
         iter++; // carefully increment iter before erasing
         Target->BranchesIn.erase(Prior);
         Target->ProcessedBranchesIn[Prior] = TargetIn;
-        Prior->BranchesIn.erase(Target);
-        Prior->ProcessedBranchesIn[Target] = PriorOut;
+        Prior->BranchesOut.erase(Target);
+        Prior->ProcessedBranchesOut[Target] = PriorOut;
         PrintDebug("  eliminated branch from %d\n", Prior->Id);
       }
     }
@@ -149,6 +149,7 @@ void Relooper::Calculate(Block *Entry) {
         for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
           Solipsize(*iter, Branch::Direct, Simple);
         }
+        assert(Entry->BranchesOut.size() == 0); // At this point, all branches should be processed
         Simple->Next = Process(Blocks, Entries);
       }
       return Simple;
@@ -302,12 +303,15 @@ void Relooper::Calculate(Block *Entry) {
           // Remove the block from the remaining blocks
           Blocks.erase(CurrInner);
           // Find new next entries and fix branches to them
-          for (BlockBranchMap::iterator iter = CurrInner->BranchesOut.begin(); iter != CurrInner->BranchesOut.end(); iter++) {
+          for (BlockBranchMap::iterator iter = CurrInner->BranchesOut.begin(); iter != CurrInner->BranchesOut.end();) {
             Block *CurrTarget = iter->first;
+            BlockBranchMap::iterator Next = iter;
+            Next++;
             if (CurrBlocks.find(CurrTarget) == CurrBlocks.end()) {
               NextEntries.insert(CurrTarget);
               Solipsize(CurrTarget, Branch::Break, Multiple); 
             }
+            iter = Next; // increment carefully because Solipsize can remove us
           }
         }
       }
