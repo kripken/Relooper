@@ -69,7 +69,7 @@ struct Block {
   Block(const char *CodeInit, const char *ConditionInit);
   ~Block();
 
-  void AddBranchTo(Block *Target, char ConditionValue) {
+  void AddBranchTo(Block *Target, int ConditionValue) {
     BranchesOut[Target] = new Branch(ConditionValue);
   }
 
@@ -103,6 +103,8 @@ struct Shape {
   Shape *Next; // The shape that will appear in the code right after this one
 
   Shape() : Id(Shape::IdCounter++), Next(NULL) {}
+  virtual ~Shape() {}
+
   virtual void Render() = 0;
 
   static int IdCounter;
