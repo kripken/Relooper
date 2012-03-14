@@ -15,6 +15,11 @@ void PrintIndented(const char *Format, ...) {
   va_end(Args);
 }
 
+void PutIndented(const char *String) {
+  for (int i = 0; i < Indenter::CurrIndent*2; i++) putc(' ', stdout);
+  puts(String);
+}
+
 // Indenter
 
 int Indenter::CurrIndent = 0;
@@ -25,7 +30,7 @@ void Branch::Render(Block *Target) {
   if (Set) PrintIndented("label = %d;\n", Target->Id);
   if (Ancestor) {
     if (Type == Direct) {
-      PrintIndented("[direct]\n");
+      PrintIndented("/* direct */\n");
     } else {
       PrintIndented("%s L%d;\n", Type == Break ? "break" : "continue", Ancestor->Id);
     }
@@ -55,7 +60,17 @@ Block::~Block() {
 }
 
 void Block::Render() {
-  if (Code) PrintIndented(Code);
+  if (Code) {
+    // Print code in an indented manner, even over multiple lines
+    char *Start = Code;
+    while (*Start) {
+      char *End = strchr(Start, '\n');
+      if (End) *End = 0;
+      PutIndented(Start);
+      if (End) *End = '\n'; else break;
+      Start = End+1;
+    }
+  }
 
   bool First = true;
   for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {

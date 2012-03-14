@@ -55,7 +55,7 @@ int main() {
   if (1) {
     printf("\n\n-- Loop + tail pattern --\n\n");
 
-    Block *b_a = new Block("// block A\n", "check");
+    Block *b_a = new Block("// block A\nvar check = maybe();\n", "check");
     Block *b_b = new Block("// block B\n", "check");
     Block *b_c = new Block("// block C\n", "check");
 

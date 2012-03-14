@@ -25,6 +25,7 @@ struct Indenter {
 
 // Renders a line of text, with proper indentation
 void PrintIndented(const char *Format, ...);
+void PutIndented(const char *String);
 
 struct Block;
 struct Shape;
@@ -61,8 +62,8 @@ struct Block {
   Shape *Parent; // The shape we are directly inside
   int Id; // A unique identifier
 
-  char *Code; // The string representation of the code in this block. Owning pointer.
-  char *Condition; // The variable on which we branch. Null if no branches from this block. Owning pointer.
+  char *Code; // The string representation of the code in this block. Owning pointer (we copy the input)
+  char *Condition; // The variable on which we branch. Null if no branches from this block. Owning pointer (we copy the input)
   Block *DefaultTarget; // If specified, the block we branch to without checking the condition, if none of the other conditions held
 
   Block(const char *CodeInit, const char *ConditionInit);
