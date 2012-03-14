@@ -39,8 +39,9 @@ struct Branch {
   Shape *Ancestor; // If not NULL, this shape is the relevant one for purposes of getting to the target block. We break or continue on it
   FlowType Type; // If Ancestor is not NULL, this says whether to break or continue
   bool Set; // Set the label variable
+  int ConditionValue; // The value for which we branch. TODO: support 64-bit values too
 
-  Branch() : Ancestor(NULL), Set(true) {}
+  Branch(int ConditionValueInit) : Ancestor(NULL), Set(true), ConditionValue(ConditionValueInit) {}
 
   // Prints out the branch
   void Render(Block *Target); // We do not store the target permanently to save memory, it is only used here
@@ -62,16 +63,17 @@ struct Block {
 
   char *Code; // The string representation of the code in this block. Owning pointer.
   char *Condition; // The variable on which we branch. Null if no branches from this block. Owning pointer.
+  Block *DefaultTarget; // If specified, the block we branch to without checking the condition, if none of the other conditions held
 
-  Block() : Parent(NULL), Id(Block::IdCounter++), Code(NULL), Condition(NULL) {}
+  Block(const char *CodeInit, const char *ConditionInit);
   ~Block();
 
-  void AddBranchTo(Block *Target) {
-    BranchesOut[Target] = new Branch;
+  void AddBranchTo(Block *Target, char ConditionValue) {
+    BranchesOut[Target] = new Branch(ConditionValue);
   }
 
-  // Prints out the instructions.
-  virtual void Render() = 0;
+  // Prints out the instructions code and branchings
+  void Render();
 
   static int IdCounter;
 };

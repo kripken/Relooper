@@ -1,6 +1,8 @@
 
 #include "Relooper.h"
 
+#include <string.h>
+#include <stdlib.h>
 #include <list>
 
 // TODO: move all set to unorderedset
@@ -34,9 +36,14 @@ void Branch::Render(Block *Target) {
 
 int Block::IdCounter = 0;
 
+Block::Block(const char *CodeInit, const char *ConditionInit) : Parent(NULL), Id(Block::IdCounter++), DefaultTarget(NULL) {
+  Code = strdup(CodeInit);
+  Condition = strdup(ConditionInit);
+}
+
 Block::~Block() {
-  if (Code) delete Code;
-  if (Condition) delete Condition;
+  if (Code) free(Code);
+  if (Condition) free(Condition);
   for (BlockBranchMap::iterator iter = ProcessedBranchesIn.begin(); iter != ProcessedBranchesIn.end(); iter++) {
     delete iter->second;
   }
@@ -45,6 +52,31 @@ Block::~Block() {
   }
   assert(BranchesIn.size() == 0);
   assert(BranchesOut.size() == 0);
+}
+
+void Block::Render() {
+  if (Code) PrintIndented(Code);
+
+  bool First = true;
+  for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
+    Block *Target = iter->first;
+    Branch *Details = iter->second;
+    if (Target == DefaultTarget) continue; // done at the end
+    assert(Condition);
+    PrintIndented("%sif (%s == %d) {\n", First ? "" : "} else ", Condition, Details->ConditionValue);
+    First = false;
+    Indenter::Indent();
+    Details->Render(Target);
+    Indenter::Unindent();
+  }
+  if (DefaultTarget) {
+    assert(!First);
+    PrintIndented("} else {\n");
+    Indenter::Indent();
+    ProcessedBranchesOut[DefaultTarget]->Render(DefaultTarget);
+    Indenter::Unindent();
+  }
+  if (!First) PrintIndented("}\n");
 }
 
 // Shape
@@ -123,7 +155,7 @@ void Relooper::Calculate(Block *Entry) {
   for (int i = 0; i < Blocks.size(); i++) {
     Block *Curr = Blocks[i];
     for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
-      iter->first->BranchesIn[Curr] = new Branch(); // XXX leaky
+      iter->first->BranchesIn[Curr] = new Branch(iter->second->ConditionValue); // XXX leaky
     }
   }
 

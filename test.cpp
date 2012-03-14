@@ -1,91 +1,75 @@
 
 #include "Relooper.h"
 
-struct SimpleBlock : public Block {
-  void Render() {
-    PrintIndented("// Block: %d\n", Id);
-
-    int counter = 1000;
-    for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
-      PrintIndented("%sif (condition == %d) {\n", (counter == 1000) ? "" : "} else ", counter);
-      counter++;
-      Indenter::Indent();
-      iter->second->Render(iter->first);
-      Indenter::Unindent();
-    }
-    if (counter > 1000) PrintIndented("}\n");
-  }
-};
-
 int main() {
   Debugging::On = 0;
 
   if (1) {
-    printf("\n\n-- If pattern --\n");
+    printf("\n\n-- If pattern --\n\n");
 
-    SimpleBlock *b1 = new SimpleBlock;
-    SimpleBlock *b2 = new SimpleBlock;
-    SimpleBlock *b3 = new SimpleBlock;
+    Block *b_a = new Block("// block A\n", "check");
+    Block *b_b = new Block("// block B\n", "check");
+    Block *b_c = new Block("// block C\n", "check");
 
-    b1->AddBranchTo(b2);
-    b1->AddBranchTo(b3);
+    b_a->AddBranchTo(b_b, 10);
+    b_a->AddBranchTo(b_c, 20);
 
-    b2->AddBranchTo(b3);
+    b_b->AddBranchTo(b_c, 30);
 
     Relooper r;
-    r.Blocks.push_back(b1);
-    r.Blocks.push_back(b2);
-    r.Blocks.push_back(b3);
+    r.Blocks.push_back(b_a);
+    r.Blocks.push_back(b_b);
+    r.Blocks.push_back(b_c);
 
-    r.Calculate(b1);
+    r.Calculate(b_a);
     printf("\n\n");
     r.Render();
   }
 
   if (1) {
-    printf("\n\n-- If-else pattern --\n");
+    printf("\n\n-- If-else pattern --\n\n");
 
-    SimpleBlock *b1 = new SimpleBlock;
-    SimpleBlock *b2 = new SimpleBlock;
-    SimpleBlock *b3 = new SimpleBlock;
-    SimpleBlock *b4 = new SimpleBlock;
+    Block *b_a = new Block("// block A\n", "check");
+    Block *b_b = new Block("// block B\n", "check");
+    Block *b_c = new Block("// block C\n", "check");
+    Block *b_d = new Block("// block D\n", "check");
 
-    b1->AddBranchTo(b2);
-    b1->AddBranchTo(b3);
+    b_a->AddBranchTo(b_b, 15);
+    b_a->AddBranchTo(b_c, 25);
 
-    b2->AddBranchTo(b4);
+    b_b->AddBranchTo(b_d, 35);
 
-    b3->AddBranchTo(b4);
+    b_c->AddBranchTo(b_d, 45);
 
     Relooper r;
-    r.Blocks.push_back(b1);
-    r.Blocks.push_back(b2);
-    r.Blocks.push_back(b3);
-    r.Blocks.push_back(b4);
+    r.Blocks.push_back(b_a);
+    r.Blocks.push_back(b_b);
+    r.Blocks.push_back(b_c);
+    r.Blocks.push_back(b_d);
 
-    r.Calculate(b1);
+    r.Calculate(b_a);
     printf("\n\n");
     r.Render();
   }
 
   if (1) {
-    printf("\n\n-- Loop + tail pattern --\n");
+    printf("\n\n-- Loop + tail pattern --\n\n");
 
-    SimpleBlock *b1 = new SimpleBlock;
-    SimpleBlock *b2 = new SimpleBlock;
-    SimpleBlock *b3 = new SimpleBlock;
+    Block *b_a = new Block("// block A\n", "check");
+    Block *b_b = new Block("// block B\n", "check");
+    Block *b_c = new Block("// block C\n", "check");
 
-    b1->AddBranchTo(b2);
+    b_a->AddBranchTo(b_b, 40);
 
-    b2->AddBranchTo(b1);
-    b2->AddBranchTo(b3);
+    b_b->AddBranchTo(b_a, 41);
+    b_b->AddBranchTo(b_c, 42);
 
     Relooper r;
-    r.Blocks.push_back(b1);
-    r.Blocks.push_back(b2);
-    r.Blocks.push_back(b3);
+    r.Blocks.push_back(b_a);
+    r.Blocks.push_back(b_b);
+    r.Blocks.push_back(b_c);
 
-    r.Calculate(b1);
+    r.Calculate(b_a);
     printf("\n\n");
     r.Render();
   }
