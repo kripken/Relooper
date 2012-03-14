@@ -5,10 +5,15 @@ struct SimpleBlock : public Block {
   void Render() {
     PrintIndented("// Block: %d\n", Id);
 
-    // Normally we would connect branchings with conditions, etc., here we just show them simply
+    int counter = 1000;
     for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
+      PrintIndented("%sif (condition == %d) {\n", (counter == 1000) ? "" : "} else ", counter);
+      counter++;
+      Indenter::Indent();
       iter->second->Render(iter->first);
+      Indenter::Unindent();
     }
+    if (counter > 1000) PrintIndented("}\n");
   }
 };
 
