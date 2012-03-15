@@ -8,12 +8,12 @@ all: relooper.js
 
 combined.bc: ../Relooper.h ../Relooper.cpp
 	$(BINDINGS_GENERATOR) bindings ../Relooper.h > /dev/null
-	$(EMCC) -g -include ../Relooper.h bindings.cpp -o bindings.bc
-	$(EMCC) -g ../Relooper.cpp -I.. -o relooper.bc
+	$(EMCC) -include ../Relooper.h bindings.cpp -o bindings.bc
+	$(EMCC) ../Relooper.cpp -I.. -o relooper.bc
 	$(EMCC) bindings.bc relooper.bc -o combined.bc
 
 relooper.js: combined.bc
-	$(EMCC) -g combined.bc --post-js bindings.js -o relooper.js
+	$(EMCC) -O2 --closure 0 combined.bc --post-js bindings.js -o relooper.js
 
 #relooper.exe: combined.bc
 #	$(NATIVIZER) combined.bc

@@ -20,3 +20,5 @@ r.AddBlock(b_c);
 r.Calculate(b_a);
 r.Render();
 
+destroy(r);
+
