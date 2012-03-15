@@ -13,7 +13,7 @@ combined.bc: ../Relooper.h ../Relooper.cpp
 	$(EMCC) bindings.bc relooper.bc -o combined.bc
 
 relooper.js: combined.bc
-	$(EMCC) -O2 --closure 0 combined.bc --post-js bindings.js -o relooper.js
+	$(EMCC) -O2 combined.bc --post-js bindings.js -o relooper.js
 
 #relooper.exe: combined.bc
 #	$(NATIVIZER) combined.bc
