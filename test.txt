@@ -1,0 +1,70 @@
+
+
+-- If pattern --
+
+
+
+// block A
+if (check == 10) {
+  label = 1;
+  /* direct */
+} else if (check == 20) {
+  label = 2;
+  /* direct */
+}
+L1: do {
+  if (label == 1) {
+    // block B
+    label = 2;
+    break L1;
+  }
+} while(0);
+// block C
+
+
+-- If-else pattern --
+
+
+
+// block A
+if (check == 15) {
+  label = 4;
+  /* direct */
+} else if (check == 25) {
+  label = 5;
+  /* direct */
+}
+L5: do {
+  if (label == 4) {
+    // block B
+    label = 6;
+    break L5;
+  }
+  else if (label == 5) {
+    // block C
+    label = 6;
+    break L5;
+  }
+} while(0);
+// block D
+
+
+-- Loop + tail pattern --
+
+
+
+L9: while(1) {
+  // block A
+  var check = maybe();
+  label = 8;
+  /* direct */
+  // block B
+  if (check == 41) {
+    label = 7;
+    continue L9;
+  } else if (check == 42) {
+    label = 9;
+    break L9;
+  }
+}
+// block C

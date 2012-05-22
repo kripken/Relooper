@@ -1,0 +1,26 @@
+ep
+if (ep -> LBB1) {
+  label = 1;
+  /* direct */
+} else if (ep -> LBB3) {
+  label = 3;
+  /* direct */
+}
+L1: do {
+  if (label == 1) {
+    LBB1
+    if (LBB1 -> LBB2) {
+      label = 2;
+      /* direct */
+    } else if (LBB1 -> LBB3) {
+      label = 3;
+      continue L4;
+    }
+    LBB2
+    label = 3;
+    break L1;
+  }
+} while(0);
+L4: while(1) {
+  LBB3
+}
