@@ -14,13 +14,11 @@ L1: do {
       /* direct */
     } else if (LBB1 -> LBB3) {
       label = 3;
-      continue L4;
+      break L1;
     }
     LBB2
     label = 3;
     break L1;
   }
 } while(0);
-L4: while(1) {
-  LBB3
-}
+LBB3

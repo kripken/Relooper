@@ -407,12 +407,11 @@ void Relooper::Calculate(Block *Entry) {
       for (BlockBlockSetMap::iterator iter = IndependentGroups.begin(); iter != IndependentGroups.end(); iter++) {
         Block *CurrEntry = iter->first;
         BlockSet &CurrBlocks = iter->second;
-        PrintDebug("  group with entry %d:\n", CurrEntry->Id);
+        PrintDebug("  multiple group with entry %d:\n", CurrEntry->Id);
         Debugging::Dump(CurrBlocks, "    ");
         // Create inner block
         CurrEntries.clear();
         CurrEntries.insert(CurrEntry);
-        Multiple->InnerMap[CurrEntry] = Process(iter->second, CurrEntries);
         for (BlockSet::iterator iter = CurrBlocks.begin(); iter != CurrBlocks.end(); iter++) {
           Block *CurrInner = *iter;
           // Remove the block from the remaining blocks
@@ -429,8 +428,9 @@ void Relooper::Calculate(Block *Entry) {
             iter = Next; // increment carefully because Solipsize can remove us
           }
         }
+        Multiple->InnerMap[CurrEntry] = Process(CurrBlocks, CurrEntries);
       }
-      Debugging::Dump(Blocks, "  remaining blocks:");
+      Debugging::Dump(Blocks, "  remaining blocks after multiple:");
       Multiple->Next = Process(Blocks, NextEntries);
       return Multiple;
     }
