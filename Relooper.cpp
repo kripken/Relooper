@@ -26,6 +26,14 @@ int Indenter::CurrIndent = 0;
 
 // Branch
 
+Branch::Branch(char *ConditionInit) : Ancestor(NULL), Set(true) {
+  Condition = strdup(ConditionInit);
+}
+
+Branch::~Branch() {
+  if (Condition) free(Condition);
+}
+
 void Branch::Render(Block *Target) {
   if (Set) PrintIndented("label = %d;\n", Target->Id);
   if (Ancestor) {
@@ -74,11 +82,16 @@ void Block::Render() {
     }
   }
 
+  if (!DefaultTarget && ProcessedBranchesOut.size() == 1) {
+    DefaultTarget = ProcessedBranchesOut.begin()->first;
+  }
+
   bool First = true;
   for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
     Block *Target = iter->first;
     Branch *Details = iter->second;
     if (Target == DefaultTarget) continue; // done at the end
+    assert(Details->Condition); // must have a condition if this is not the default target
     PrintIndented("%sif (%s) {\n", First ? "" : "} else ", Details->Condition);
     First = false;
     Indenter::Indent();
@@ -86,7 +99,6 @@ void Block::Render() {
     Indenter::Unindent();
   }
   if (DefaultTarget) {
-    assert(!First);
     PrintIndented("} else {\n");
     Indenter::Indent();
     ProcessedBranchesOut[DefaultTarget]->Render(DefaultTarget);

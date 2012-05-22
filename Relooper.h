@@ -45,7 +45,8 @@ struct Branch {
   bool Set; // Set the label variable
   char *Condition; // The condition for which we branch. For example, "my_var == 1". Conditions are checked one by one, and the last is ignored (always taken)
 
-  Branch(char *ConditionInit) : Ancestor(NULL), Set(true), Condition(ConditionInit) {}
+  Branch(char *ConditionInit);
+  ~Branch();
 
   // Prints out the branch
   void Render(Block *Target); // We do not store the target permanently to save memory, it is only used here
