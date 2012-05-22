@@ -513,3 +513,34 @@ void PrintDebug(const char *Format, ...) {
   }
 }
 
+
+// C API - useful for binding to other languages
+
+extern "C" {
+
+void *rl_new_block(char *text, char *check) {
+  return new Block(text, check);
+}
+
+void rl_block_add_branch_to(void *from, void *to, int value) {
+  ((Block*)from)->AddBranchTo((Block*)to, value);
+}
+
+void *rl_create_relooper() {
+  return new Relooper;
+}
+
+void *rl_relooper_add_block(void *relooper, void *block) {
+  ((Relooper*)relooper)->AddBlock((Block*)block);
+}
+
+void rl_relooper_calculate(void *relooper, void *entry) {
+  ((Relooper*)relooper)->Calculate((Block*)entry);
+}
+
+void rl_relooper_render(void *relooper) {
+  ((Relooper*)relooper)->Render();
+}
+
+}
+

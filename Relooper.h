@@ -182,3 +182,17 @@ struct Debugging {
 
 void PrintDebug(const char *Format, ...);
 
+
+// C API - useful for binding to other languages
+
+extern "C" {
+
+void *rl_new_block(char *text, char *check);
+void rl_block_add_branch_to(void *from, void *to, int value);
+void *rl_create_relooper();
+void *rl_relooper_add_block(void *relooper, void *block);
+void rl_relooper_calculate(void *relooper, void *entry);
+void rl_relooper_render(void *relooper);
+
+}
+
