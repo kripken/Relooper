@@ -11,6 +11,9 @@ LLVM.
 #include <assert.h>
 #include <stdio.h>
 #include <stdarg.h>
+
+#ifdef __cplusplus
+
 #include <map>
 #include <string>
 #include <vector>
@@ -182,10 +185,13 @@ struct Debugging {
 
 void PrintDebug(const char *Format, ...);
 
+#endif // __cplusplus
 
 // C API - useful for binding to other languages
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 void *rl_new_block(char *text, char *check);
 void  rl_delete_block(void *block);
@@ -196,5 +202,7 @@ void *rl_relooper_add_block(void *relooper, void *block);
 void  rl_relooper_calculate(void *relooper, void *entry);
 void  rl_relooper_render(void *relooper);
 
+#ifdef __cplusplus
 }
+#endif
 

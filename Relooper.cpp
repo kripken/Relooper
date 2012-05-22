@@ -530,7 +530,7 @@ void rl_block_add_branch_to(void *from, void *to, int value) {
   ((Block*)from)->AddBranchTo((Block*)to, value);
 }
 
-void *rl_create_relooper() {
+void *rl_new_relooper() {
   return new Relooper;
 }
 
