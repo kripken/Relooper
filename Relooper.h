@@ -70,10 +70,9 @@ public:
   int Id; // A unique identifier
 
   char *Code; // The string representation of the code in this block. Owning pointer (we copy the input)
-  char *Condition; // The variable on which we branch. Null if no branches from this block. Owning pointer (we copy the input)
   Block *DefaultTarget; // If specified, the block we branch to without checking the condition, if none of the other conditions held
 
-  Block(const char *CodeInit, const char *ConditionInit);
+  Block(const char *CodeInit);
   ~Block();
 
   void AddBranchTo(Block *Target, char *Condition);
@@ -203,7 +202,7 @@ void PrintDebug(const char *Format, ...);
 extern "C" {
 #endif
 
-RELOOPERDLL_API void *rl_new_block(char *text, char *check);
+RELOOPERDLL_API void *rl_new_block(char *text);
 RELOOPERDLL_API void  rl_delete_block(void *block);
 RELOOPERDLL_API void  rl_block_add_branch_to(void *from, void *to, char *condition);
 RELOOPERDLL_API void *rl_new_relooper();

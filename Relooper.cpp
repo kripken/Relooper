@@ -41,14 +41,12 @@ void Branch::Render(Block *Target) {
 
 int Block::IdCounter = 0;
 
-Block::Block(const char *CodeInit, const char *ConditionInit) : Parent(NULL), Id(Block::IdCounter++), DefaultTarget(NULL) {
+Block::Block(const char *CodeInit) : Parent(NULL), Id(Block::IdCounter++), DefaultTarget(NULL) {
   Code = strdup(CodeInit);
-  Condition = strdup(ConditionInit);
 }
 
 Block::~Block() {
   if (Code) free(Code);
-  if (Condition) free(Condition);
   for (BlockBranchMap::iterator iter = ProcessedBranchesIn.begin(); iter != ProcessedBranchesIn.end(); iter++) {
     delete iter->second;
   }
@@ -81,7 +79,6 @@ void Block::Render() {
     Block *Target = iter->first;
     Branch *Details = iter->second;
     if (Target == DefaultTarget) continue; // done at the end
-    assert(Condition);
     PrintIndented("%sif (%s) {\n", First ? "" : "} else ", Details->Condition);
     First = false;
     Indenter::Indent();
@@ -518,8 +515,8 @@ void PrintDebug(const char *Format, ...) {
 
 extern "C" {
 
-void *rl_new_block(char *text, char *check) {
-  return new Block(text, check);
+void *rl_new_block(char *text) {
+  return new Block(text);
 }
 
 void rl_delete_block(void *block) {
