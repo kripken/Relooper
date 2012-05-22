@@ -522,12 +522,20 @@ void *rl_new_block(char *text, char *check) {
   return new Block(text, check);
 }
 
+void rl_delete_block(void *block) {
+  delete (Block*)block;
+}
+
 void rl_block_add_branch_to(void *from, void *to, int value) {
   ((Block*)from)->AddBranchTo((Block*)to, value);
 }
 
 void *rl_create_relooper() {
   return new Relooper;
+}
+
+void rl_delete_relooper(void *relooper) {
+  delete (Relooper*)relooper;
 }
 
 void *rl_relooper_add_block(void *relooper, void *block) {
