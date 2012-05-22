@@ -59,8 +59,8 @@ Block::~Block() {
   assert(BranchesOut.size() == 0);
 }
 
-void Block::AddBranchTo(Block *Target, int ConditionValue) {
-  BranchesOut[Target] = new Branch(ConditionValue);
+void Block::AddBranchTo(Block *Target, char *Condition) {
+  BranchesOut[Target] = new Branch(Condition);
 }
 
 void Block::Render() {
@@ -82,7 +82,7 @@ void Block::Render() {
     Branch *Details = iter->second;
     if (Target == DefaultTarget) continue; // done at the end
     assert(Condition);
-    PrintIndented("%sif (%s == %d) {\n", First ? "" : "} else ", Condition, Details->ConditionValue);
+    PrintIndented("%sif (%s) {\n", First ? "" : "} else ", Details->Condition);
     First = false;
     Indenter::Indent();
     Details->Render(Target);
@@ -181,7 +181,7 @@ void Relooper::Calculate(Block *Entry) {
   for (int i = 0; i < Blocks.size(); i++) {
     Block *Curr = Blocks[i];
     for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
-      iter->first->BranchesIn[Curr] = new Branch(iter->second->ConditionValue);
+      iter->first->BranchesIn[Curr] = new Branch(iter->second->Condition);
     }
   }
 
@@ -526,8 +526,8 @@ void rl_delete_block(void *block) {
   delete (Block*)block;
 }
 
-void rl_block_add_branch_to(void *from, void *to, int value) {
-  ((Block*)from)->AddBranchTo((Block*)to, value);
+void rl_block_add_branch_to(void *from, void *to, char *condition) {
+  ((Block*)from)->AddBranchTo((Block*)to, condition);
 }
 
 void *rl_new_relooper() {

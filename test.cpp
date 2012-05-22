@@ -11,10 +11,10 @@ int main() {
     Block *b_b = new Block("// block B\n", "check");
     Block *b_c = new Block("// block C\n", "check");
 
-    b_a->AddBranchTo(b_b, 10);
-    b_a->AddBranchTo(b_c, 20);
+    b_a->AddBranchTo(b_b, "== 10");
+    b_a->AddBranchTo(b_c, "== 20");
 
-    b_b->AddBranchTo(b_c, 30);
+    b_b->AddBranchTo(b_c, "== 30");
 
     Relooper r;
     r.AddBlock(b_a);
@@ -34,12 +34,12 @@ int main() {
     Block *b_c = new Block("// block C\n", "check");
     Block *b_d = new Block("// block D\n", "check");
 
-    b_a->AddBranchTo(b_b, 15);
-    b_a->AddBranchTo(b_c, 25);
+    b_a->AddBranchTo(b_b, "== 15");
+    b_a->AddBranchTo(b_c, "== 25");
 
-    b_b->AddBranchTo(b_d, 35);
+    b_b->AddBranchTo(b_d, "== 35");
 
-    b_c->AddBranchTo(b_d, 45);
+    b_c->AddBranchTo(b_d, "== 45");
 
     Relooper r;
     r.AddBlock(b_a);
@@ -59,10 +59,10 @@ int main() {
     Block *b_b = new Block("// block B\n", "check");
     Block *b_c = new Block("// block C\n", "check");
 
-    b_a->AddBranchTo(b_b, 40);
+    b_a->AddBranchTo(b_b, "== 40");
 
-    b_b->AddBranchTo(b_a, 41);
-    b_b->AddBranchTo(b_c, 42);
+    b_b->AddBranchTo(b_a, "== 41");
+    b_b->AddBranchTo(b_c, "== 42");
 
     Relooper r;
     r.AddBlock(b_a);

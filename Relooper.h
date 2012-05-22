@@ -43,9 +43,9 @@ struct Branch {
   Shape *Ancestor; // If not NULL, this shape is the relevant one for purposes of getting to the target block. We break or continue on it
   Branch::FlowType Type; // If Ancestor is not NULL, this says whether to break or continue
   bool Set; // Set the label variable
-  int ConditionValue; // The value for which we branch. TODO: support 64-bit values too
+  char *Condition; // The condition for which we branch. For example, "== 1". Conditions are checked one by one, and the last is ignored (always taken)
 
-  Branch(int ConditionValueInit) : Ancestor(NULL), Set(true), ConditionValue(ConditionValueInit) {}
+  Branch(char *ConditionInit) : Ancestor(NULL), Set(true), Condition(ConditionInit) {}
 
   // Prints out the branch
   void Render(Block *Target); // We do not store the target permanently to save memory, it is only used here
@@ -76,7 +76,7 @@ public:
   Block(const char *CodeInit, const char *ConditionInit);
   ~Block();
 
-  void AddBranchTo(Block *Target, int ConditionValue);
+  void AddBranchTo(Block *Target, char *Condition);
 
   // Prints out the instructions code and branchings
   void Render();
@@ -195,7 +195,7 @@ extern "C" {
 
 void *rl_new_block(char *text, char *check);
 void  rl_delete_block(void *block);
-void  rl_block_add_branch_to(void *from, void *to, int value);
+void  rl_block_add_branch_to(void *from, void *to, char *condition);
 void *rl_new_relooper();
 void  rl_delete_relooper(void *relooper);
 void  rl_relooper_add_block(void *relooper, void *block);
