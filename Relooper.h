@@ -43,7 +43,7 @@ struct Branch {
   Shape *Ancestor; // If not NULL, this shape is the relevant one for purposes of getting to the target block. We break or continue on it
   Branch::FlowType Type; // If Ancestor is not NULL, this says whether to break or continue
   bool Set; // Set the label variable
-  char *Condition; // The condition for which we branch. For example, "== 1". Conditions are checked one by one, and the last is ignored (always taken)
+  char *Condition; // The condition for which we branch. For example, "my_var == 1". Conditions are checked one by one, and the last is ignored (always taken)
 
   Branch(char *ConditionInit) : Ancestor(NULL), Set(true), Condition(ConditionInit) {}
 
