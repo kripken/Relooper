@@ -198,7 +198,7 @@ void  rl_delete_block(void *block);
 void  rl_block_add_branch_to(void *from, void *to, int value);
 void *rl_new_relooper();
 void  rl_delete_relooper(void *relooper);
-void *rl_relooper_add_block(void *relooper, void *block);
+void  rl_relooper_add_block(void *relooper, void *block);
 void  rl_relooper_calculate(void *relooper, void *entry);
 void  rl_relooper_render(void *relooper);
 

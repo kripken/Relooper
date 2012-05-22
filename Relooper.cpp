@@ -538,7 +538,7 @@ void rl_delete_relooper(void *relooper) {
   delete (Relooper*)relooper;
 }
 
-void *rl_relooper_add_block(void *relooper, void *block) {
+void rl_relooper_add_block(void *relooper, void *block) {
   ((Relooper*)relooper)->AddBlock((Block*)block);
 }
 
