@@ -99,10 +99,14 @@ void Block::Render() {
     Indenter::Unindent();
   }
   if (DefaultTarget) {
-    PrintIndented("} else {\n");
-    Indenter::Indent();
+    if (!First) {
+      PrintIndented("} else {\n");
+      Indenter::Indent();
+    }
     ProcessedBranchesOut[DefaultTarget]->Render(DefaultTarget);
-    Indenter::Unindent();
+    if (!First) {
+      Indenter::Unindent();
+    }
   }
   if (!First) PrintIndented("}\n");
 }
@@ -205,10 +209,13 @@ void Relooper::Calculate(Block *Entry) {
       Parent->Shapes.push_back(New);
     }
 
-    // Create a list of entries from a block
-    void GetBlocksOut(Block *Source, BlockSet& Entries) {
+    // Create a list of entries from a block. If LimitTo is provided, only results in that set
+    // will appear
+    void GetBlocksOut(Block *Source, BlockSet& Entries, BlockSet *LimitTo=NULL) {
       for (BlockBranchMap::iterator iter = Source->BranchesOut.begin(); iter != Source->BranchesOut.end(); iter++) {
-        Entries.insert(iter->first);
+        if (!LimitTo || LimitTo->find(iter->first) != LimitTo->end()) {
+          Entries.insert(iter->first);
+        }
       }
     }
 
@@ -244,7 +251,7 @@ void Relooper::Calculate(Block *Entry) {
       if (Blocks.size() > 1) {
         Blocks.erase(Inner);
         BlockSet Entries;
-        GetBlocksOut(Inner, Entries);
+        GetBlocksOut(Inner, Entries, &Blocks);
         BlockSet JustInner;
         JustInner.insert(Inner);
         for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
@@ -495,6 +502,7 @@ void Relooper::Calculate(Block *Entry) {
     }
   }
   BlockSet Entries;
+
   Entries.insert(Entry);
   Root = Recursor(this).Process(AllBlocks, Entries);
 }
