@@ -7,6 +7,8 @@
 
 // TODO: move all set to unorderedset
 
+static void PrintDebug(const char *Format, ...);
+
 struct Indenter {
   static int CurrIndent;
 
@@ -545,7 +547,7 @@ void Debugging::Dump(BlockSet &Blocks, const char *prefix) {
   }
 }
 
-void PrintDebug(const char *Format, ...) {
+static void PrintDebug(const char *Format, ...) {
   if (Debugging::On) {
     va_list Args;
     va_start(Args, Format);

@@ -175,8 +175,6 @@ struct Debugging {
   static void Dump(BlockSet &Blocks, const char *prefix=NULL);
 };
 
-void PrintDebug(const char *Format, ...);
-
 #endif // __cplusplus
 
 // C API - useful for binding to other languages
