@@ -672,5 +672,9 @@ void rl_relooper_render(void *relooper) {
   ((Relooper*)relooper)->Render();
 }
 
+void rl_set_debugging(int on) {
+  Debugging::On = on;
+}
+
 }
 
