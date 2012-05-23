@@ -578,7 +578,7 @@ void rl_set_output_buffer(char *buffer) {
 void *rl_new_block(char *text) {
   Block *ret = new Block(text);
   if (Debugging::On) {
-    printf("  void *b%d = rl_new_block(\"%s\");\n", ret->Id, text);
+    printf("  void *b%d = rl_new_block(\"code %d\");\n", ret->Id, ret->Id);
     __blockDebugMap__[ret] = ret->Id;
     printf("  block_map[%d] = b%d;\n", ret->Id, ret->Id);
   }
