@@ -27,15 +27,15 @@ int main() {
   puts(buffer);
   return 0;
 }
-// Adding block 0
+// Adding block 0 (ep)
 //   with branch out to 1
 //   with branch out to 3
-// Adding block 1
+// Adding block 1 (LBB1)
 //   with branch out to 2
 //   with branch out to 3
-// Adding block 2
+// Adding block 2 (LBB2)
 //   with branch out to 3
-// Adding block 3
+// Adding block 3 (LBB3)
 // Process() called
   blocks :  0 1 2 3 
   entries:  0 

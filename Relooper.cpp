@@ -346,34 +346,65 @@ void Relooper::Calculate(Block *Entry) {
     // the entry itself, plus all the blocks it can reach that cannot be directly reached by another entry. Note that we
     // ignore directly reaching the entry itself by another entry.
     void FindIndependentGroups(BlockSet &Blocks, BlockSet &Entries, BlockBlockSetMap& IndependentGroups) {
+      typedef std::map<Block*, Block*> BlockBlockMap;
+      typedef std::list<Block*> BlockList;
+
+      struct HelperClass {
+        BlockBlockSetMap& IndependentGroups;
+        BlockBlockMap Ownership; // For each block, which entry it belongs to. We have reached it from there.
+
+        HelperClass(BlockBlockSetMap& IndependentGroupsInit) : IndependentGroups(IndependentGroupsInit) {}
+        void InvalidateWithChildren(Block *New) { // TODO: rename New
+          BlockList ToInvalidate; // Being in the list means you need to be invalidated
+          ToInvalidate.push_back(New);
+          while (ToInvalidate.size() > 0) {
+            Block *Invalidatee = ToInvalidate.front();
+            ToInvalidate.pop_front();
+            Block *Owner = Ownership[Invalidatee];
+            if (IndependentGroups.find(Owner) != IndependentGroups.end()) { // Owner may have been invalidated, do not add to IndependentGroups!
+              IndependentGroups[Owner].erase(Invalidatee);
+            }
+            Ownership[Invalidatee] = NULL;
+            for (BlockBranchMap::iterator iter = Invalidatee->BranchesOut.begin(); iter != Invalidatee->BranchesOut.end(); iter++) {
+              Block *Target = iter->first;
+              BlockBlockMap::iterator Known = Ownership.find(Target);
+              if (Known != Ownership.end()) {
+                Block *TargetOwner = Known->second;
+                if (TargetOwner) {
+                  ToInvalidate.push_back(Target);
+                }
+              }
+            }
+          }
+        }
+      };
+      HelperClass Helper(IndependentGroups);
+
       // We flow out from each of the entries, simultaneously.
       // When we reach a new block, we add it as belonging to the one we got to it from.
       // If we reach a new block that is already marked as belonging to someone, it is reachable by
       // two entries and is not valid for any of them. Remove it and all it can reach that have been
       // visited.
-      typedef std::map<Block*, Block*> BlockBlockMap;
-      typedef std::list<Block*> BlockList;
 
-      BlockBlockMap Ownership; // For each block, Which entry it belongs to. We have reached it from there.
       BlockList Queue; // Being in the queue means we just added this item, and we need to add its children
       for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
         Block *Entry = *iter;
-        Ownership[Entry] = Entry;
+        Helper.Ownership[Entry] = Entry;
         IndependentGroups[Entry].insert(Entry);
         Queue.push_back(Entry);
       }
       while (Queue.size() > 0) {
         Block *Curr = Queue.front();
         Queue.pop_front();
-        Block *Owner = Ownership[Curr]; // Curr must be in the ownership map if we are in the queue
+        Block *Owner = Helper.Ownership[Curr]; // Curr must be in the ownership map if we are in the queue
         if (!Owner) continue; // we have been invalidated meanwhile after being reached from two entries
         // Add all children
         for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
           Block *New = iter->first;
-          BlockBlockMap::iterator Known = Ownership.find(New);
-          if (Known == Ownership.end()) {
+          BlockBlockMap::iterator Known = Helper.Ownership.find(New);
+          if (Known == Helper.Ownership.end()) {
             // New node. Add it, and put it in the queue
-            Ownership[New] = Owner;
+            Helper.Ownership[New] = Owner;
             IndependentGroups[Owner].insert(New);
             Queue.push_back(New);
             continue;
@@ -382,29 +413,34 @@ void Relooper::Calculate(Block *Entry) {
           if (!NewOwner) continue; // We reached an invalidated node
           if (NewOwner != Owner) {
             // Invalidate this and all reachable that we have seen - we reached this from two locations
-            BlockList ToInvalidate; // Being in the list means you need to be invalidated
-            ToInvalidate.push_back(New);
-            while (ToInvalidate.size() > 0) {
-              Block *Invalidatee = ToInvalidate.front();
-              ToInvalidate.pop_front();
-              Block *Owner = Ownership[Invalidatee];
-              if (IndependentGroups.find(Owner) != IndependentGroups.end()) { // Owner may have been invalidated, do not add to IndependentGroups!
-                IndependentGroups[Owner].erase(Invalidatee);
-              }
-              Ownership[Invalidatee] = NULL;
-              for (BlockBranchMap::iterator iter = Invalidatee->BranchesOut.begin(); iter != Invalidatee->BranchesOut.end(); iter++) {
-                Block *Target = iter->first;
-                BlockBlockMap::iterator Known = Ownership.find(Target);
-                if (Known != Ownership.end()) {
-                  Block *TargetOwner = Known->second;
-                  if (TargetOwner) {
-                    ToInvalidate.push_back(Target);
-                  }
-                }
-              }
-            }
+            Helper.InvalidateWithChildren(New);
           }
           // otherwise, we have the same owner, so do nothing
+        }
+      }
+
+      // Having processed all the interesting blocks, we remain with just one potential issue:
+      // If a->b, and a was invalidated, but then b was later reached by someone else, we must
+      // invalidate b. To check for this, we go over all elements in the independent groups,
+      // if an element has a parent which does *not* have the same owner, we must remove it
+      // and all its children.
+
+      for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
+        BlockSet &CurrGroup = IndependentGroups[*iter];
+        BlockList ToInvalidate;
+        for (BlockSet::iterator iter = CurrGroup.begin(); iter != CurrGroup.end(); iter++) {
+          Block *Child = *iter;
+          for (BlockBranchMap::iterator iter = Child->BranchesIn.begin(); iter != Child->BranchesIn.end(); iter++) {
+            Block *Parent = iter->first;
+            if (Helper.Ownership[Parent] != Helper.Ownership[Child]) {
+              ToInvalidate.push_back(Child);
+            }
+          }
+        }
+        while (ToInvalidate.size() > 0) {
+          Block *Invalidatee = ToInvalidate.front();
+          ToInvalidate.pop_front();
+          Helper.InvalidateWithChildren(Invalidatee);
         }
       }
 
@@ -519,7 +555,7 @@ void Relooper::Calculate(Block *Entry) {
   for (int i = 0; i < Blocks.size(); i++) {
     AllBlocks.insert(Blocks[i]);
     if (Debugging::On) {
-      PrintDebug("Adding block %d\n", Blocks[i]->Id);
+      PrintDebug("Adding block %d (%s)\n", Blocks[i]->Id, Blocks[i]->Code);
       for (BlockBranchMap::iterator iter = Blocks[i]->BranchesOut.begin(); iter != Blocks[i]->BranchesOut.end(); iter++) {
         PrintDebug("  with branch out to %d\n", iter->first->Id);
       }

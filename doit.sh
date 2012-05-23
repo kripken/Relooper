@@ -21,6 +21,10 @@ echo "test dead"
 gcc test_dead.cpp -c -o test_dead.o -g
 g++ Relooper.o test_dead.o -o test_dead
 
+echo "test 4"
+g++ test4.cpp -c -o test4.o -g
+g++ Relooper.o test4.o -o test4
+
 echo
 echo "============================="
 echo

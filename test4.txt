@@ -1,0 +1,47 @@
+//19
+if ( 1 ) {
+  label = 1;
+  /* direct */
+} else if ( 1 ) {
+  label = 3;
+  /* direct */
+}
+L1: do {
+  if (label == 1) {
+    //20
+    if ( 1 ) {
+      label = 2;
+      /* direct */
+    } else if ( 1 ) {
+      label = 3;
+      break L1;
+    }
+    //21
+    label = 4;
+    break L1;
+  }
+} while(0);
+L4: do {
+  if (label == 3) {
+    //22
+    label = 4;
+    break L4;
+  }
+} while(0);
+//23
+if ( 1 ) {
+  label = 5;
+  /* direct */
+} else if ( 1 ) {
+  label = 6;
+  /* direct */
+}
+L7: do {
+  if (label == 5) {
+    //24
+  }
+  else if (label == 6) {
+    //28
+  }
+} while(0);
+
