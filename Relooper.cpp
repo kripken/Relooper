@@ -7,10 +7,17 @@
 
 // TODO: move all set to unorderedset
 
-char *__OutputBuffer__ = NULL;
-void SetOutputBuffer(char *Buffer) {
-  __OutputBuffer__ = Buffer;
-}
+struct Indenter {
+  static int CurrIndent;
+
+  static void Indent() { CurrIndent++; }
+  static void Unindent() { CurrIndent--; }
+};
+
+static void PrintIndented(const char *Format, ...);
+static void PutIndented(const char *String);
+
+static char *__OutputBuffer__ = NULL;
 
 void PrintIndented(const char *Format, ...) {
   assert(__OutputBuffer__);
@@ -520,6 +527,10 @@ void Relooper::Calculate(Block *Entry) {
   Root = Recursor(this).Process(AllBlocks, Entries);
 }
 
+void Relooper::SetOutputBuffer(char *Buffer) {
+  __OutputBuffer__ = Buffer;
+}
+
 // Debugging
 
 bool Debugging::On = false; // TODO: make this a compile-time #define
@@ -549,7 +560,7 @@ void PrintDebug(const char *Format, ...) {
 extern "C" {
 
 void  rl_set_output_buffer(char *buffer) {
-  SetOutputBuffer(buffer);
+  Relooper::SetOutputBuffer(buffer);
 }
 
 void *rl_new_block(char *text) {

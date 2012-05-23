@@ -19,18 +19,6 @@ LLVM.
 #include <vector>
 #include <set>
 
-struct Indenter {
-  static int CurrIndent;
-
-  static void Indent() { CurrIndent++; }
-  static void Unindent() { CurrIndent--; }
-};
-
-// Renders a line of text, with proper indentation, to a global buffer XXX Note no size checks on the buffer! Make sure it is big enough
-void SetOutputBuffer(char *Buffer);
-void PrintIndented(const char *Format, ...);
-void PutIndented(const char *String);
-
 struct Block;
 struct Shape;
 
@@ -174,6 +162,9 @@ struct Relooper {
 
   // Renders the result.
   void Render() { Root->Render(); }
+
+  // Sets the global buffer all printing goes to. XXX Note no size checks on the buffer! Make sure it is big enough
+  static void SetOutputBuffer(char *Buffer);
 };
 
 typedef std::set<Block*> BlockSet;
