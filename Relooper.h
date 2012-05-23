@@ -26,7 +26,8 @@ struct Indenter {
   static void Unindent() { CurrIndent--; }
 };
 
-// Renders a line of text, with proper indentation
+// Renders a line of text, with proper indentation, to a global buffer XXX Note no size checks on the buffer! Make sure it is big enough
+void SetOutputBuffer(char *Buffer);
 void PrintIndented(const char *Format, ...);
 void PutIndented(const char *String);
 
@@ -203,6 +204,7 @@ void PrintDebug(const char *Format, ...);
 extern "C" {
 #endif
 
+RELOOPERDLL_API void  rl_set_output_buffer(char *buffer);
 RELOOPERDLL_API void *rl_new_block(char *text);
 RELOOPERDLL_API void  rl_delete_block(void *block);
 RELOOPERDLL_API void  rl_block_add_branch_to(void *from, void *to, char *condition);

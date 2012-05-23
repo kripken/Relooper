@@ -4,7 +4,11 @@
 int main() {
   Debugging::On = 0;
 
+  char buffer[10000];
+
   if (1) {
+    SetOutputBuffer(buffer);
+
     printf("\n\n-- If pattern --\n\n");
 
     Block *b_a = new Block("// block A\n");
@@ -24,9 +28,13 @@ int main() {
     r.Calculate(b_a);
     printf("\n\n");
     r.Render();
+
+    puts(buffer);
   }
 
   if (1) {
+    SetOutputBuffer(buffer);
+
     printf("\n\n-- If-else pattern --\n\n");
 
     Block *b_a = new Block("// block A\n");
@@ -50,9 +58,13 @@ int main() {
     r.Calculate(b_a);
     printf("\n\n");
     r.Render();
+
+    puts(buffer);
   }
 
   if (1) {
+    SetOutputBuffer(buffer);
+
     printf("\n\n-- Loop + tail pattern --\n\n");
 
     Block *b_a = new Block("// block A\nvar check = maybe();\n");
@@ -72,6 +84,8 @@ int main() {
     r.Calculate(b_a);
     printf("\n\n");
     r.Render();
+
+    puts(buffer);
   }
 }
 

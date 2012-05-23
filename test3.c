@@ -2,6 +2,9 @@
 #include "Relooper.h"
 
 int main() {
+  char buffer[10000];
+  rl_set_output_buffer(buffer);
+
   void *r = rl_new_relooper();
   void *ep = rl_new_block("ep");
   rl_relooper_add_block(r, ep);
@@ -33,5 +36,7 @@ int main() {
   rl_relooper_calculate(r, ep);
   rl_relooper_render(r);
   rl_delete_relooper(r);
+
+  puts(buffer);
 }
 

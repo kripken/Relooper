@@ -7,17 +7,27 @@
 
 // TODO: move all set to unorderedset
 
+char *__OutputBuffer__ = NULL;
+void SetOutputBuffer(char *Buffer) {
+  __OutputBuffer__ = Buffer;
+}
+
 void PrintIndented(const char *Format, ...) {
-  for (int i = 0; i < Indenter::CurrIndent*2; i++) putchar(' ');
+  assert(__OutputBuffer__);
+  for (int i = 0; i < Indenter::CurrIndent*2; i++, __OutputBuffer__++) *__OutputBuffer__ = ' ';
   va_list Args;
   va_start(Args, Format);
-  vprintf(Format, Args);
+  __OutputBuffer__ += vsprintf(__OutputBuffer__, Format, Args);
   va_end(Args);
 }
 
 void PutIndented(const char *String) {
-  for (int i = 0; i < Indenter::CurrIndent*2; i++) putchar(' ');
-  puts(String);
+  assert(__OutputBuffer__);
+  for (int i = 0; i < Indenter::CurrIndent*2; i++, __OutputBuffer__++) *__OutputBuffer__ = ' ';
+  strcpy(__OutputBuffer__, String);
+  __OutputBuffer__ += strlen(String);
+  *__OutputBuffer__++ = '\n';
+  *__OutputBuffer__ = 0;
 }
 
 // Indenter
@@ -537,6 +547,10 @@ void PrintDebug(const char *Format, ...) {
 // C API - useful for binding to other languages
 
 extern "C" {
+
+void  rl_set_output_buffer(char *buffer) {
+  SetOutputBuffer(buffer);
+}
 
 void *rl_new_block(char *text) {
   return new Block(text);
