@@ -549,6 +549,7 @@ void Debugging::Dump(BlockSet &Blocks, const char *prefix) {
 
 static void PrintDebug(const char *Format, ...) {
   if (Debugging::On) {
+    printf("// ");
     va_list Args;
     va_start(Args, Format);
     vprintf(Format, Args);
@@ -559,25 +560,50 @@ static void PrintDebug(const char *Format, ...) {
 
 // C API - useful for binding to other languages
 
+typedef std::map<void*, int> VoidIntMap;
+VoidIntMap __blockDebugMap__; // maps block pointers in currently running code to block ids, for generated debug output
+
 extern "C" {
 
-void  rl_set_output_buffer(char *buffer) {
+void rl_set_output_buffer(char *buffer) {
+  if (Debugging::On) {
+    printf("#include \"Relooper.h\"\n");
+    printf("int main() {\n");
+    printf("  char buffer[100000];\n");
+    printf("  rl_set_output_buffer(buffer);\n");
+  }
   Relooper::SetOutputBuffer(buffer);
 }
 
 void *rl_new_block(char *text) {
-  return new Block(text);
+  Block *ret = new Block(text);
+  if (Debugging::On) {
+    printf("  void *b%d = rl_new_block(\"%s\");\n", ret->Id, text);
+    __blockDebugMap__[ret] = ret->Id;
+    printf("  block_map[%d] = b%d;\n", ret->Id, ret->Id);
+  }
+  return ret;
 }
 
 void rl_delete_block(void *block) {
+  if (Debugging::On) {
+    printf("  rl_delete_block(block_map[%d]);\n", ((Block*)block)->Id);
+  }
   delete (Block*)block;
 }
 
 void rl_block_add_branch_to(void *from, void *to, char *condition) {
+  if (Debugging::On) {
+    printf("  rl_block_add_branch_to(block_map[%d], block_map[%d], \"%s\");\n", ((Block*)from)->Id, ((Block*)to)->Id, condition);
+  }
   ((Block*)from)->AddBranchTo((Block*)to, condition);
 }
 
 void *rl_new_relooper() {
+  if (Debugging::On) {
+    printf("  void *block_map[10000];\n");
+    printf("  void *rl = rl_new_relooper();\n");
+  }
   return new Relooper;
 }
 
@@ -586,10 +612,21 @@ void rl_delete_relooper(void *relooper) {
 }
 
 void rl_relooper_add_block(void *relooper, void *block) {
+  if (Debugging::On) {
+    printf("  rl_relooper_add_block(rl, block_map[%d]);\n", ((Block*)block)->Id);
+  }
   ((Relooper*)relooper)->AddBlock((Block*)block);
 }
 
 void rl_relooper_calculate(void *relooper, void *entry) {
+  if (Debugging::On) {
+    printf("  rl_relooper_calculate(rl, block_map[%d]);\n", ((Block*)entry)->Id);
+    printf("  rl_relooper_render(rl);\n");
+    printf("  rl_delete_relooper(rl);\n");
+    printf("  puts(buffer);\n");
+    printf("  return 0;\n");
+    printf("}\n");
+  }
   ((Relooper*)relooper)->Calculate((Block*)entry);
 }
 

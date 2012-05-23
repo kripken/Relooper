@@ -45,8 +45,7 @@ typedef std::map<Block*, Branch*> BlockBranchMap;
 
 // Represents a basic block of code - some instructions that end with a
 // control flow modifier (a branch, return or throw).
-class Block {
-public:
+struct Block {
   // Branches become processed after we finish the shape relevant to them. For example,
   // when we recreate a loop, branches to the loop start become continues and are now
   // processed. When we calculate what shape to generate from a set of blocks, we ignore
@@ -70,7 +69,7 @@ public:
   // Prints out the instructions code and branchings
   void Render();
 
-private:
+  // INTERNAL
   static int IdCounter;
 };
 
@@ -91,8 +90,7 @@ private:
 //            flow is not known until runtime (indirect branches,
 //            setjmp returns, etc.)
 //
-class Shape {
-public:
+struct Shape {
   enum Type { Simple = 0, Multiple = 1, Loop = 2, Emulated = 3};
 
   int Id; // A unique identifier. Used to identify loops, labels are Lx where x is the Id.
@@ -103,7 +101,7 @@ public:
 
   virtual void Render() = 0;
 
-private:
+  // INTERNAL
   static int IdCounter;
 };
 

@@ -10,3 +10,7 @@ echo "test 3"
 ./test3 &> test3.out
 diff -U 5 test3.out test3.txt
 
+echo "test debug"
+./test_debug &> test_debug.out
+diff -U 5 test_debug.out test_debug.txt
+

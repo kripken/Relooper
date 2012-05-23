@@ -13,6 +13,10 @@ echo "test 3"
 gcc test3.c -c -o test3.o -g
 g++ Relooper.o test3.o -o test3
 
+echo "test debug"
+gcc test_debug.cpp -c -o test_debug.o -g
+g++ Relooper.o test_debug.o -o test_debug
+
 echo
 echo "============================="
 echo
