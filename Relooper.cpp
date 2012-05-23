@@ -366,15 +366,18 @@ void Relooper::Calculate(Block *Entry) {
             while (ToInvalidate.size() > 0) {
               Block *Invalidatee = ToInvalidate.front();
               ToInvalidate.pop_front();
-              IndependentGroups[Ownership[Invalidatee]].erase(Invalidatee);
-              Ownership[Invalidatee] = NULL;
-              for (BlockBranchMap::iterator iter = Invalidatee->BranchesOut.begin(); iter != Invalidatee->BranchesOut.end(); iter++) {
-                Block *Target = iter->first;
-                BlockBlockMap::iterator Known = Ownership.find(Target);
-                if (Known != Ownership.end()) {
-                  Block *TargetOwner = Known->second;
-                  if (TargetOwner) {
-                    ToInvalidate.push_back(Target);
+              Block *Owner = Ownership[Invalidatee];
+              if (IndependentGroups.find(Owner) != IndependentGroups.end()) {
+                IndependentGroups[Owner].erase(Invalidatee);
+                Ownership[Invalidatee] = NULL;
+                for (BlockBranchMap::iterator iter = Invalidatee->BranchesOut.begin(); iter != Invalidatee->BranchesOut.end(); iter++) {
+                  Block *Target = iter->first;
+                  BlockBlockMap::iterator Known = Ownership.find(Target);
+                  if (Known != Ownership.end()) {
+                    Block *TargetOwner = Known->second;
+                    if (TargetOwner) {
+                      ToInvalidate.push_back(Target);
+                    }
                   }
                 }
               }
