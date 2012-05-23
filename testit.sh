@@ -14,3 +14,7 @@ echo "test debug"
 ./test_debug &> test_debug.out
 diff -U 5 test_debug.out test_debug.txt
 
+echo "test dead"
+./test_dead &> test_dead.out
+diff -U 5 test_dead.out test_dead.txt
+

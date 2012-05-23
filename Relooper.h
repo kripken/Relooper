@@ -56,6 +56,7 @@ struct Block {
   BlockBranchMap ProcessedBranchesOut;
   BlockBranchMap ProcessedBranchesIn;
   Shape *Parent; // The shape we are directly inside
+  bool Reachable; // Whether we can reach this from the entry
   int Id; // A unique identifier
 
   char *Code; // The string representation of the code in this block. Owning pointer (we copy the input)

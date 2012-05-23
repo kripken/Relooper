@@ -68,7 +68,7 @@ void Branch::Render(Block *Target) {
 
 int Block::IdCounter = 0;
 
-Block::Block(const char *CodeInit) : Parent(NULL), Id(Block::IdCounter++), DefaultTarget(NULL) {
+Block::Block(const char *CodeInit) : Parent(NULL), Reachable(false), Id(Block::IdCounter++), DefaultTarget(NULL) {
   Code = strdup(CodeInit);
 }
 
@@ -80,8 +80,9 @@ Block::~Block() {
   for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
     delete iter->second;
   }
-  assert(BranchesIn.size() == 0);
-  assert(BranchesOut.size() == 0);
+  // XXX If not reachable, expected to have branches here. But need to clean them up to prevent leaks!
+  assert(!Reachable || BranchesIn.size() == 0);
+  assert(!Reachable || BranchesOut.size() == 0);
 }
 
 void Block::AddBranchTo(Block *Target, char *Condition) {
@@ -267,6 +268,7 @@ void Relooper::Calculate(Block *Entry) {
       Notice(Simple);
       Simple->Inner = Inner;
       Inner->Parent = Simple;
+      Inner->Reachable = true;
       if (Blocks.size() > 1) {
         Blocks.erase(Inner);
         BlockSet Entries;
