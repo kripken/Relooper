@@ -25,6 +25,10 @@ echo "test 4"
 g++ test4.cpp -c -o test4.o -g
 g++ Relooper.o test4.o -o test4
 
+echo "test inf"
+g++ test_inf.cpp -c -o test_inf.o -g
+g++ Relooper.o test_inf.o -o test_inf
+
 echo
 echo "============================="
 echo
