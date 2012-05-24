@@ -3,7 +3,7 @@ import random, subprocess, difflib
 
 while True:
   # Random decisions
-  num = random.randint(2, 10)
+  num = random.randint(2, 100)
   density = random.random()
   decisions = [random.randint(1, num-1) for x in range(random.randint(round(num/3), num))]
   branches = [0]*num
