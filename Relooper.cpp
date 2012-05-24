@@ -46,7 +46,7 @@ int Indenter::CurrIndent = 0;
 // Branch
 
 Branch::Branch(const char *ConditionInit) : Ancestor(NULL), Set(true) {
-  Condition = strdup(ConditionInit);
+  Condition = ConditionInit ? strdup(ConditionInit) : NULL;
 }
 
 Branch::~Branch() {
@@ -102,11 +102,17 @@ void Block::Render() {
     }
   }
 
+  if (!ProcessedBranchesOut.size()) return;
+
   if (!DefaultTarget) { // If no default specified, it is the last
     for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
-      DefaultTarget = iter->first;
+      if (!iter->second->Condition) {
+        assert(!DefaultTarget); // Must be exactly one default
+        DefaultTarget = iter->first;
+      }
     }
   }
+  assert(DefaultTarget); // Must be a default
 
   bool First = true;
   for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
@@ -636,7 +642,7 @@ void rl_delete_block(void *block) {
 
 void rl_block_add_branch_to(void *from, void *to, const char *condition) {
   if (Debugging::On) {
-    printf("  rl_block_add_branch_to(block_map[%d], block_map[%d], \"%s\");\n", ((Block*)from)->Id, ((Block*)to)->Id, condition);
+    printf("  rl_block_add_branch_to(block_map[%d], block_map[%d], %s%s%s);\n", ((Block*)from)->Id, ((Block*)to)->Id, condition ? "\"" : "", condition ? condition : "NULL", condition ? "\"" : "");
   }
   ((Block*)from)->AddBranchTo((Block*)to, condition);
 }

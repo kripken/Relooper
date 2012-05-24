@@ -25,13 +25,13 @@ int main() {
   rl_relooper_add_block(r, b28);
 
   rl_block_add_branch_to(b19, b20, " 1 ");
-  rl_block_add_branch_to(b19, b22, " 1 ");
+  rl_block_add_branch_to(b19, b22, NULL);
   rl_block_add_branch_to(b20, b21, " 1 ");
-  rl_block_add_branch_to(b20, b22, " 1 ");
-  rl_block_add_branch_to(b21, b23, " 1 ");
-  rl_block_add_branch_to(b22, b23, " 1 ");
+  rl_block_add_branch_to(b20, b22, NULL);
+  rl_block_add_branch_to(b21, b23, NULL);
+  rl_block_add_branch_to(b22, b23, NULL);
   rl_block_add_branch_to(b23, b24, " 1 ");
-  rl_block_add_branch_to(b23, b28, " 1 ");
+  rl_block_add_branch_to(b23, b28, NULL);
 
   rl_relooper_calculate(r, b19);
   rl_relooper_render(r);

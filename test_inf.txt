@@ -1,9 +1,9 @@
 code 0
-if (!(uint(i4) >= uint(i5))) {
-  label = 1;
+if (uint(i4) >= uint(i5)) {
+  label = 2;
   /* direct */
 } else {
-  label = 2;
+  label = 1;
   /* direct */
 }
 L1: do {
@@ -19,11 +19,11 @@ L1: do {
   }
 } while(0);
 code 3
-if (!(i2 == 0)) {
-  label = 4;
+if (i2 == 0) {
+  label = 15;
   /* direct */
 } else {
-  label = 15;
+  label = 4;
   /* direct */
 }
 L5: do {
@@ -33,11 +33,11 @@ L5: do {
     /* direct */
     L7: while(1) {
       code 5
-      if (!(uint(i6) >= uint(i7))) {
-        label = 6;
+      if (uint(i6) >= uint(i7)) {
+        label = 7;
         /* direct */
       } else {
-        label = 7;
+        label = 6;
         /* direct */
       }
       L9: do {
@@ -53,11 +53,11 @@ L5: do {
         }
       } while(0);
       code 8
-      if (!(uint(i6) >= uint(i7))) {
-        label = 9;
+      if (uint(i6) >= uint(i7)) {
+        label = 10;
         /* direct */
       } else {
-        label = 10;
+        label = 9;
         /* direct */
       }
       L13: do {
@@ -73,11 +73,11 @@ L5: do {
         }
       } while(0);
       code 11
-      if (!(uint(i5) >= uint(i6))) {
-        label = 12;
+      if (uint(i5) >= uint(i6)) {
+        label = 13;
         /* direct */
       } else {
-        label = 13;
+        label = 12;
         /* direct */
       }
       L17: do {
@@ -104,11 +104,11 @@ L5: do {
   }
 } while(0);
 code 15
-if (!(uint(i4) >= uint(i5))) {
-  label = 16;
+if (uint(i4) >= uint(i5)) {
+  label = 17;
   /* direct */
 } else {
-  label = 17;
+  label = 16;
   /* direct */
 }
 L22: do {
@@ -124,11 +124,11 @@ L22: do {
   }
 } while(0);
 code 18
-if (!(i2 == 0)) {
-  label = 19;
+if (i2 == 0) {
+  label = 102;
   /* direct */
 } else {
-  label = 102;
+  label = 19;
   /* direct */
 }
 L26: do {
@@ -138,11 +138,11 @@ L26: do {
     /* direct */
     L28: while(1) {
       code 20
-      if (!(uint(i5) >= uint(i6))) {
-        label = 21;
+      if (uint(i5) >= uint(i6)) {
+        label = 22;
         /* direct */
       } else {
-        label = 22;
+        label = 21;
         /* direct */
       }
       L30: do {
@@ -158,11 +158,11 @@ L26: do {
         }
       } while(0);
       code 23
-      if (!(uint(i5) >= uint(i6))) {
-        label = 24;
+      if (uint(i5) >= uint(i6)) {
+        label = 25;
         /* direct */
       } else {
-        label = 25;
+        label = 24;
         /* direct */
       }
       L34: do {
@@ -178,11 +178,11 @@ L26: do {
         }
       } while(0);
       code 26
-      if (!(uint(i5) >= uint(i6))) {
-        label = 27;
+      if (uint(i5) >= uint(i6)) {
+        label = 28;
         /* direct */
       } else {
-        label = 28;
+        label = 27;
         /* direct */
       }
       L38: do {
@@ -198,11 +198,11 @@ L26: do {
         }
       } while(0);
       code 29
-      if (!(uint(i5) >= uint(i6))) {
-        label = 30;
+      if (uint(i5) >= uint(i6)) {
+        label = 31;
         /* direct */
       } else {
-        label = 31;
+        label = 30;
         /* direct */
       }
       L42: do {
@@ -218,11 +218,11 @@ L26: do {
         }
       } while(0);
       code 32
-      if (!(uint(i5) >= uint(i6))) {
-        label = 33;
+      if (uint(i5) >= uint(i6)) {
+        label = 34;
         /* direct */
       } else {
-        label = 34;
+        label = 33;
         /* direct */
       }
       L46: do {
@@ -238,11 +238,11 @@ L26: do {
         }
       } while(0);
       code 35
-      if (!(uint(i5) >= uint(i6))) {
-        label = 36;
+      if (uint(i5) >= uint(i6)) {
+        label = 37;
         /* direct */
       } else {
-        label = 37;
+        label = 36;
         /* direct */
       }
       L50: do {
@@ -258,11 +258,11 @@ L26: do {
         }
       } while(0);
       code 38
-      if (!(uint(i5) >= uint(i6))) {
-        label = 39;
+      if (uint(i5) >= uint(i6)) {
+        label = 40;
         /* direct */
       } else {
-        label = 40;
+        label = 39;
         /* direct */
       }
       L54: do {
@@ -278,11 +278,11 @@ L26: do {
         }
       } while(0);
       code 41
-      if (!(uint(i5) >= uint(i6))) {
-        label = 42;
+      if (uint(i5) >= uint(i6)) {
+        label = 43;
         /* direct */
       } else {
-        label = 43;
+        label = 42;
         /* direct */
       }
       L58: do {
@@ -298,11 +298,11 @@ L26: do {
         }
       } while(0);
       code 44
-      if (!(uint(i5) >= uint(i6))) {
-        label = 45;
+      if (uint(i5) >= uint(i6)) {
+        label = 46;
         /* direct */
       } else {
-        label = 46;
+        label = 45;
         /* direct */
       }
       L62: do {
@@ -318,11 +318,11 @@ L26: do {
         }
       } while(0);
       code 47
-      if (!(uint(i5) >= uint(i6))) {
-        label = 48;
+      if (uint(i5) >= uint(i6)) {
+        label = 49;
         /* direct */
       } else {
-        label = 49;
+        label = 48;
         /* direct */
       }
       L66: do {
@@ -338,11 +338,11 @@ L26: do {
         }
       } while(0);
       code 50
-      if (!(uint(i5) >= uint(i6))) {
-        label = 51;
+      if (uint(i5) >= uint(i6)) {
+        label = 52;
         /* direct */
       } else {
-        label = 52;
+        label = 51;
         /* direct */
       }
       L70: do {
@@ -358,11 +358,11 @@ L26: do {
         }
       } while(0);
       code 53
-      if (!(uint(i5) >= uint(i6))) {
-        label = 54;
+      if (uint(i5) >= uint(i6)) {
+        label = 55;
         /* direct */
       } else {
-        label = 55;
+        label = 54;
         /* direct */
       }
       L74: do {
@@ -378,11 +378,11 @@ L26: do {
         }
       } while(0);
       code 56
-      if (!(uint(i5) >= uint(i6))) {
-        label = 57;
+      if (uint(i5) >= uint(i6)) {
+        label = 58;
         /* direct */
       } else {
-        label = 58;
+        label = 57;
         /* direct */
       }
       L78: do {
@@ -398,11 +398,11 @@ L26: do {
         }
       } while(0);
       code 59
-      if (!(uint(i5) >= uint(i6))) {
-        label = 60;
+      if (uint(i5) >= uint(i6)) {
+        label = 61;
         /* direct */
       } else {
-        label = 61;
+        label = 60;
         /* direct */
       }
       L82: do {
@@ -418,11 +418,11 @@ L26: do {
         }
       } while(0);
       code 62
-      if (!(uint(i5) >= uint(i6))) {
-        label = 63;
+      if (uint(i5) >= uint(i6)) {
+        label = 64;
         /* direct */
       } else {
-        label = 64;
+        label = 63;
         /* direct */
       }
       L86: do {
@@ -438,11 +438,11 @@ L26: do {
         }
       } while(0);
       code 65
-      if (!(uint(i5) >= uint(i6))) {
-        label = 66;
+      if (uint(i5) >= uint(i6)) {
+        label = 67;
         /* direct */
       } else {
-        label = 67;
+        label = 66;
         /* direct */
       }
       L90: do {
@@ -458,11 +458,11 @@ L26: do {
         }
       } while(0);
       code 68
-      if (!(uint(i5) >= uint(i6))) {
-        label = 69;
+      if (uint(i5) >= uint(i6)) {
+        label = 70;
         /* direct */
       } else {
-        label = 70;
+        label = 69;
         /* direct */
       }
       L94: do {
@@ -478,11 +478,11 @@ L26: do {
         }
       } while(0);
       code 71
-      if (!(uint(i5) >= uint(i6))) {
-        label = 72;
+      if (uint(i5) >= uint(i6)) {
+        label = 73;
         /* direct */
       } else {
-        label = 73;
+        label = 72;
         /* direct */
       }
       L98: do {
@@ -498,11 +498,11 @@ L26: do {
         }
       } while(0);
       code 74
-      if (!(uint(i5) >= uint(i6))) {
-        label = 75;
+      if (uint(i5) >= uint(i6)) {
+        label = 76;
         /* direct */
       } else {
-        label = 76;
+        label = 75;
         /* direct */
       }
       L102: do {
@@ -518,11 +518,11 @@ L26: do {
         }
       } while(0);
       code 77
-      if (!(uint(i5) >= uint(i6))) {
-        label = 78;
+      if (uint(i5) >= uint(i6)) {
+        label = 79;
         /* direct */
       } else {
-        label = 79;
+        label = 78;
         /* direct */
       }
       L106: do {
@@ -538,11 +538,11 @@ L26: do {
         }
       } while(0);
       code 80
-      if (!(uint(i5) >= uint(i6))) {
-        label = 81;
+      if (uint(i5) >= uint(i6)) {
+        label = 82;
         /* direct */
       } else {
-        label = 82;
+        label = 81;
         /* direct */
       }
       L110: do {
@@ -558,11 +558,11 @@ L26: do {
         }
       } while(0);
       code 83
-      if (!(uint(i5) >= uint(i6))) {
-        label = 84;
+      if (uint(i5) >= uint(i6)) {
+        label = 85;
         /* direct */
       } else {
-        label = 85;
+        label = 84;
         /* direct */
       }
       L114: do {
@@ -578,11 +578,11 @@ L26: do {
         }
       } while(0);
       code 86
-      if (!(uint(i5) >= uint(i6))) {
-        label = 87;
+      if (uint(i5) >= uint(i6)) {
+        label = 88;
         /* direct */
       } else {
-        label = 88;
+        label = 87;
         /* direct */
       }
       L118: do {
@@ -598,11 +598,11 @@ L26: do {
         }
       } while(0);
       code 89
-      if (!(uint(i5) >= uint(i6))) {
-        label = 90;
+      if (uint(i5) >= uint(i6)) {
+        label = 91;
         /* direct */
       } else {
-        label = 91;
+        label = 90;
         /* direct */
       }
       L122: do {
@@ -618,11 +618,11 @@ L26: do {
         }
       } while(0);
       code 92
-      if (!(uint(i5) >= uint(i6))) {
-        label = 93;
+      if (uint(i5) >= uint(i6)) {
+        label = 94;
         /* direct */
       } else {
-        label = 94;
+        label = 93;
         /* direct */
       }
       L126: do {
@@ -638,11 +638,11 @@ L26: do {
         }
       } while(0);
       code 95
-      if (!(uint(i5) >= uint(i6))) {
-        label = 96;
+      if (uint(i5) >= uint(i6)) {
+        label = 97;
         /* direct */
       } else {
-        label = 97;
+        label = 96;
         /* direct */
       }
       L130: do {
@@ -658,11 +658,11 @@ L26: do {
         }
       } while(0);
       code 98
-      if (!(uint(i5) >= uint(i6))) {
-        label = 99;
+      if (uint(i5) >= uint(i6)) {
+        label = 100;
         /* direct */
       } else {
-        label = 100;
+        label = 99;
         /* direct */
       }
       L134: do {
@@ -689,11 +689,11 @@ L26: do {
   }
 } while(0);
 code 102
-if (!(uint(i4) >= uint(i5))) {
-  label = 103;
+if (uint(i4) >= uint(i5)) {
+  label = 104;
   /* direct */
 } else {
-  label = 104;
+  label = 103;
   /* direct */
 }
 L139: do {
@@ -709,11 +709,11 @@ L139: do {
   }
 } while(0);
 code 105
-if (!(i2 == 0)) {
-  label = 106;
+if (i2 == 0) {
+  label = 168;
   /* direct */
 } else {
-  label = 168;
+  label = 106;
   /* direct */
 }
 L143: do {
@@ -723,11 +723,11 @@ L143: do {
     /* direct */
     L145: while(1) {
       code 107
-      if (!(uint(i5) >= uint(i6))) {
-        label = 108;
+      if (uint(i5) >= uint(i6)) {
+        label = 109;
         /* direct */
       } else {
-        label = 109;
+        label = 108;
         /* direct */
       }
       L147: do {
@@ -743,11 +743,11 @@ L143: do {
         }
       } while(0);
       code 110
-      if (!(uint(i5) >= uint(i6))) {
-        label = 111;
+      if (uint(i5) >= uint(i6)) {
+        label = 112;
         /* direct */
       } else {
-        label = 112;
+        label = 111;
         /* direct */
       }
       L151: do {
@@ -763,11 +763,11 @@ L143: do {
         }
       } while(0);
       code 113
-      if (!(uint(i5) >= uint(i6))) {
-        label = 114;
+      if (uint(i5) >= uint(i6)) {
+        label = 115;
         /* direct */
       } else {
-        label = 115;
+        label = 114;
         /* direct */
       }
       L155: do {
@@ -783,11 +783,11 @@ L143: do {
         }
       } while(0);
       code 116
-      if (!(uint(i5) >= uint(i6))) {
-        label = 117;
+      if (uint(i5) >= uint(i6)) {
+        label = 118;
         /* direct */
       } else {
-        label = 118;
+        label = 117;
         /* direct */
       }
       L159: do {
@@ -803,11 +803,11 @@ L143: do {
         }
       } while(0);
       code 119
-      if (!(uint(i5) >= uint(i6))) {
-        label = 120;
+      if (uint(i5) >= uint(i6)) {
+        label = 121;
         /* direct */
       } else {
-        label = 121;
+        label = 120;
         /* direct */
       }
       L163: do {
@@ -823,11 +823,11 @@ L143: do {
         }
       } while(0);
       code 122
-      if (!(uint(i5) >= uint(i6))) {
-        label = 123;
+      if (uint(i5) >= uint(i6)) {
+        label = 124;
         /* direct */
       } else {
-        label = 124;
+        label = 123;
         /* direct */
       }
       L167: do {
@@ -843,11 +843,11 @@ L143: do {
         }
       } while(0);
       code 125
-      if (!(uint(i5) >= uint(i6))) {
-        label = 126;
+      if (uint(i5) >= uint(i6)) {
+        label = 127;
         /* direct */
       } else {
-        label = 127;
+        label = 126;
         /* direct */
       }
       L171: do {
@@ -863,11 +863,11 @@ L143: do {
         }
       } while(0);
       code 128
-      if (!(uint(i5) >= uint(i6))) {
-        label = 129;
+      if (uint(i5) >= uint(i6)) {
+        label = 130;
         /* direct */
       } else {
-        label = 130;
+        label = 129;
         /* direct */
       }
       L175: do {
@@ -883,11 +883,11 @@ L143: do {
         }
       } while(0);
       code 131
-      if (!(uint(i5) >= uint(i6))) {
-        label = 132;
+      if (uint(i5) >= uint(i6)) {
+        label = 133;
         /* direct */
       } else {
-        label = 133;
+        label = 132;
         /* direct */
       }
       L179: do {
@@ -903,11 +903,11 @@ L143: do {
         }
       } while(0);
       code 134
-      if (!(uint(i5) >= uint(i6))) {
-        label = 135;
+      if (uint(i5) >= uint(i6)) {
+        label = 136;
         /* direct */
       } else {
-        label = 136;
+        label = 135;
         /* direct */
       }
       L183: do {
@@ -923,11 +923,11 @@ L143: do {
         }
       } while(0);
       code 137
-      if (!(uint(i5) >= uint(i6))) {
-        label = 138;
+      if (uint(i5) >= uint(i6)) {
+        label = 139;
         /* direct */
       } else {
-        label = 139;
+        label = 138;
         /* direct */
       }
       L187: do {
@@ -943,11 +943,11 @@ L143: do {
         }
       } while(0);
       code 140
-      if (!(uint(i5) >= uint(i6))) {
-        label = 141;
+      if (uint(i5) >= uint(i6)) {
+        label = 142;
         /* direct */
       } else {
-        label = 142;
+        label = 141;
         /* direct */
       }
       L191: do {
@@ -963,11 +963,11 @@ L143: do {
         }
       } while(0);
       code 143
-      if (!(uint(i5) >= uint(i6))) {
-        label = 144;
+      if (uint(i5) >= uint(i6)) {
+        label = 145;
         /* direct */
       } else {
-        label = 145;
+        label = 144;
         /* direct */
       }
       L195: do {
@@ -983,11 +983,11 @@ L143: do {
         }
       } while(0);
       code 146
-      if (!(uint(i5) >= uint(i6))) {
-        label = 147;
+      if (uint(i5) >= uint(i6)) {
+        label = 148;
         /* direct */
       } else {
-        label = 148;
+        label = 147;
         /* direct */
       }
       L199: do {
@@ -1003,11 +1003,11 @@ L143: do {
         }
       } while(0);
       code 149
-      if (!(uint(i5) >= uint(i6))) {
-        label = 150;
+      if (uint(i5) >= uint(i6)) {
+        label = 151;
         /* direct */
       } else {
-        label = 151;
+        label = 150;
         /* direct */
       }
       L203: do {
@@ -1023,11 +1023,11 @@ L143: do {
         }
       } while(0);
       code 152
-      if (!(uint(i5) >= uint(i6))) {
-        label = 153;
+      if (uint(i5) >= uint(i6)) {
+        label = 154;
         /* direct */
       } else {
-        label = 154;
+        label = 153;
         /* direct */
       }
       L207: do {
@@ -1043,11 +1043,11 @@ L143: do {
         }
       } while(0);
       code 155
-      if (!(uint(i5) >= uint(i6))) {
-        label = 156;
+      if (uint(i5) >= uint(i6)) {
+        label = 157;
         /* direct */
       } else {
-        label = 157;
+        label = 156;
         /* direct */
       }
       L211: do {
@@ -1063,11 +1063,11 @@ L143: do {
         }
       } while(0);
       code 158
-      if (!(uint(i5) >= uint(i6))) {
-        label = 159;
+      if (uint(i5) >= uint(i6)) {
+        label = 160;
         /* direct */
       } else {
-        label = 160;
+        label = 159;
         /* direct */
       }
       L215: do {
@@ -1083,11 +1083,11 @@ L143: do {
         }
       } while(0);
       code 161
-      if (!(uint(i5) >= uint(i6))) {
-        label = 162;
+      if (uint(i5) >= uint(i6)) {
+        label = 163;
         /* direct */
       } else {
-        label = 163;
+        label = 162;
         /* direct */
       }
       L219: do {
@@ -1103,11 +1103,11 @@ L143: do {
         }
       } while(0);
       code 164
-      if (!(uint(i5) >= uint(i6))) {
-        label = 165;
+      if (uint(i5) >= uint(i6)) {
+        label = 166;
         /* direct */
       } else {
-        label = 166;
+        label = 165;
         /* direct */
       }
       L223: do {
@@ -1134,11 +1134,11 @@ L143: do {
   }
 } while(0);
 code 168
-if (!(uint(i4) >= uint(i5))) {
-  label = 169;
+if (uint(i4) >= uint(i5)) {
+  label = 170;
   /* direct */
 } else {
-  label = 170;
+  label = 169;
   /* direct */
 }
 L228: do {
@@ -1154,11 +1154,11 @@ L228: do {
   }
 } while(0);
 code 171
-if (!(i2 == 0)) {
-  label = 172;
+if (i2 == 0) {
+  label = 183;
   /* direct */
 } else {
-  label = 183;
+  label = 172;
   /* direct */
 }
 L232: do {
@@ -1168,11 +1168,11 @@ L232: do {
     /* direct */
     L234: while(1) {
       code 173
-      if (!(uint(i5) >= uint(i6))) {
-        label = 174;
+      if (uint(i5) >= uint(i6)) {
+        label = 175;
         /* direct */
       } else {
-        label = 175;
+        label = 174;
         /* direct */
       }
       L236: do {
@@ -1188,11 +1188,11 @@ L232: do {
         }
       } while(0);
       code 176
-      if (!(uint(i5) >= uint(i6))) {
-        label = 177;
+      if (uint(i5) >= uint(i6)) {
+        label = 178;
         /* direct */
       } else {
-        label = 178;
+        label = 177;
         /* direct */
       }
       L240: do {
@@ -1208,11 +1208,11 @@ L232: do {
         }
       } while(0);
       code 179
-      if (!(uint(i4) >= uint(i5))) {
-        label = 180;
+      if (uint(i4) >= uint(i5)) {
+        label = 181;
         /* direct */
       } else {
-        label = 181;
+        label = 180;
         /* direct */
       }
       L244: do {

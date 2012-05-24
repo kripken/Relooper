@@ -22,16 +22,16 @@ int main() {
   rl_relooper_add_block(r, LBB6);
 
   rl_block_add_branch_to(ep, LBB1, "ep -> LBB1");
-  rl_block_add_branch_to(ep, LBB3, "ep -> LBB3");
+  rl_block_add_branch_to(ep, LBB3, NULL);
   rl_block_add_branch_to(LBB1, LBB2, "LBB1 -> LBB2");
-  rl_block_add_branch_to(LBB1, LBB3, "LBB1 -> LBB3");
-  rl_block_add_branch_to(LBB2, LBB3, "LBB2 -> LBB3");
+  rl_block_add_branch_to(LBB1, LBB3, NULL);
+  rl_block_add_branch_to(LBB2, LBB3, NULL);
   rl_block_add_branch_to(LBB3, LBB4, "LBB3 -> LBB4");
-  rl_block_add_branch_to(LBB3, LBB6, "LBB3 -> LBB6");
+  rl_block_add_branch_to(LBB3, LBB6, NULL);
   rl_block_add_branch_to(LBB4, LBB5, "LBB4 -> LBB5");
-  rl_block_add_branch_to(LBB4, LBB6, "LBB4 -> LBB6");
+  rl_block_add_branch_to(LBB4, LBB6, NULL);
   rl_block_add_branch_to(LBB5, LBB6, "LBB5 -> LBB6");
-  rl_block_add_branch_to(LBB5, LBB5, "LBB5 -> LBB5");
+  rl_block_add_branch_to(LBB5, LBB5, NULL);
 
   rl_relooper_calculate(r, ep);
   rl_relooper_render(r);

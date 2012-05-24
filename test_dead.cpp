@@ -13,7 +13,7 @@ int main() {
   Block *b_a = new Block("// block A\n");
   Block *b_b = new Block("// block B\n"); // never reached
 
-  b_b->AddBranchTo(b_b, "check == 30");
+  b_b->AddBranchTo(b_b, NULL);
 
   Relooper r;
   r.AddBlock(b_a);

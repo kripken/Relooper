@@ -32,7 +32,7 @@ struct Branch {
   Shape *Ancestor; // If not NULL, this shape is the relevant one for purposes of getting to the target block. We break or continue on it
   Branch::FlowType Type; // If Ancestor is not NULL, this says whether to break or continue
   bool Set; // Set the label variable
-  const char *Condition; // The condition for which we branch. For example, "my_var == 1". Conditions are checked one by one, and the last is ignored (always taken)
+  const char *Condition; // The condition for which we branch. For example, "my_var == 1". Conditions are checked one by one. One of the conditions should have NULL as the condition, in which case it is the default
 
   Branch(const char *ConditionInit);
   ~Branch();
@@ -60,7 +60,8 @@ struct Block {
   int Id; // A unique identifier
 
   const char *Code; // The string representation of the code in this block. Owning pointer (we copy the input)
-  Block *DefaultTarget; // If specified, the block we branch to without checking the condition, if none of the other conditions held
+  Block *DefaultTarget; // The block we branch to without checking the condition, if none of the other conditions held.
+                        // Since each block *must* branch somewhere, this must be set
 
   Block(const char *CodeInit);
   ~Block();

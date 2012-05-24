@@ -41,12 +41,12 @@ L5: do {
     }
     L7: while(1) {
       LBB5
-      if (LBB5 -> LBB5) {
-        label = 5;
-        continue L7;
-      } else {
+      if (LBB5 -> LBB6) {
         label = 6;
         break L5;
+      } else {
+        label = 5;
+        continue L7;
       }
     }
   }
