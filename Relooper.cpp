@@ -45,12 +45,12 @@ int Indenter::CurrIndent = 0;
 
 // Branch
 
-Branch::Branch(char *ConditionInit) : Ancestor(NULL), Set(true) {
+Branch::Branch(const char *ConditionInit) : Ancestor(NULL), Set(true) {
   Condition = strdup(ConditionInit);
 }
 
 Branch::~Branch() {
-  if (Condition) free(Condition);
+  if (Condition) free((void*)Condition);
 }
 
 void Branch::Render(Block *Target) {
@@ -73,7 +73,7 @@ Block::Block(const char *CodeInit) : Parent(NULL), Reachable(false), Id(Block::I
 }
 
 Block::~Block() {
-  if (Code) free(Code);
+  if (Code) free((void*)Code);
   for (BlockBranchMap::iterator iter = ProcessedBranchesIn.begin(); iter != ProcessedBranchesIn.end(); iter++) {
     delete iter->second;
   }
@@ -85,14 +85,14 @@ Block::~Block() {
   assert(!Reachable || BranchesOut.size() == 0);
 }
 
-void Block::AddBranchTo(Block *Target, char *Condition) {
+void Block::AddBranchTo(Block *Target, const char *Condition) {
   BranchesOut[Target] = new Branch(Condition);
 }
 
 void Block::Render() {
   if (Code) {
     // Print code in an indented manner, even over multiple lines
-    char *Start = Code;
+    char *Start = const_cast<char*>(Code);
     while (*Start) {
       char *End = strchr(Start, '\n');
       if (End) *End = 0;
@@ -615,7 +615,7 @@ void rl_set_output_buffer(char *buffer) {
   Relooper::SetOutputBuffer(buffer);
 }
 
-void *rl_new_block(char *text) {
+void *rl_new_block(const char *text) {
   Block *ret = new Block(text);
   if (Debugging::On) {
     printf("  void *b%d = rl_new_block(\"// code %d\");\n", ret->Id, ret->Id);
@@ -632,7 +632,7 @@ void rl_delete_block(void *block) {
   delete (Block*)block;
 }
 
-void rl_block_add_branch_to(void *from, void *to, char *condition) {
+void rl_block_add_branch_to(void *from, void *to, const char *condition) {
   if (Debugging::On) {
     printf("  rl_block_add_branch_to(block_map[%d], block_map[%d], \"%s\");\n", ((Block*)from)->Id, ((Block*)to)->Id, condition);
   }

@@ -32,9 +32,9 @@ struct Branch {
   Shape *Ancestor; // If not NULL, this shape is the relevant one for purposes of getting to the target block. We break or continue on it
   Branch::FlowType Type; // If Ancestor is not NULL, this says whether to break or continue
   bool Set; // Set the label variable
-  char *Condition; // The condition for which we branch. For example, "my_var == 1". Conditions are checked one by one, and the last is ignored (always taken)
+  const char *Condition; // The condition for which we branch. For example, "my_var == 1". Conditions are checked one by one, and the last is ignored (always taken)
 
-  Branch(char *ConditionInit);
+  Branch(const char *ConditionInit);
   ~Branch();
 
   // Prints out the branch
@@ -59,13 +59,13 @@ struct Block {
   bool Reachable; // Whether we can reach this from the entry
   int Id; // A unique identifier
 
-  char *Code; // The string representation of the code in this block. Owning pointer (we copy the input)
+  const char *Code; // The string representation of the code in this block. Owning pointer (we copy the input)
   Block *DefaultTarget; // If specified, the block we branch to without checking the condition, if none of the other conditions held
 
   Block(const char *CodeInit);
   ~Block();
 
-  void AddBranchTo(Block *Target, char *Condition);
+  void AddBranchTo(Block *Target, const char *Condition);
 
   // Prints out the instructions code and branchings
   void Render();
@@ -193,9 +193,9 @@ extern "C" {
 #endif
 
 RELOOPERDLL_API void  rl_set_output_buffer(char *buffer);
-RELOOPERDLL_API void *rl_new_block(char *text);
+RELOOPERDLL_API void *rl_new_block(const char *text);
 RELOOPERDLL_API void  rl_delete_block(void *block);
-RELOOPERDLL_API void  rl_block_add_branch_to(void *from, void *to, char *condition);
+RELOOPERDLL_API void  rl_block_add_branch_to(void *from, void *to, const char *condition);
 RELOOPERDLL_API void *rl_new_relooper();
 RELOOPERDLL_API void  rl_delete_relooper(void *relooper);
 RELOOPERDLL_API void  rl_relooper_add_block(void *relooper, void *block);
