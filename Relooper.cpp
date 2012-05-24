@@ -469,7 +469,7 @@ void Relooper::Calculate(Block *Entry) {
       }
     }
 
-    Shape *MakeMultiple(BlockSet &Blocks, BlockBlockSetMap& IndependentGroups) {
+    Shape *MakeMultiple(BlockSet &Blocks, BlockSet& Entries, BlockBlockSetMap& IndependentGroups) {
       PrintDebug("creating multiple block with %d inner groups\n", IndependentGroups.size());
       MultipleShape *Multiple = new MultipleShape();
       Notice(Multiple);
@@ -501,6 +501,13 @@ void Relooper::Calculate(Block *Entry) {
         Multiple->InnerMap[CurrEntry] = Process(CurrBlocks, CurrEntries);
       }
       Debugging::Dump(Blocks, "  remaining blocks after multiple:");
+      // Add entries not handled as next entries, they are deferred
+      for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
+        Block *Entry = *iter;
+        if (IndependentGroups.find(Entry) == IndependentGroups.end()) {
+          NextEntries.insert(Entry);
+        }
+      }
       Multiple->Next = Process(Blocks, NextEntries);
       return Multiple;
     }
@@ -553,7 +560,7 @@ void Relooper::Calculate(Block *Entry) {
 
         if (IndependentGroups.size() > 0) {
           // Some groups removable ==> Multiple
-          return MakeMultiple(Blocks, IndependentGroups);
+          return MakeMultiple(Blocks, Entries, IndependentGroups);
         }
       }
       // No independent groups, must be loopable ==> Loop
