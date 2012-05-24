@@ -2,7 +2,7 @@
 if ( 1 ) {
   label = 1;
   /* direct */
-} else if ( 1 ) {
+} else {
   label = 3;
   /* direct */
 }
@@ -12,7 +12,7 @@ L1: do {
     if ( 1 ) {
       label = 2;
       /* direct */
-    } else if ( 1 ) {
+    } else {
       label = 3;
       break L1;
     }
@@ -32,7 +32,7 @@ L4: do {
 if ( 1 ) {
   label = 5;
   /* direct */
-} else if ( 1 ) {
+} else {
   label = 6;
   /* direct */
 }

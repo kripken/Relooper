@@ -2,12 +2,16 @@
 import random, subprocess
 
 while True:
-  # Generate random block graph
-  num = random.randint(1, 20)
+  # Random decisions
+  num = random.randint(1, 6)
   density = random.random()
+  decisions = [random.randint(0, 1) for x in range(1000)]
   print num, density
 
-  src = '''
+  # parts
+  entry = '''print('entry'); var label; var decisions = %s; var index = 0; function check() { if (index == decisions.length) throw 'HALT'; return decisions[index++] }''' % str(decisions)
+
+  opt = '''
 
 #include <stdlib.h>
 #include "Relooper.h"
@@ -21,28 +25,28 @@ int main() {
 
   for i in range(num):
     if i == 0:
-      src += '''
-  Block *b%d = new Block("print('entry'); var label; var decisions = %s; var index = 0; function check() { if (index == decisions.length) throw 'HALT'; return decisions[index++] }");
-''' % (i, str([random.randint(0, 1) for x in range(1000)]))
+      opt += '''
+  Block *b%d = new Block("%s");
+''' % (i, entry)
     else:
-      src += '''  Block *b%d = new Block("check(); print(%d);");
+      opt += '''  Block *b%d = new Block("check(); print(%d);");
 ''' % (i, i)
 
   for i in range(num):
     for j in range(1, num):
       if random.random() <= density:
-        src += '''  b%d->AddBranchTo(b%d, "check()");
+        opt += '''  b%d->AddBranchTo(b%d, "check()");
 ''' % (i, j)
 
-  src += '''
+  opt += '''
   Relooper r;
 '''
 
   for i in range(num):
-    src += '''  r.AddBlock(b%d);
+    opt += '''  r.AddBlock(b%d);
 ''' % i
 
-  src += '''
+  opt += '''
   r.Calculate(b0);
   printf("\\n\\n");
   r.Render();
@@ -53,7 +57,7 @@ int main() {
 }
 '''
 
-  open('fuzz.cpp', 'w').write(src)
+  open('fuzz.cpp', 'w').write(opt)
 
   subprocess.call(['g++', 'fuzz.cpp', 'Relooper.o', '-o', 'fuzz', '-g'])
   subprocess.call(['./fuzz'], stdout=open('fuzz.opt.js', 'w'))

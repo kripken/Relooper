@@ -102,8 +102,10 @@ void Block::Render() {
     }
   }
 
-  if (!DefaultTarget && ProcessedBranchesOut.size() == 1) {
-    DefaultTarget = ProcessedBranchesOut.begin()->first;
+  if (!DefaultTarget) { // If no default specified, it is the last
+    for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
+      DefaultTarget = iter->first;
+    }
   }
 
   bool First = true;

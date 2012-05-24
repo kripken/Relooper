@@ -2,7 +2,7 @@ code 0
 if (!(uint(i4) >= uint(i5))) {
   label = 1;
   /* direct */
-} else if (uint(i4) >= uint(i5)) {
+} else {
   label = 2;
   /* direct */
 }
@@ -22,7 +22,7 @@ code 3
 if (!(i2 == 0)) {
   label = 4;
   /* direct */
-} else if (i2 == 0) {
+} else {
   label = 15;
   /* direct */
 }
@@ -36,7 +36,7 @@ L5: do {
       if (!(uint(i6) >= uint(i7))) {
         label = 6;
         /* direct */
-      } else if (uint(i6) >= uint(i7)) {
+      } else {
         label = 7;
         /* direct */
       }
@@ -56,7 +56,7 @@ L5: do {
       if (!(uint(i6) >= uint(i7))) {
         label = 9;
         /* direct */
-      } else if (uint(i6) >= uint(i7)) {
+      } else {
         label = 10;
         /* direct */
       }
@@ -76,7 +76,7 @@ L5: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 12;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 13;
         /* direct */
       }
@@ -96,7 +96,7 @@ L5: do {
       if (i2 != 0) {
         label = 5;
         continue L7;
-      } else if (!(i2 != 0)) {
+      } else {
         label = 15;
         break L5;
       }
@@ -107,7 +107,7 @@ code 15
 if (!(uint(i4) >= uint(i5))) {
   label = 16;
   /* direct */
-} else if (uint(i4) >= uint(i5)) {
+} else {
   label = 17;
   /* direct */
 }
@@ -127,7 +127,7 @@ code 18
 if (!(i2 == 0)) {
   label = 19;
   /* direct */
-} else if (i2 == 0) {
+} else {
   label = 102;
   /* direct */
 }
@@ -141,7 +141,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 21;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 22;
         /* direct */
       }
@@ -161,7 +161,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 24;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 25;
         /* direct */
       }
@@ -181,7 +181,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 27;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 28;
         /* direct */
       }
@@ -201,7 +201,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 30;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 31;
         /* direct */
       }
@@ -221,7 +221,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 33;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 34;
         /* direct */
       }
@@ -241,7 +241,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 36;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 37;
         /* direct */
       }
@@ -261,7 +261,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 39;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 40;
         /* direct */
       }
@@ -281,7 +281,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 42;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 43;
         /* direct */
       }
@@ -301,7 +301,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 45;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 46;
         /* direct */
       }
@@ -321,7 +321,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 48;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 49;
         /* direct */
       }
@@ -341,7 +341,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 51;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 52;
         /* direct */
       }
@@ -361,7 +361,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 54;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 55;
         /* direct */
       }
@@ -381,7 +381,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 57;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 58;
         /* direct */
       }
@@ -401,7 +401,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 60;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 61;
         /* direct */
       }
@@ -421,7 +421,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 63;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 64;
         /* direct */
       }
@@ -441,7 +441,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 66;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 67;
         /* direct */
       }
@@ -461,7 +461,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 69;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 70;
         /* direct */
       }
@@ -481,7 +481,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 72;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 73;
         /* direct */
       }
@@ -501,7 +501,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 75;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 76;
         /* direct */
       }
@@ -521,7 +521,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 78;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 79;
         /* direct */
       }
@@ -541,7 +541,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 81;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 82;
         /* direct */
       }
@@ -561,7 +561,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 84;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 85;
         /* direct */
       }
@@ -581,7 +581,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 87;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 88;
         /* direct */
       }
@@ -601,7 +601,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 90;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 91;
         /* direct */
       }
@@ -621,7 +621,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 93;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 94;
         /* direct */
       }
@@ -641,7 +641,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 96;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 97;
         /* direct */
       }
@@ -661,7 +661,7 @@ L26: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 99;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 100;
         /* direct */
       }
@@ -681,7 +681,7 @@ L26: do {
       if (i2 != 0) {
         label = 20;
         continue L28;
-      } else if (!(i2 != 0)) {
+      } else {
         label = 102;
         break L26;
       }
@@ -692,7 +692,7 @@ code 102
 if (!(uint(i4) >= uint(i5))) {
   label = 103;
   /* direct */
-} else if (uint(i4) >= uint(i5)) {
+} else {
   label = 104;
   /* direct */
 }
@@ -712,7 +712,7 @@ code 105
 if (!(i2 == 0)) {
   label = 106;
   /* direct */
-} else if (i2 == 0) {
+} else {
   label = 168;
   /* direct */
 }
@@ -726,7 +726,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 108;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 109;
         /* direct */
       }
@@ -746,7 +746,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 111;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 112;
         /* direct */
       }
@@ -766,7 +766,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 114;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 115;
         /* direct */
       }
@@ -786,7 +786,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 117;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 118;
         /* direct */
       }
@@ -806,7 +806,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 120;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 121;
         /* direct */
       }
@@ -826,7 +826,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 123;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 124;
         /* direct */
       }
@@ -846,7 +846,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 126;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 127;
         /* direct */
       }
@@ -866,7 +866,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 129;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 130;
         /* direct */
       }
@@ -886,7 +886,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 132;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 133;
         /* direct */
       }
@@ -906,7 +906,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 135;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 136;
         /* direct */
       }
@@ -926,7 +926,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 138;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 139;
         /* direct */
       }
@@ -946,7 +946,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 141;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 142;
         /* direct */
       }
@@ -966,7 +966,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 144;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 145;
         /* direct */
       }
@@ -986,7 +986,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 147;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 148;
         /* direct */
       }
@@ -1006,7 +1006,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 150;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 151;
         /* direct */
       }
@@ -1026,7 +1026,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 153;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 154;
         /* direct */
       }
@@ -1046,7 +1046,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 156;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 157;
         /* direct */
       }
@@ -1066,7 +1066,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 159;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 160;
         /* direct */
       }
@@ -1086,7 +1086,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 162;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 163;
         /* direct */
       }
@@ -1106,7 +1106,7 @@ L143: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 165;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 166;
         /* direct */
       }
@@ -1126,7 +1126,7 @@ L143: do {
       if (i2 != 0) {
         label = 107;
         continue L145;
-      } else if (!(i2 != 0)) {
+      } else {
         label = 168;
         break L143;
       }
@@ -1137,7 +1137,7 @@ code 168
 if (!(uint(i4) >= uint(i5))) {
   label = 169;
   /* direct */
-} else if (uint(i4) >= uint(i5)) {
+} else {
   label = 170;
   /* direct */
 }
@@ -1157,7 +1157,7 @@ code 171
 if (!(i2 == 0)) {
   label = 172;
   /* direct */
-} else if (i2 == 0) {
+} else {
   label = 183;
   /* direct */
 }
@@ -1171,7 +1171,7 @@ L232: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 174;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 175;
         /* direct */
       }
@@ -1191,7 +1191,7 @@ L232: do {
       if (!(uint(i5) >= uint(i6))) {
         label = 177;
         /* direct */
-      } else if (uint(i5) >= uint(i6)) {
+      } else {
         label = 178;
         /* direct */
       }
@@ -1211,7 +1211,7 @@ L232: do {
       if (!(uint(i4) >= uint(i5))) {
         label = 180;
         /* direct */
-      } else if (uint(i4) >= uint(i5)) {
+      } else {
         label = 181;
         /* direct */
       }
@@ -1231,7 +1231,7 @@ L232: do {
       if (i2 != 0) {
         label = 173;
         continue L234;
-      } else if (!(i2 != 0)) {
+      } else {
         label = 183;
         break L232;
       }
