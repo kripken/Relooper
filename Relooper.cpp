@@ -116,13 +116,17 @@ void Block::Render() {
   // *must* appear in the Simple (the Simple is the only one reaching the
   // Multiple), so we can remove the Multiple and add its independent groups
   // into the Simple's branches.
-  // TODO: Also remove assignments to label when possible (at least in
-  //       trivial case of the Multiple being of identical size to our branches)
   MultipleShape *Fused = dynamic_cast<MultipleShape*>(Parent->Next);
   if (Fused) {
     PrintDebug("Fusing Multiple to Simple\n");
     Parent->Next = Parent->Next->Next;
     Fused->RenderLoopPrefix();
+
+    // When the Multiple has the same number of groups as we have branches,
+    // they will all be fused, so it is safe to not set the label at all
+    if (SetLabel && Fused->InnerMap.size() == ProcessedBranchesOut.size()) {
+      SetLabel = false;
+    }
   }
 
   if (!DefaultTarget) { // If no default specified, it is the last

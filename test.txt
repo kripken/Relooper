@@ -28,13 +28,11 @@ L1: do {
 // block A
 L5: do {
   if (check == 15) {
-    label = 4;
     /* direct */
     // block B
     label = 6;
     break L5;
   } else {
-    label = 5;
     /* direct */
     // block C
     label = 6;

@@ -29,11 +29,9 @@ L4: do {
 //23
 L7: do {
   if ( 1 ) {
-    label = 5;
     /* direct */
     //24
   } else {
-    label = 6;
     /* direct */
     //28
   }
