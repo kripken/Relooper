@@ -119,6 +119,9 @@ typedef std::map<Block*, Shape*> BlockShapeMap;
 
 struct MultipleShape : public Shape {
   BlockShapeMap InnerMap;
+  bool NeedLoop; // If we have branches, we need a loop
+
+  MultipleShape() : NeedLoop(false) {}
 
   void RenderLoopPrefix();
   void RenderLoopPostfix();

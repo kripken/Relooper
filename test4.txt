@@ -27,13 +27,11 @@ L4: do {
   }
 } while(0);
 //23
-L7: do {
-  if ( 1 ) {
-    /* direct */
-    //24
-  } else {
-    /* direct */
-    //28
-  }
-} while(0);
+if ( 1 ) {
+  /* direct */
+  //24
+} else {
+  /* direct */
+  //28
+}
 

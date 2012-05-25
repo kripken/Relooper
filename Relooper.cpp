@@ -184,14 +184,17 @@ int Shape::IdCounter = 0;
 // MultipleShape
 
 void MultipleShape::RenderLoopPrefix() {
-  // TODO: only when needed
-  PrintIndented("L%d: do {\n", Id);
-  Indenter::Indent();
+  if (NeedLoop) {
+    PrintIndented("L%d: do {\n", Id);
+    Indenter::Indent();
+  }
 }
 
 void MultipleShape::RenderLoopPostfix() {
-  Indenter::Unindent();
-  PrintIndented("} while(0);\n");
+  if (NeedLoop) {
+    Indenter::Unindent();
+    PrintIndented("} while(0);\n");
+  }
 }
 
 void MultipleShape::Render() {
@@ -303,6 +306,9 @@ void Relooper::Calculate(Block *Entry) {
         Branch *PriorOut = Prior->BranchesOut[Target];
         PriorOut->Ancestor = Ancestor; // Do we need this info
         PriorOut->Type = Type;         // on TargetIn too?
+        if (MultipleShape *Multiple = dynamic_cast<MultipleShape*>(Ancestor)) {
+          Multiple->NeedLoop = true; // We are breaking out of this Multiple, so need a loop
+        }
         iter++; // carefully increment iter before erasing
         Target->BranchesIn.erase(Prior);
         Target->ProcessedBranchesIn[Prior] = TargetIn;
