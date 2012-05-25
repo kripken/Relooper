@@ -104,6 +104,8 @@ void Block::Render() {
 
   if (!ProcessedBranchesOut.size()) return;
 
+  bool SetLabel = true; // in some cases it is clear we can avoid setting label, see later
+
   // Fusing: If the next is a Multiple, we can fuse it with this block. Note
   // that we must be the Inner of a Simple, so fusing means joining a Simple
   // to a Multiple. What happens there is that all options in the Multiple
@@ -138,6 +140,7 @@ void Block::Render() {
     PrintIndented("%sif (%s) {\n", First ? "" : "} else ", Details->Condition);
     First = false;
     Indenter::Indent();
+    if (!SetLabel) Details->Set = false;
     Details->Render(Target);
     if (Fused && Fused->InnerMap.find(Target) != Fused->InnerMap.end()) {
       Fused->InnerMap.find(Target)->second->Render();
@@ -149,7 +152,9 @@ void Block::Render() {
       PrintIndented("} else {\n");
       Indenter::Indent();
     }
-    ProcessedBranchesOut[DefaultTarget]->Render(DefaultTarget);
+    Branch *Details = ProcessedBranchesOut[DefaultTarget];
+    if (!SetLabel) Details->Set = false;
+    Details->Render(DefaultTarget);
     if (Fused && Fused->InnerMap.find(DefaultTarget) != Fused->InnerMap.end()) {
       Fused->InnerMap.find(DefaultTarget)->second->Render();
     }
