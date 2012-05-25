@@ -3,14 +3,14 @@ import random, subprocess, difflib
 
 while True:
   # Random decisions
-  num = random.randint(2, 100)
-  density = random.random()
-  decisions = [random.randint(1, num-1) for x in range(random.randint(round(num/3), num))]
+  num = random.randint(2, 400)
+  density = random.random() * random.random()
+  decisions = [random.randint(1, num-1) for x in range(num*3)]
   branches = [0]*num
   defaults = [0]*num
   for i in range(num):
     b = set([])
-    bs = random.randint(1, max(1, round(density*(num-1))))
+    bs = random.randint(1, max(1, round(density*random.random()*(num-1))))
     for j in range(bs):
       b.add(random.randint(1, num-1))
     defaults[i] = random.choice(list(b))
@@ -18,7 +18,7 @@ while True:
     branches[i] = b
   print num, density
 
-  for temp in ['fuzz', 'fuzz.fast.js', 'fuzz.cpp']:
+  for temp in ['fuzz', 'fuzz.fast.js', 'fuzz.slow.js', 'fuzz.cpp']:
     try:
       os.unlink(temp)
     except:
@@ -96,14 +96,14 @@ int main() {
 
   open('fuzz.slow.js', 'w').write(slow)
   open('fuzz.cpp', 'w').write(fast)
-  print '_',
+  print '_'
   slow_out = subprocess.Popen(['mozjs', '-m', '-n', 'fuzz.slow.js'], stdout=subprocess.PIPE).communicate()[0]
 
-  print '.',
+  print '.'
   subprocess.call(['g++', 'fuzz.cpp', 'Relooper.o', '-o', 'fuzz', '-g'])
-  print '*',
+  print '*'
   subprocess.call(['./fuzz'], stdout=open('fuzz.fast.js', 'w'))
-  print '-',
+  print '-'
   fast_out = subprocess.Popen(['mozjs', '-m', '-n', 'fuzz.fast.js'], stdout=subprocess.PIPE).communicate()[0]
   print
 
