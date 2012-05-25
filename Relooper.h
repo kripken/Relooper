@@ -93,8 +93,6 @@ struct Block {
 //            setjmp returns, etc.)
 //
 struct Shape {
-  enum Type { Simple = 0, Multiple = 1, Loop = 2, Emulated = 3};
-
   int Id; // A unique identifier. Used to identify loops, labels are Lx where x is the Id.
   Shape *Next; // The shape that will appear in the code right after this one
 
@@ -121,6 +119,9 @@ typedef std::map<Block*, Shape*> BlockShapeMap;
 
 struct MultipleShape : public Shape {
   BlockShapeMap InnerMap;
+
+  void RenderLoopPrefix();
+  void RenderLoopPostfix();
 
   void Render();
 };

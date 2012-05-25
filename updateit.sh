@@ -5,4 +5,5 @@
 ./test_dead &> test_dead.txt
 ./test4 &> test4.txt
 ./test_inf &> test_inf.txt
+./test_fuzz1 &> test_fuzz1.txt
 

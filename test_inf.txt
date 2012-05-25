@@ -1,93 +1,75 @@
 code 0
-if (uint(i4) >= uint(i5)) {
-  label = 2;
-  /* direct */
-} else {
-  label = 1;
-  /* direct */
-}
 L1: do {
-  if (label == 1) {
-    code 1
+  if (uint(i4) >= uint(i5)) {
+    label = 2;
+    /* direct */
+    code 2
     label = 3;
     break L1;
-  }
-  else if (label == 2) {
-    code 2
+  } else {
+    label = 1;
+    /* direct */
+    code 1
     label = 3;
     break L1;
   }
 } while(0);
 code 3
-if (i2 == 0) {
-  label = 15;
-  /* direct */
-} else {
-  label = 4;
-  /* direct */
-}
 L5: do {
-  if (label == 4) {
+  if (i2 == 0) {
+    label = 15;
+    /* direct */
+  } else {
+    label = 4;
+    /* direct */
     code 4
     label = 5;
     /* direct */
     L7: while(1) {
       code 5
-      if (uint(i6) >= uint(i7)) {
-        label = 7;
-        /* direct */
-      } else {
-        label = 6;
-        /* direct */
-      }
       L9: do {
-        if (label == 6) {
-          code 6
+        if (uint(i6) >= uint(i7)) {
+          label = 7;
+          /* direct */
+          code 7
           label = 8;
           break L9;
-        }
-        else if (label == 7) {
-          code 7
+        } else {
+          label = 6;
+          /* direct */
+          code 6
           label = 8;
           break L9;
         }
       } while(0);
       code 8
-      if (uint(i6) >= uint(i7)) {
-        label = 10;
-        /* direct */
-      } else {
-        label = 9;
-        /* direct */
-      }
       L13: do {
-        if (label == 9) {
-          code 9
+        if (uint(i6) >= uint(i7)) {
+          label = 10;
+          /* direct */
+          code 10
           label = 11;
           break L13;
-        }
-        else if (label == 10) {
-          code 10
+        } else {
+          label = 9;
+          /* direct */
+          code 9
           label = 11;
           break L13;
         }
       } while(0);
       code 11
-      if (uint(i5) >= uint(i6)) {
-        label = 13;
-        /* direct */
-      } else {
-        label = 12;
-        /* direct */
-      }
       L17: do {
-        if (label == 12) {
-          code 12
+        if (uint(i5) >= uint(i6)) {
+          label = 13;
+          /* direct */
+          code 13
           label = 14;
           break L17;
-        }
-        else if (label == 13) {
-          code 13
+        } else {
+          label = 12;
+          /* direct */
+          code 12
           label = 14;
           break L17;
         }
@@ -104,575 +86,461 @@ L5: do {
   }
 } while(0);
 code 15
-if (uint(i4) >= uint(i5)) {
-  label = 17;
-  /* direct */
-} else {
-  label = 16;
-  /* direct */
-}
 L22: do {
-  if (label == 16) {
-    code 16
+  if (uint(i4) >= uint(i5)) {
+    label = 17;
+    /* direct */
+    code 17
     label = 18;
     break L22;
-  }
-  else if (label == 17) {
-    code 17
+  } else {
+    label = 16;
+    /* direct */
+    code 16
     label = 18;
     break L22;
   }
 } while(0);
 code 18
-if (i2 == 0) {
-  label = 102;
-  /* direct */
-} else {
-  label = 19;
-  /* direct */
-}
 L26: do {
-  if (label == 19) {
+  if (i2 == 0) {
+    label = 102;
+    /* direct */
+  } else {
+    label = 19;
+    /* direct */
     code 19
     label = 20;
     /* direct */
     L28: while(1) {
       code 20
-      if (uint(i5) >= uint(i6)) {
-        label = 22;
-        /* direct */
-      } else {
-        label = 21;
-        /* direct */
-      }
       L30: do {
-        if (label == 21) {
-          code 21
+        if (uint(i5) >= uint(i6)) {
+          label = 22;
+          /* direct */
+          code 22
           label = 23;
           break L30;
-        }
-        else if (label == 22) {
-          code 22
+        } else {
+          label = 21;
+          /* direct */
+          code 21
           label = 23;
           break L30;
         }
       } while(0);
       code 23
-      if (uint(i5) >= uint(i6)) {
-        label = 25;
-        /* direct */
-      } else {
-        label = 24;
-        /* direct */
-      }
       L34: do {
-        if (label == 24) {
-          code 24
+        if (uint(i5) >= uint(i6)) {
+          label = 25;
+          /* direct */
+          code 25
           label = 26;
           break L34;
-        }
-        else if (label == 25) {
-          code 25
+        } else {
+          label = 24;
+          /* direct */
+          code 24
           label = 26;
           break L34;
         }
       } while(0);
       code 26
-      if (uint(i5) >= uint(i6)) {
-        label = 28;
-        /* direct */
-      } else {
-        label = 27;
-        /* direct */
-      }
       L38: do {
-        if (label == 27) {
-          code 27
+        if (uint(i5) >= uint(i6)) {
+          label = 28;
+          /* direct */
+          code 28
           label = 29;
           break L38;
-        }
-        else if (label == 28) {
-          code 28
+        } else {
+          label = 27;
+          /* direct */
+          code 27
           label = 29;
           break L38;
         }
       } while(0);
       code 29
-      if (uint(i5) >= uint(i6)) {
-        label = 31;
-        /* direct */
-      } else {
-        label = 30;
-        /* direct */
-      }
       L42: do {
-        if (label == 30) {
-          code 30
+        if (uint(i5) >= uint(i6)) {
+          label = 31;
+          /* direct */
+          code 31
           label = 32;
           break L42;
-        }
-        else if (label == 31) {
-          code 31
+        } else {
+          label = 30;
+          /* direct */
+          code 30
           label = 32;
           break L42;
         }
       } while(0);
       code 32
-      if (uint(i5) >= uint(i6)) {
-        label = 34;
-        /* direct */
-      } else {
-        label = 33;
-        /* direct */
-      }
       L46: do {
-        if (label == 33) {
-          code 33
+        if (uint(i5) >= uint(i6)) {
+          label = 34;
+          /* direct */
+          code 34
           label = 35;
           break L46;
-        }
-        else if (label == 34) {
-          code 34
+        } else {
+          label = 33;
+          /* direct */
+          code 33
           label = 35;
           break L46;
         }
       } while(0);
       code 35
-      if (uint(i5) >= uint(i6)) {
-        label = 37;
-        /* direct */
-      } else {
-        label = 36;
-        /* direct */
-      }
       L50: do {
-        if (label == 36) {
-          code 36
+        if (uint(i5) >= uint(i6)) {
+          label = 37;
+          /* direct */
+          code 37
           label = 38;
           break L50;
-        }
-        else if (label == 37) {
-          code 37
+        } else {
+          label = 36;
+          /* direct */
+          code 36
           label = 38;
           break L50;
         }
       } while(0);
       code 38
-      if (uint(i5) >= uint(i6)) {
-        label = 40;
-        /* direct */
-      } else {
-        label = 39;
-        /* direct */
-      }
       L54: do {
-        if (label == 39) {
-          code 39
+        if (uint(i5) >= uint(i6)) {
+          label = 40;
+          /* direct */
+          code 40
           label = 41;
           break L54;
-        }
-        else if (label == 40) {
-          code 40
+        } else {
+          label = 39;
+          /* direct */
+          code 39
           label = 41;
           break L54;
         }
       } while(0);
       code 41
-      if (uint(i5) >= uint(i6)) {
-        label = 43;
-        /* direct */
-      } else {
-        label = 42;
-        /* direct */
-      }
       L58: do {
-        if (label == 42) {
-          code 42
+        if (uint(i5) >= uint(i6)) {
+          label = 43;
+          /* direct */
+          code 43
           label = 44;
           break L58;
-        }
-        else if (label == 43) {
-          code 43
+        } else {
+          label = 42;
+          /* direct */
+          code 42
           label = 44;
           break L58;
         }
       } while(0);
       code 44
-      if (uint(i5) >= uint(i6)) {
-        label = 46;
-        /* direct */
-      } else {
-        label = 45;
-        /* direct */
-      }
       L62: do {
-        if (label == 45) {
-          code 45
+        if (uint(i5) >= uint(i6)) {
+          label = 46;
+          /* direct */
+          code 46
           label = 47;
           break L62;
-        }
-        else if (label == 46) {
-          code 46
+        } else {
+          label = 45;
+          /* direct */
+          code 45
           label = 47;
           break L62;
         }
       } while(0);
       code 47
-      if (uint(i5) >= uint(i6)) {
-        label = 49;
-        /* direct */
-      } else {
-        label = 48;
-        /* direct */
-      }
       L66: do {
-        if (label == 48) {
-          code 48
+        if (uint(i5) >= uint(i6)) {
+          label = 49;
+          /* direct */
+          code 49
           label = 50;
           break L66;
-        }
-        else if (label == 49) {
-          code 49
+        } else {
+          label = 48;
+          /* direct */
+          code 48
           label = 50;
           break L66;
         }
       } while(0);
       code 50
-      if (uint(i5) >= uint(i6)) {
-        label = 52;
-        /* direct */
-      } else {
-        label = 51;
-        /* direct */
-      }
       L70: do {
-        if (label == 51) {
-          code 51
+        if (uint(i5) >= uint(i6)) {
+          label = 52;
+          /* direct */
+          code 52
           label = 53;
           break L70;
-        }
-        else if (label == 52) {
-          code 52
+        } else {
+          label = 51;
+          /* direct */
+          code 51
           label = 53;
           break L70;
         }
       } while(0);
       code 53
-      if (uint(i5) >= uint(i6)) {
-        label = 55;
-        /* direct */
-      } else {
-        label = 54;
-        /* direct */
-      }
       L74: do {
-        if (label == 54) {
-          code 54
+        if (uint(i5) >= uint(i6)) {
+          label = 55;
+          /* direct */
+          code 55
           label = 56;
           break L74;
-        }
-        else if (label == 55) {
-          code 55
+        } else {
+          label = 54;
+          /* direct */
+          code 54
           label = 56;
           break L74;
         }
       } while(0);
       code 56
-      if (uint(i5) >= uint(i6)) {
-        label = 58;
-        /* direct */
-      } else {
-        label = 57;
-        /* direct */
-      }
       L78: do {
-        if (label == 57) {
-          code 57
+        if (uint(i5) >= uint(i6)) {
+          label = 58;
+          /* direct */
+          code 58
           label = 59;
           break L78;
-        }
-        else if (label == 58) {
-          code 58
+        } else {
+          label = 57;
+          /* direct */
+          code 57
           label = 59;
           break L78;
         }
       } while(0);
       code 59
-      if (uint(i5) >= uint(i6)) {
-        label = 61;
-        /* direct */
-      } else {
-        label = 60;
-        /* direct */
-      }
       L82: do {
-        if (label == 60) {
-          code 60
+        if (uint(i5) >= uint(i6)) {
+          label = 61;
+          /* direct */
+          code 61
           label = 62;
           break L82;
-        }
-        else if (label == 61) {
-          code 61
+        } else {
+          label = 60;
+          /* direct */
+          code 60
           label = 62;
           break L82;
         }
       } while(0);
       code 62
-      if (uint(i5) >= uint(i6)) {
-        label = 64;
-        /* direct */
-      } else {
-        label = 63;
-        /* direct */
-      }
       L86: do {
-        if (label == 63) {
-          code 63
+        if (uint(i5) >= uint(i6)) {
+          label = 64;
+          /* direct */
+          code 64
           label = 65;
           break L86;
-        }
-        else if (label == 64) {
-          code 64
+        } else {
+          label = 63;
+          /* direct */
+          code 63
           label = 65;
           break L86;
         }
       } while(0);
       code 65
-      if (uint(i5) >= uint(i6)) {
-        label = 67;
-        /* direct */
-      } else {
-        label = 66;
-        /* direct */
-      }
       L90: do {
-        if (label == 66) {
-          code 66
+        if (uint(i5) >= uint(i6)) {
+          label = 67;
+          /* direct */
+          code 67
           label = 68;
           break L90;
-        }
-        else if (label == 67) {
-          code 67
+        } else {
+          label = 66;
+          /* direct */
+          code 66
           label = 68;
           break L90;
         }
       } while(0);
       code 68
-      if (uint(i5) >= uint(i6)) {
-        label = 70;
-        /* direct */
-      } else {
-        label = 69;
-        /* direct */
-      }
       L94: do {
-        if (label == 69) {
-          code 69
+        if (uint(i5) >= uint(i6)) {
+          label = 70;
+          /* direct */
+          code 70
           label = 71;
           break L94;
-        }
-        else if (label == 70) {
-          code 70
+        } else {
+          label = 69;
+          /* direct */
+          code 69
           label = 71;
           break L94;
         }
       } while(0);
       code 71
-      if (uint(i5) >= uint(i6)) {
-        label = 73;
-        /* direct */
-      } else {
-        label = 72;
-        /* direct */
-      }
       L98: do {
-        if (label == 72) {
-          code 72
+        if (uint(i5) >= uint(i6)) {
+          label = 73;
+          /* direct */
+          code 73
           label = 74;
           break L98;
-        }
-        else if (label == 73) {
-          code 73
+        } else {
+          label = 72;
+          /* direct */
+          code 72
           label = 74;
           break L98;
         }
       } while(0);
       code 74
-      if (uint(i5) >= uint(i6)) {
-        label = 76;
-        /* direct */
-      } else {
-        label = 75;
-        /* direct */
-      }
       L102: do {
-        if (label == 75) {
-          code 75
+        if (uint(i5) >= uint(i6)) {
+          label = 76;
+          /* direct */
+          code 76
           label = 77;
           break L102;
-        }
-        else if (label == 76) {
-          code 76
+        } else {
+          label = 75;
+          /* direct */
+          code 75
           label = 77;
           break L102;
         }
       } while(0);
       code 77
-      if (uint(i5) >= uint(i6)) {
-        label = 79;
-        /* direct */
-      } else {
-        label = 78;
-        /* direct */
-      }
       L106: do {
-        if (label == 78) {
-          code 78
+        if (uint(i5) >= uint(i6)) {
+          label = 79;
+          /* direct */
+          code 79
           label = 80;
           break L106;
-        }
-        else if (label == 79) {
-          code 79
+        } else {
+          label = 78;
+          /* direct */
+          code 78
           label = 80;
           break L106;
         }
       } while(0);
       code 80
-      if (uint(i5) >= uint(i6)) {
-        label = 82;
-        /* direct */
-      } else {
-        label = 81;
-        /* direct */
-      }
       L110: do {
-        if (label == 81) {
-          code 81
+        if (uint(i5) >= uint(i6)) {
+          label = 82;
+          /* direct */
+          code 82
           label = 83;
           break L110;
-        }
-        else if (label == 82) {
-          code 82
+        } else {
+          label = 81;
+          /* direct */
+          code 81
           label = 83;
           break L110;
         }
       } while(0);
       code 83
-      if (uint(i5) >= uint(i6)) {
-        label = 85;
-        /* direct */
-      } else {
-        label = 84;
-        /* direct */
-      }
       L114: do {
-        if (label == 84) {
-          code 84
+        if (uint(i5) >= uint(i6)) {
+          label = 85;
+          /* direct */
+          code 85
           label = 86;
           break L114;
-        }
-        else if (label == 85) {
-          code 85
+        } else {
+          label = 84;
+          /* direct */
+          code 84
           label = 86;
           break L114;
         }
       } while(0);
       code 86
-      if (uint(i5) >= uint(i6)) {
-        label = 88;
-        /* direct */
-      } else {
-        label = 87;
-        /* direct */
-      }
       L118: do {
-        if (label == 87) {
-          code 87
+        if (uint(i5) >= uint(i6)) {
+          label = 88;
+          /* direct */
+          code 88
           label = 89;
           break L118;
-        }
-        else if (label == 88) {
-          code 88
+        } else {
+          label = 87;
+          /* direct */
+          code 87
           label = 89;
           break L118;
         }
       } while(0);
       code 89
-      if (uint(i5) >= uint(i6)) {
-        label = 91;
-        /* direct */
-      } else {
-        label = 90;
-        /* direct */
-      }
       L122: do {
-        if (label == 90) {
-          code 90
+        if (uint(i5) >= uint(i6)) {
+          label = 91;
+          /* direct */
+          code 91
           label = 92;
           break L122;
-        }
-        else if (label == 91) {
-          code 91
+        } else {
+          label = 90;
+          /* direct */
+          code 90
           label = 92;
           break L122;
         }
       } while(0);
       code 92
-      if (uint(i5) >= uint(i6)) {
-        label = 94;
-        /* direct */
-      } else {
-        label = 93;
-        /* direct */
-      }
       L126: do {
-        if (label == 93) {
-          code 93
+        if (uint(i5) >= uint(i6)) {
+          label = 94;
+          /* direct */
+          code 94
           label = 95;
           break L126;
-        }
-        else if (label == 94) {
-          code 94
+        } else {
+          label = 93;
+          /* direct */
+          code 93
           label = 95;
           break L126;
         }
       } while(0);
       code 95
-      if (uint(i5) >= uint(i6)) {
-        label = 97;
-        /* direct */
-      } else {
-        label = 96;
-        /* direct */
-      }
       L130: do {
-        if (label == 96) {
-          code 96
+        if (uint(i5) >= uint(i6)) {
+          label = 97;
+          /* direct */
+          code 97
           label = 98;
           break L130;
-        }
-        else if (label == 97) {
-          code 97
+        } else {
+          label = 96;
+          /* direct */
+          code 96
           label = 98;
           break L130;
         }
       } while(0);
       code 98
-      if (uint(i5) >= uint(i6)) {
-        label = 100;
-        /* direct */
-      } else {
-        label = 99;
-        /* direct */
-      }
       L134: do {
-        if (label == 99) {
-          code 99
+        if (uint(i5) >= uint(i6)) {
+          label = 100;
+          /* direct */
+          code 100
           label = 101;
           break L134;
-        }
-        else if (label == 100) {
-          code 100
+        } else {
+          label = 99;
+          /* direct */
+          code 99
           label = 101;
           break L134;
         }
@@ -689,435 +557,349 @@ L26: do {
   }
 } while(0);
 code 102
-if (uint(i4) >= uint(i5)) {
-  label = 104;
-  /* direct */
-} else {
-  label = 103;
-  /* direct */
-}
 L139: do {
-  if (label == 103) {
-    code 103
+  if (uint(i4) >= uint(i5)) {
+    label = 104;
+    /* direct */
+    code 104
     label = 105;
     break L139;
-  }
-  else if (label == 104) {
-    code 104
+  } else {
+    label = 103;
+    /* direct */
+    code 103
     label = 105;
     break L139;
   }
 } while(0);
 code 105
-if (i2 == 0) {
-  label = 168;
-  /* direct */
-} else {
-  label = 106;
-  /* direct */
-}
 L143: do {
-  if (label == 106) {
+  if (i2 == 0) {
+    label = 168;
+    /* direct */
+  } else {
+    label = 106;
+    /* direct */
     code 106
     label = 107;
     /* direct */
     L145: while(1) {
       code 107
-      if (uint(i5) >= uint(i6)) {
-        label = 109;
-        /* direct */
-      } else {
-        label = 108;
-        /* direct */
-      }
       L147: do {
-        if (label == 108) {
-          code 108
+        if (uint(i5) >= uint(i6)) {
+          label = 109;
+          /* direct */
+          code 109
           label = 110;
           break L147;
-        }
-        else if (label == 109) {
-          code 109
+        } else {
+          label = 108;
+          /* direct */
+          code 108
           label = 110;
           break L147;
         }
       } while(0);
       code 110
-      if (uint(i5) >= uint(i6)) {
-        label = 112;
-        /* direct */
-      } else {
-        label = 111;
-        /* direct */
-      }
       L151: do {
-        if (label == 111) {
-          code 111
+        if (uint(i5) >= uint(i6)) {
+          label = 112;
+          /* direct */
+          code 112
           label = 113;
           break L151;
-        }
-        else if (label == 112) {
-          code 112
+        } else {
+          label = 111;
+          /* direct */
+          code 111
           label = 113;
           break L151;
         }
       } while(0);
       code 113
-      if (uint(i5) >= uint(i6)) {
-        label = 115;
-        /* direct */
-      } else {
-        label = 114;
-        /* direct */
-      }
       L155: do {
-        if (label == 114) {
-          code 114
+        if (uint(i5) >= uint(i6)) {
+          label = 115;
+          /* direct */
+          code 115
           label = 116;
           break L155;
-        }
-        else if (label == 115) {
-          code 115
+        } else {
+          label = 114;
+          /* direct */
+          code 114
           label = 116;
           break L155;
         }
       } while(0);
       code 116
-      if (uint(i5) >= uint(i6)) {
-        label = 118;
-        /* direct */
-      } else {
-        label = 117;
-        /* direct */
-      }
       L159: do {
-        if (label == 117) {
-          code 117
+        if (uint(i5) >= uint(i6)) {
+          label = 118;
+          /* direct */
+          code 118
           label = 119;
           break L159;
-        }
-        else if (label == 118) {
-          code 118
+        } else {
+          label = 117;
+          /* direct */
+          code 117
           label = 119;
           break L159;
         }
       } while(0);
       code 119
-      if (uint(i5) >= uint(i6)) {
-        label = 121;
-        /* direct */
-      } else {
-        label = 120;
-        /* direct */
-      }
       L163: do {
-        if (label == 120) {
-          code 120
+        if (uint(i5) >= uint(i6)) {
+          label = 121;
+          /* direct */
+          code 121
           label = 122;
           break L163;
-        }
-        else if (label == 121) {
-          code 121
+        } else {
+          label = 120;
+          /* direct */
+          code 120
           label = 122;
           break L163;
         }
       } while(0);
       code 122
-      if (uint(i5) >= uint(i6)) {
-        label = 124;
-        /* direct */
-      } else {
-        label = 123;
-        /* direct */
-      }
       L167: do {
-        if (label == 123) {
-          code 123
+        if (uint(i5) >= uint(i6)) {
+          label = 124;
+          /* direct */
+          code 124
           label = 125;
           break L167;
-        }
-        else if (label == 124) {
-          code 124
+        } else {
+          label = 123;
+          /* direct */
+          code 123
           label = 125;
           break L167;
         }
       } while(0);
       code 125
-      if (uint(i5) >= uint(i6)) {
-        label = 127;
-        /* direct */
-      } else {
-        label = 126;
-        /* direct */
-      }
       L171: do {
-        if (label == 126) {
-          code 126
+        if (uint(i5) >= uint(i6)) {
+          label = 127;
+          /* direct */
+          code 127
           label = 128;
           break L171;
-        }
-        else if (label == 127) {
-          code 127
+        } else {
+          label = 126;
+          /* direct */
+          code 126
           label = 128;
           break L171;
         }
       } while(0);
       code 128
-      if (uint(i5) >= uint(i6)) {
-        label = 130;
-        /* direct */
-      } else {
-        label = 129;
-        /* direct */
-      }
       L175: do {
-        if (label == 129) {
-          code 129
+        if (uint(i5) >= uint(i6)) {
+          label = 130;
+          /* direct */
+          code 130
           label = 131;
           break L175;
-        }
-        else if (label == 130) {
-          code 130
+        } else {
+          label = 129;
+          /* direct */
+          code 129
           label = 131;
           break L175;
         }
       } while(0);
       code 131
-      if (uint(i5) >= uint(i6)) {
-        label = 133;
-        /* direct */
-      } else {
-        label = 132;
-        /* direct */
-      }
       L179: do {
-        if (label == 132) {
-          code 132
+        if (uint(i5) >= uint(i6)) {
+          label = 133;
+          /* direct */
+          code 133
           label = 134;
           break L179;
-        }
-        else if (label == 133) {
-          code 133
+        } else {
+          label = 132;
+          /* direct */
+          code 132
           label = 134;
           break L179;
         }
       } while(0);
       code 134
-      if (uint(i5) >= uint(i6)) {
-        label = 136;
-        /* direct */
-      } else {
-        label = 135;
-        /* direct */
-      }
       L183: do {
-        if (label == 135) {
-          code 135
+        if (uint(i5) >= uint(i6)) {
+          label = 136;
+          /* direct */
+          code 136
           label = 137;
           break L183;
-        }
-        else if (label == 136) {
-          code 136
+        } else {
+          label = 135;
+          /* direct */
+          code 135
           label = 137;
           break L183;
         }
       } while(0);
       code 137
-      if (uint(i5) >= uint(i6)) {
-        label = 139;
-        /* direct */
-      } else {
-        label = 138;
-        /* direct */
-      }
       L187: do {
-        if (label == 138) {
-          code 138
+        if (uint(i5) >= uint(i6)) {
+          label = 139;
+          /* direct */
+          code 139
           label = 140;
           break L187;
-        }
-        else if (label == 139) {
-          code 139
+        } else {
+          label = 138;
+          /* direct */
+          code 138
           label = 140;
           break L187;
         }
       } while(0);
       code 140
-      if (uint(i5) >= uint(i6)) {
-        label = 142;
-        /* direct */
-      } else {
-        label = 141;
-        /* direct */
-      }
       L191: do {
-        if (label == 141) {
-          code 141
+        if (uint(i5) >= uint(i6)) {
+          label = 142;
+          /* direct */
+          code 142
           label = 143;
           break L191;
-        }
-        else if (label == 142) {
-          code 142
+        } else {
+          label = 141;
+          /* direct */
+          code 141
           label = 143;
           break L191;
         }
       } while(0);
       code 143
-      if (uint(i5) >= uint(i6)) {
-        label = 145;
-        /* direct */
-      } else {
-        label = 144;
-        /* direct */
-      }
       L195: do {
-        if (label == 144) {
-          code 144
+        if (uint(i5) >= uint(i6)) {
+          label = 145;
+          /* direct */
+          code 145
           label = 146;
           break L195;
-        }
-        else if (label == 145) {
-          code 145
+        } else {
+          label = 144;
+          /* direct */
+          code 144
           label = 146;
           break L195;
         }
       } while(0);
       code 146
-      if (uint(i5) >= uint(i6)) {
-        label = 148;
-        /* direct */
-      } else {
-        label = 147;
-        /* direct */
-      }
       L199: do {
-        if (label == 147) {
-          code 147
+        if (uint(i5) >= uint(i6)) {
+          label = 148;
+          /* direct */
+          code 148
           label = 149;
           break L199;
-        }
-        else if (label == 148) {
-          code 148
+        } else {
+          label = 147;
+          /* direct */
+          code 147
           label = 149;
           break L199;
         }
       } while(0);
       code 149
-      if (uint(i5) >= uint(i6)) {
-        label = 151;
-        /* direct */
-      } else {
-        label = 150;
-        /* direct */
-      }
       L203: do {
-        if (label == 150) {
-          code 150
+        if (uint(i5) >= uint(i6)) {
+          label = 151;
+          /* direct */
+          code 151
           label = 152;
           break L203;
-        }
-        else if (label == 151) {
-          code 151
+        } else {
+          label = 150;
+          /* direct */
+          code 150
           label = 152;
           break L203;
         }
       } while(0);
       code 152
-      if (uint(i5) >= uint(i6)) {
-        label = 154;
-        /* direct */
-      } else {
-        label = 153;
-        /* direct */
-      }
       L207: do {
-        if (label == 153) {
-          code 153
+        if (uint(i5) >= uint(i6)) {
+          label = 154;
+          /* direct */
+          code 154
           label = 155;
           break L207;
-        }
-        else if (label == 154) {
-          code 154
+        } else {
+          label = 153;
+          /* direct */
+          code 153
           label = 155;
           break L207;
         }
       } while(0);
       code 155
-      if (uint(i5) >= uint(i6)) {
-        label = 157;
-        /* direct */
-      } else {
-        label = 156;
-        /* direct */
-      }
       L211: do {
-        if (label == 156) {
-          code 156
+        if (uint(i5) >= uint(i6)) {
+          label = 157;
+          /* direct */
+          code 157
           label = 158;
           break L211;
-        }
-        else if (label == 157) {
-          code 157
+        } else {
+          label = 156;
+          /* direct */
+          code 156
           label = 158;
           break L211;
         }
       } while(0);
       code 158
-      if (uint(i5) >= uint(i6)) {
-        label = 160;
-        /* direct */
-      } else {
-        label = 159;
-        /* direct */
-      }
       L215: do {
-        if (label == 159) {
-          code 159
+        if (uint(i5) >= uint(i6)) {
+          label = 160;
+          /* direct */
+          code 160
           label = 161;
           break L215;
-        }
-        else if (label == 160) {
-          code 160
+        } else {
+          label = 159;
+          /* direct */
+          code 159
           label = 161;
           break L215;
         }
       } while(0);
       code 161
-      if (uint(i5) >= uint(i6)) {
-        label = 163;
-        /* direct */
-      } else {
-        label = 162;
-        /* direct */
-      }
       L219: do {
-        if (label == 162) {
-          code 162
+        if (uint(i5) >= uint(i6)) {
+          label = 163;
+          /* direct */
+          code 163
           label = 164;
           break L219;
-        }
-        else if (label == 163) {
-          code 163
+        } else {
+          label = 162;
+          /* direct */
+          code 162
           label = 164;
           break L219;
         }
       } while(0);
       code 164
-      if (uint(i5) >= uint(i6)) {
-        label = 166;
-        /* direct */
-      } else {
-        label = 165;
-        /* direct */
-      }
       L223: do {
-        if (label == 165) {
-          code 165
+        if (uint(i5) >= uint(i6)) {
+          label = 166;
+          /* direct */
+          code 166
           label = 167;
           break L223;
-        }
-        else if (label == 166) {
-          code 166
+        } else {
+          label = 165;
+          /* direct */
+          code 165
           label = 167;
           break L223;
         }
@@ -1134,95 +916,77 @@ L143: do {
   }
 } while(0);
 code 168
-if (uint(i4) >= uint(i5)) {
-  label = 170;
-  /* direct */
-} else {
-  label = 169;
-  /* direct */
-}
 L228: do {
-  if (label == 169) {
-    code 169
+  if (uint(i4) >= uint(i5)) {
+    label = 170;
+    /* direct */
+    code 170
     label = 171;
     break L228;
-  }
-  else if (label == 170) {
-    code 170
+  } else {
+    label = 169;
+    /* direct */
+    code 169
     label = 171;
     break L228;
   }
 } while(0);
 code 171
-if (i2 == 0) {
-  label = 183;
-  /* direct */
-} else {
-  label = 172;
-  /* direct */
-}
 L232: do {
-  if (label == 172) {
+  if (i2 == 0) {
+    label = 183;
+    /* direct */
+  } else {
+    label = 172;
+    /* direct */
     code 172
     label = 173;
     /* direct */
     L234: while(1) {
       code 173
-      if (uint(i5) >= uint(i6)) {
-        label = 175;
-        /* direct */
-      } else {
-        label = 174;
-        /* direct */
-      }
       L236: do {
-        if (label == 174) {
-          code 174
+        if (uint(i5) >= uint(i6)) {
+          label = 175;
+          /* direct */
+          code 175
           label = 176;
           break L236;
-        }
-        else if (label == 175) {
-          code 175
+        } else {
+          label = 174;
+          /* direct */
+          code 174
           label = 176;
           break L236;
         }
       } while(0);
       code 176
-      if (uint(i5) >= uint(i6)) {
-        label = 178;
-        /* direct */
-      } else {
-        label = 177;
-        /* direct */
-      }
       L240: do {
-        if (label == 177) {
-          code 177
+        if (uint(i5) >= uint(i6)) {
+          label = 178;
+          /* direct */
+          code 178
           label = 179;
           break L240;
-        }
-        else if (label == 178) {
-          code 178
+        } else {
+          label = 177;
+          /* direct */
+          code 177
           label = 179;
           break L240;
         }
       } while(0);
       code 179
-      if (uint(i4) >= uint(i5)) {
-        label = 181;
-        /* direct */
-      } else {
-        label = 180;
-        /* direct */
-      }
       L244: do {
-        if (label == 180) {
-          code 180
+        if (uint(i4) >= uint(i5)) {
+          label = 181;
+          /* direct */
+          code 181
           label = 182;
           break L244;
-        }
-        else if (label == 181) {
-          code 181
+        } else {
+          label = 180;
+          /* direct */
+          code 180
           label = 182;
           break L244;
         }

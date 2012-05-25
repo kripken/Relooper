@@ -104,6 +104,21 @@ void Block::Render() {
 
   if (!ProcessedBranchesOut.size()) return;
 
+  // Fusing: If the next is a Multiple, we can fuse it with this block. Note
+  // that we must be the Inner of a Simple, so fusing means joining a Simple
+  // to a Multiple. What happens there is that all options in the Multiple
+  // *must* appear in the Simple (the Simple is the only one reaching the
+  // Multiple), so we can remove the Multiple and add its independent groups
+  // into the Simple's branches.
+  // TODO: Also remove assignments to label when possible (at least in
+  //       trivial case of the Multiple being of identical size to our branches)
+  MultipleShape *Fused = dynamic_cast<MultipleShape*>(Parent->Next);
+  if (Fused) {
+    PrintDebug("Fusing Multiple to Simple\n");
+    Parent->Next = Parent->Next->Next;
+    Fused->RenderLoopPrefix();
+  }
+
   if (!DefaultTarget) { // If no default specified, it is the last
     for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
       if (!iter->second->Condition) {
@@ -124,6 +139,9 @@ void Block::Render() {
     First = false;
     Indenter::Indent();
     Details->Render(Target);
+    if (Fused && Fused->InnerMap.find(Target) != Fused->InnerMap.end()) {
+      Fused->InnerMap.find(Target)->second->Render();
+    }
     Indenter::Unindent();
   }
   if (DefaultTarget) {
@@ -132,11 +150,18 @@ void Block::Render() {
       Indenter::Indent();
     }
     ProcessedBranchesOut[DefaultTarget]->Render(DefaultTarget);
+    if (Fused && Fused->InnerMap.find(DefaultTarget) != Fused->InnerMap.end()) {
+      Fused->InnerMap.find(DefaultTarget)->second->Render();
+    }
     if (!First) {
       Indenter::Unindent();
     }
   }
   if (!First) PrintIndented("}\n");
+
+  if (Fused) {
+    Fused->RenderLoopPostfix();
+  }
 }
 
 // Shape
@@ -145,12 +170,19 @@ int Shape::IdCounter = 0;
 
 // MultipleShape
 
+void MultipleShape::RenderLoopPrefix() {
+  // TODO: only when needed
+  PrintIndented("L%d: do {\n", Id);
+  Indenter::Indent();
+}
+
+void MultipleShape::RenderLoopPostfix() {
+  Indenter::Unindent();
+  PrintIndented("} while(0);\n");
+}
+
 void MultipleShape::Render() {
-  bool NeedLoop = true; // TODO
-  if (NeedLoop) {
-    PrintIndented("L%d: do {\n", Id);
-    Indenter::Indent();
-  }
+  RenderLoopPrefix();
   bool First = true;
   for (BlockShapeMap::iterator iter = InnerMap.begin(); iter != InnerMap.end(); iter++) {
     PrintIndented("%sif (label == %d) {\n", First ? "" : "else ", iter->first->Id);
@@ -160,10 +192,7 @@ void MultipleShape::Render() {
     Indenter::Unindent();
     PrintIndented("}\n");
   }
-  if (NeedLoop) {
-    Indenter::Unindent();
-    PrintIndented("} while(0);\n");
-  }
+  RenderLoopPostfix();
   if (Next) Next->Render();
 };
 

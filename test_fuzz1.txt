@@ -7,18 +7,16 @@ print(5); state = check();
 label = 6;
 /* direct */
 print(6); state = check();
-if (state == 7) {
-  label = 7;
-  /* direct */
-} else {
-  label = 1;
-  /* direct */
-}
 L3: do {
-  if (label == 7) {
+  if (state == 7) {
+    label = 7;
+    /* direct */
     print(7); state = check();
     label = 2;
     break L3;
+  } else {
+    label = 1;
+    /* direct */
   }
 } while(0);
 L5: while(1) {
