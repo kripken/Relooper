@@ -23,7 +23,6 @@ L5: do {
     label = 4;
     /* direct */
     code 4
-    label = 5;
     /* direct */
     L7: while(1) {
       code 5
@@ -110,7 +109,6 @@ L26: do {
     label = 19;
     /* direct */
     code 19
-    label = 20;
     /* direct */
     L28: while(1) {
       code 20
@@ -581,7 +579,6 @@ L143: do {
     label = 106;
     /* direct */
     code 106
-    label = 107;
     /* direct */
     L145: while(1) {
       code 107
@@ -940,7 +937,6 @@ L232: do {
     label = 172;
     /* direct */
     code 172
-    label = 173;
     /* direct */
     L234: while(1) {
       code 173

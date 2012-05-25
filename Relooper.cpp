@@ -106,6 +106,10 @@ void Block::Render() {
 
   bool SetLabel = true; // in some cases it is clear we can avoid setting label, see later
 
+  if (ProcessedBranchesOut.size() == 1 && ProcessedBranchesOut.begin()->second->Type == Branch::Direct) {
+    SetLabel = false;
+  }
+
   // Fusing: If the next is a Multiple, we can fuse it with this block. Note
   // that we must be the Inner of a Simple, so fusing means joining a Simple
   // to a Multiple. What happens there is that all options in the Multiple

@@ -52,7 +52,6 @@ L5: do {
 L9: while(1) {
   // block A
   var check = maybe();
-  label = 8;
   /* direct */
   // block B
   if (check == 41) {
