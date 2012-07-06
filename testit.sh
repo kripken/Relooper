@@ -34,3 +34,7 @@ echo "test fuzz2"
 ./test_fuzz2 &> test_fuzz2.out
 diff -U 5 test_fuzz2.txt test_fuzz2.out
 
+echo "test fuzz3"
+./test_fuzz3 &> test_fuzz3.out
+diff -U 5 test_fuzz3.txt test_fuzz3.out
+
