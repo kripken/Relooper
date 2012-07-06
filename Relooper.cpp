@@ -81,8 +81,6 @@ Block::~Block() {
     delete iter->second;
   }
   // XXX If not reachable, expected to have branches here. But need to clean them up to prevent leaks!
-  assert(!Reachable || BranchesIn.size() == 0);
-  assert(!Reachable || BranchesOut.size() == 0);
 }
 
 void Block::AddBranchTo(Block *Target, const char *Condition) {
@@ -260,12 +258,33 @@ void Relooper::AddBlock(Block *New) {
   Blocks.push_back(New);
 }
 
+struct RelooperRecursor {
+  Relooper *Parent;
+  RelooperRecursor(Relooper *ParentInit) : Parent(ParentInit) {}
+};
+
 void Relooper::Calculate(Block *Entry) {
   Shapes.reserve(Blocks.size()); // vague heuristic, better than nothing
 
-  // Add incoming branches
+  // Find live blocks (reachable from the entry)
+  struct LiveScanner : public RelooperRecursor {
+    LiveScanner(Relooper *Parent) : RelooperRecursor(Parent) {}
+    BlockSet Blocks;
+    void Scan(Block *Curr) {
+      if (Blocks.find(Curr) != Blocks.end()) return;
+      Blocks.insert(Curr);
+      for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
+        Scan(iter->first);
+      }
+    }
+  };
+  LiveScanner Live(this);
+  Live.Scan(Entry);
+
+  // Add incoming branches from live blocks, ignoring dead code
   for (int i = 0; i < Blocks.size(); i++) {
     Block *Curr = Blocks[i];
+    if (Live.Blocks.find(Curr) == Live.Blocks.end()) continue;
     for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
       iter->first->BranchesIn[Curr] = new Branch(iter->second->Condition);
     }
@@ -273,9 +292,8 @@ void Relooper::Calculate(Block *Entry) {
 
   // Recursively process the graph
 
-  struct Recursor {
-    Relooper *Parent;
-    Recursor(Relooper *ParentInit) : Parent(ParentInit) {}
+  struct Analyzer : public RelooperRecursor {
+    Analyzer(Relooper *Parent) : RelooperRecursor(Parent) {}
 
     // Add a shape to the list of shapes in this Relooper calculation
     void Notice(Shape *New) {
@@ -629,7 +647,7 @@ void Relooper::Calculate(Block *Entry) {
   BlockSet Entries;
 
   Entries.insert(Entry);
-  Root = Recursor(this).Process(AllBlocks, Entries);
+  Root = Analyzer(this).Process(AllBlocks, Entries);
 }
 
 void Relooper::SetOutputBuffer(char *Buffer) {
