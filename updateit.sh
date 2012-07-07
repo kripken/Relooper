@@ -8,5 +8,5 @@
 ./test_fuzz1 &> test_fuzz1.txt
 ./test_fuzz2 &> test_fuzz2.txt
 ./test_fuzz3 &> test_fuzz3.txt
-
+./test_fuzz4 &> test_fuzz4.txt
 
