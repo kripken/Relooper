@@ -19,12 +19,10 @@ L1: do {
     /* direct */
   }
 } while(0);
-L4: do {
-  if (label == 3) {
-    //22
-    /* direct */
-  }
-} while(0);
+if (label == 3) {
+  //22
+  /* direct */
+}
 //23
 if ( 1 ) {
   /* direct */

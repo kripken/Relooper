@@ -325,7 +325,7 @@ void Relooper::Calculate(Block *Entry) {
         PriorOut->Ancestor = Ancestor; // Do we need this info
         PriorOut->Type = Type;         // on TargetIn too?
         if (MultipleShape *Multiple = dynamic_cast<MultipleShape*>(Ancestor)) {
-          Multiple->NeedLoop = true; // We are breaking out of this Multiple, so need a loop
+          Multiple->NeedLoop++; // We are breaking out of this Multiple, so need a loop
         }
         iter++; // carefully increment iter before erasing
         Target->BranchesIn.erase(Prior);
@@ -682,9 +682,12 @@ void Relooper::Calculate(Block *Entry) {
             Block *Target = iter->first;
             Branch *Details = iter->second;
             PrintDebug("At branch %d (type %d)\n", Target->Id, Details->Type);
-            if (Target->Parent == Natural) {
+            if (Details->Type != Branch::Direct && Target->Parent == Natural) {
               PrintDebug("Simplifying to direct branch %d\n", Branch::Direct);
               Details->Type = Branch::Direct;
+              if (MultipleShape *Multiple = dynamic_cast<MultipleShape*>(Details->Ancestor)) {
+                Multiple->NeedLoop--;
+              }
             }
           }
         }
