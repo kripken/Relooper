@@ -41,7 +41,7 @@ L5: while(1) {
       print(4); state = check();
       if (state == 3) {
         label = 3;
-        continue L8;
+        /* direct */
       } else {
         label = 1;
         continue L5;

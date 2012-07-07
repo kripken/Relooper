@@ -634,6 +634,8 @@ void Relooper::Calculate(Block *Entry) {
     }
   };
 
+  // Main
+
   BlockSet AllBlocks;
   for (int i = 0; i < Blocks.size(); i++) {
     AllBlocks.insert(Blocks[i]);
@@ -648,6 +650,63 @@ void Relooper::Calculate(Block *Entry) {
 
   Entries.insert(Entry);
   Root = Analyzer(this).Process(AllBlocks, Entries);
+
+  // Optimizations
+
+  struct Optimizer {
+    Relooper *Parent;
+    Optimizer(Relooper *ParentInit) : Parent(ParentInit) {}
+
+    #define SHAPE_SWITCH(var, simple, multiple, loop) \
+      if (SimpleShape *Simple = dynamic_cast<SimpleShape*>(var)) { \
+        simple; \
+      } else if (MultipleShape *Multiple = dynamic_cast<MultipleShape*>(var)) { \
+        multiple; \
+      } else if (LoopShape *Loop = dynamic_cast<LoopShape*>(var)) { \
+        loop; \
+      }
+
+    // Remove unneeded breaks and continues.
+    // A flow operation is trivially unneeded if the shape we naturally get to by normal code
+    // execution is the same as the flow forces us to.
+    void RemoveUnneededFlows(Shape *Root, Shape *Natural=NULL) {
+      SHAPE_SWITCH(Root, {
+        PrintDebug("At %d, %d, natural: %d\n", Simple->Id, Simple->Inner->Id, Natural ? Natural->Id : -1);
+        // If there is a next block, we already know at Simple creation time to make direct branches,
+        // and we can do nothing more. If there is no next however, then Natural is where we will
+        // go to by doing nothing, so we can potentially optimize some branches to direct.
+        if (Simple->Next) {
+          RemoveUnneededFlows(Simple->Next, Natural);
+        } else {
+          for (BlockBranchMap::iterator iter = Simple->Inner->ProcessedBranchesOut.begin(); iter != Simple->Inner->ProcessedBranchesOut.end(); iter++) {
+            Block *Target = iter->first;
+            Branch *Details = iter->second;
+            PrintDebug("At branch %d (type %d)\n", Target->Id, Details->Type);
+            if (Target->Parent == Natural) {
+              PrintDebug("Simplifying to direct branch %d\n", Branch::Direct);
+              Details->Type = Branch::Direct;
+            }
+          }
+        }
+      }, {
+        for (BlockShapeMap::iterator iter = Multiple->InnerMap.begin(); iter != Multiple->InnerMap.end(); iter++) {
+          RemoveUnneededFlows(iter->second, Multiple->Next);
+        }
+        RemoveUnneededFlows(Multiple->Next, Natural);
+      }, {
+        RemoveUnneededFlows(Loop->Inner, Loop->Inner);
+        RemoveUnneededFlows(Loop->Next, Natural);
+      });
+    }
+
+    void Process(Shape *Root) {
+      RemoveUnneededFlows(Root);
+    }
+  };
+
+  PrintDebug("=== Optimizing shapes ===\n");
+
+  Optimizer(this).Process(Root);
 }
 
 void Relooper::SetOutputBuffer(char *Buffer) {

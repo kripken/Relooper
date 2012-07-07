@@ -12,8 +12,7 @@ L1: do {
       break L1;
     }
     LBB2
-    label = 3;
-    break L1;
+    /* direct */
   } else {
     label = 3;
     /* direct */

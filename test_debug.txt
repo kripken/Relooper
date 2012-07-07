@@ -76,6 +76,13 @@ int main() {
   blocks :  3 
   entries:  3 
 // creating simple block with block #3
+// === Optimizing shapes ===
+// At 0, 0, natural: -1
+// At 2, 1, natural: 4
+// At 3, 2, natural: 4
+// At branch 3 (type 1)
+// Simplifying to direct branch 0
+// At 4, 3, natural: -1
 // Fusing Multiple to Simple
 ep
 L1: do {
@@ -91,8 +98,7 @@ L1: do {
       break L1;
     }
     LBB2
-    label = 3;
-    break L1;
+    /* direct */
   } else {
     label = 3;
     /* direct */

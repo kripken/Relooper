@@ -22,8 +22,7 @@ L1: do {
 L4: do {
   if (label == 3) {
     //22
-    label = 4;
-    break L4;
+    /* direct */
   }
 } while(0);
 //23

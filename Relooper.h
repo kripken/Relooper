@@ -118,7 +118,7 @@ struct SimpleShape : public Shape {
 typedef std::map<Block*, Shape*> BlockShapeMap;
 
 struct MultipleShape : public Shape {
-  BlockShapeMap InnerMap;
+  BlockShapeMap InnerMap; // entry block -> shape
   bool NeedLoop; // If we have branches, we need a loop
 
   MultipleShape() : NeedLoop(false) {}

@@ -10,8 +10,7 @@ L1: do {
     label = 1;
     /* direct */
     // block B
-    label = 2;
-    break L1;
+    /* direct */
   } else {
     label = 2;
     /* direct */
@@ -30,13 +29,11 @@ L5: do {
   if (check == 15) {
     /* direct */
     // block B
-    label = 6;
-    break L5;
+    /* direct */
   } else {
     /* direct */
     // block C
-    label = 6;
-    break L5;
+    /* direct */
   }
 } while(0);
 // block D
@@ -54,7 +51,7 @@ L9: while(1) {
   // block B
   if (check == 41) {
     label = 7;
-    continue L9;
+    /* direct */
   } else {
     label = 9;
     break L9;
