@@ -1,11 +1,9 @@
 //19
 do {
   if ( 1 ) {
-    label = 1;
     /* direct */
     //20
     if ( 1 ) {
-      label = 2;
       /* direct */
     } else {
       label = 3;

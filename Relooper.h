@@ -69,7 +69,7 @@ struct Block {
   void AddBranchTo(Block *Target, const char *Condition);
 
   // Prints out the instructions code and branchings
-  void Render();
+  void Render(bool InLoop);
 
   // INTERNAL
   static int IdCounter;
@@ -99,7 +99,7 @@ struct Shape {
   Shape() : Id(Shape::IdCounter++), Next(NULL) {}
   virtual ~Shape() {}
 
-  virtual void Render() = 0;
+  virtual void Render(bool InLoop) = 0;
 
   // INTERNAL
   static int IdCounter;
@@ -109,9 +109,9 @@ struct SimpleShape : public Shape {
   Block *Inner;
 
   SimpleShape() : Inner(NULL) {}
-  void Render() {
-    Inner->Render();
-    if (Next) Next->Render();
+  void Render(bool InLoop) {
+    Inner->Render(InLoop);
+    if (Next) Next->Render(InLoop);
   }
 };
 
@@ -134,19 +134,19 @@ struct MultipleShape : public LabeledShape {
   void RenderLoopPrefix();
   void RenderLoopPostfix();
 
-  void Render();
+  void Render(bool InLoop);
 };
 
 struct LoopShape : public LabeledShape {
   Shape *Inner;
 
   LoopShape() : Inner(NULL) {}
-  void Render();
+  void Render(bool InLoop);
 };
 
 struct EmulatedShape : public Shape {
   std::vector<Block*> Blocks;
-  void Render();
+  void Render(bool InLoop);
 };
 
 // Implements the relooper algorithm for a function's blocks.
@@ -174,7 +174,7 @@ struct Relooper {
   void Calculate(Block *Entry);
 
   // Renders the result.
-  void Render() { Root->Render(); }
+  void Render() { Root->Render(false); }
 
   // Sets the global buffer all printing goes to. XXX Note no size checks on the buffer! Make sure it is big enough
   static void SetOutputBuffer(char *Buffer);

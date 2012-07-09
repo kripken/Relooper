@@ -92,7 +92,7 @@ void Block::AddBranchTo(Block *Target, const char *Condition) {
   BranchesOut[Target] = new Branch(Condition);
 }
 
-void Block::Render() {
+void Block::Render(bool InLoop) {
   if (Code) {
     // Print code in an indented manner, even over multiple lines
     char *Start = const_cast<char*>(Code);
@@ -113,6 +113,24 @@ void Block::Render() {
     SetLabel = false;
   }
 
+  // A setting of the label variable (label = x) is necessary if it can
+  // make an impact. The main case is where we set label to x, then elsewhere
+  // we check if label is equal to that value, i.e., that label is an entry
+  // in a multiple block. A secondary case is if a particular branch site
+  // has some settings necessary by the main criterion, and others that are
+  // seemingly unimportant. However, they still matter if we are in a loop,
+  //
+  //    while (1) {
+  //      if (check) label = 1; else label = 2;
+  //      if (label == 1) { .. }
+  //    }
+  //
+  // (Note that this case is impossible due to fusing, but that is not
+  // material here.) So setting to 2 is important just to clear the 1 for
+  // future iterations. (An alternative approach could be to clear the
+  // label variable after it is used, unclear which leads to smaller
+  // code.) TODO: reserve block ID 0 for settings that are really clearings.
+
   // Fusing: If the next is a Multiple, we can fuse it with this block. Note
   // that we must be the Inner of a Simple, so fusing means joining a Simple
   // to a Multiple. What happens there is that all options in the Multiple
@@ -132,23 +150,7 @@ void Block::Render() {
     }
   }
 
-  // A setting of the label variable (label = x) is necessary if it can
-  // make an impact. The main case is where we set label to x, then elsewhere
-  // we check if label is equal to that value, i.e., that label is an entry
-  // in a multiple block. A secondary case is if a particular branch site
-  // has some settings necessary by the main criterion, and others that are
-  // seemingly unimportant. However, they still matter if we are in a loop,
-  //
-  //    while (1) {
-  //      if (check) label = 1; else label = 2;
-  //      if (label == 1) { .. }
-  //    }
-  //
-  // (Note that this case is impossible due to fusing, but that is not
-  // material here.) So setting to 2 is important just to clear the 1 for
-  // future iterations. (An alternative approach could be to clear the
-  // label variable after it is used, unclear which leads to smaller
-  // code.) TODO: reserve block ID 0 for settings that are really clearings.
+  // If we are in a loop, we must set all labels, see comment before.
   bool HasMultipleEntries = false;
   for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
     Block *Target = iter->first;
@@ -175,9 +177,9 @@ void Block::Render() {
     PrintIndented("%sif (%s) {\n", First ? "" : "} else ", Details->Condition);
     First = false;
     Indenter::Indent();
-    Details->Render(Target, SetLabel);
+    Details->Render(Target, SetLabel && !(!InLoop && !Target->IsCheckedMultipleEntry));
     if (Fused && Fused->InnerMap.find(Target) != Fused->InnerMap.end()) {
-      Fused->InnerMap.find(Target)->second->Render();
+      Fused->InnerMap.find(Target)->second->Render(InLoop);
     }
     Indenter::Unindent();
   }
@@ -187,9 +189,9 @@ void Block::Render() {
       Indenter::Indent();
     }
     Branch *Details = ProcessedBranchesOut[DefaultTarget];
-    Details->Render(DefaultTarget, SetLabel);
+    Details->Render(DefaultTarget, SetLabel && !(!InLoop && !DefaultTarget->IsCheckedMultipleEntry));
     if (Fused && Fused->InnerMap.find(DefaultTarget) != Fused->InnerMap.end()) {
-      Fused->InnerMap.find(DefaultTarget)->second->Render();
+      Fused->InnerMap.find(DefaultTarget)->second->Render(InLoop);
     }
     if (!First) {
       Indenter::Unindent();
@@ -226,39 +228,39 @@ void MultipleShape::RenderLoopPostfix() {
   }
 }
 
-void MultipleShape::Render() {
+void MultipleShape::Render(bool InLoop) {
   RenderLoopPrefix();
   bool First = true;
   for (BlockShapeMap::iterator iter = InnerMap.begin(); iter != InnerMap.end(); iter++) {
     PrintIndented("%sif (label == %d) {\n", First ? "" : "else ", iter->first->Id);
     First = false;
     Indenter::Indent();
-    iter->second->Render();
+    iter->second->Render(InLoop);
     Indenter::Unindent();
     PrintIndented("}\n");
   }
   RenderLoopPostfix();
-  if (Next) Next->Render();
+  if (Next) Next->Render(InLoop);
 };
 
 // LoopShape
 
-void LoopShape::Render() {
+void LoopShape::Render(bool InLoop) {
   if (Labeled) {
     PrintIndented("L%d: while(1) {\n", Id);
   } else {
     PrintIndented("while(1) {\n");
   }
   Indenter::Indent();
-  Inner->Render();
+  Inner->Render(true);
   Indenter::Unindent();
   PrintIndented("}\n");
-  if (Next) Next->Render();
+  if (Next) Next->Render(InLoop);
 };
 
 // EmulatedShape
 
-void EmulatedShape::Render() {
+void EmulatedShape::Render(bool InLoop) {
   PrintIndented("while(1) {\n");
   Indenter::Indent();
   PrintIndented("switch(label) {\n");
@@ -267,7 +269,7 @@ void EmulatedShape::Render() {
     Block *Curr = Blocks[i];
     PrintIndented("case %d: {\n", Curr->Id);
     Indenter::Indent();
-    Curr->Render();
+    Curr->Render(InLoop);
     PrintIndented("break;\n");
     Indenter::Unindent();
     PrintIndented("}\n");
@@ -276,7 +278,7 @@ void EmulatedShape::Render() {
   PrintIndented("}\n");
   Indenter::Unindent();
   PrintIndented("}\n");
-  if (Next) Next->Render();
+  if (Next) Next->Render(InLoop);
 };
 
 // Relooper

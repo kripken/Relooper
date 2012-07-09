@@ -7,7 +7,6 @@ print(5); state = check();
 print(6); state = check();
 do {
   if (state == 7) {
-    label = 7;
     /* direct */
     print(7); state = check();
     label = 2;
