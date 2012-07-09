@@ -32,6 +32,7 @@ struct Branch {
   Shape *Ancestor; // If not NULL, this shape is the relevant one for purposes of getting to the target block. We break or continue on it
   Branch::FlowType Type; // If Ancestor is not NULL, this says whether to break or continue
   bool Set; // Set the label variable
+  bool Labeled; // If a break or continue, whether we need to use a label
   const char *Condition; // The condition for which we branch. For example, "my_var == 1". Conditions are checked one by one. One of the conditions should have NULL as the condition, in which case it is the default
 
   Branch(const char *ConditionInit);
@@ -117,7 +118,14 @@ struct SimpleShape : public Shape {
 
 typedef std::map<Block*, Shape*> BlockShapeMap;
 
-struct MultipleShape : public Shape {
+// A shape that may be implemented with a labeled loop.
+struct LabeledShape : public Shape {
+  bool Labeled; // If we have a loop, whether it needs to be labeled
+
+  LabeledShape() : Labeled(false) {}
+};
+
+struct MultipleShape : public LabeledShape {
   BlockShapeMap InnerMap; // entry block -> shape
   int NeedLoop; // If we have branches, we need a loop. This is a counter of loop requirements,
                 // if we optimize it to 0, the loop is unneeded
@@ -130,8 +138,9 @@ struct MultipleShape : public Shape {
   void Render();
 };
 
-struct LoopShape : public Shape {
+struct LoopShape : public LabeledShape {
   Shape *Inner;
+
   LoopShape() : Inner(NULL) {}
   void Render();
 };

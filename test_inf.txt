@@ -18,7 +18,7 @@ L5: do {
     /* direct */
     code 4
     /* direct */
-    L7: while(1) {
+    while(1) {
       code 5
       if (uint(i6) >= uint(i7)) {
         /* direct */
@@ -80,7 +80,7 @@ L26: do {
     /* direct */
     code 19
     /* direct */
-    L28: while(1) {
+    while(1) {
       code 20
       if (uint(i5) >= uint(i6)) {
         /* direct */
@@ -382,7 +382,7 @@ L143: do {
     /* direct */
     code 106
     /* direct */
-    L145: while(1) {
+    while(1) {
       code 107
       if (uint(i5) >= uint(i6)) {
         /* direct */
@@ -614,7 +614,7 @@ L232: do {
     /* direct */
     code 172
     /* direct */
-    L234: while(1) {
+    while(1) {
       code 173
       if (uint(i5) >= uint(i6)) {
         /* direct */

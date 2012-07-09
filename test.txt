@@ -40,7 +40,7 @@ if (check == 15) {
 
 
 
-L9: while(1) {
+while(1) {
   // block A
   var check = maybe();
   /* direct */
@@ -50,7 +50,7 @@ L9: while(1) {
     /* direct */
   } else {
     label = 9;
-    break L9;
+    break;
   }
 }
 // block C

@@ -1,5 +1,5 @@
 //19
-L1: do {
+do {
   if ( 1 ) {
     label = 1;
     /* direct */
@@ -9,11 +9,11 @@ L1: do {
       /* direct */
     } else {
       label = 3;
-      break L1;
+      break;
     }
     //21
     label = 4;
-    break L1;
+    break;
   } else {
     label = 3;
     /* direct */

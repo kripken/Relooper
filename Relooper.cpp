@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <list>
+#include <stack>
 
 // TODO: move all set to unorderedset
 
@@ -45,7 +46,7 @@ int Indenter::CurrIndent = 0;
 
 // Branch
 
-Branch::Branch(const char *ConditionInit) : Ancestor(NULL), Set(true) {
+Branch::Branch(const char *ConditionInit) : Ancestor(NULL), Set(true), Labeled(false) {
   Condition = ConditionInit ? strdup(ConditionInit) : NULL;
 }
 
@@ -59,7 +60,11 @@ void Branch::Render(Block *Target) {
     if (Type == Direct) {
       PrintIndented("/* direct */\n");
     } else {
-      PrintIndented("%s L%d;\n", Type == Break ? "break" : "continue", Ancestor->Id);
+      if (Labeled) {
+        PrintIndented("%s L%d;\n", Type == Break ? "break" : "continue", Ancestor->Id);
+      } else {
+        PrintIndented("%s;\n", Type == Break ? "break" : "continue");
+      }
     }
   }
 }
@@ -183,7 +188,11 @@ int Shape::IdCounter = 0;
 
 void MultipleShape::RenderLoopPrefix() {
   if (NeedLoop) {
-    PrintIndented("L%d: do {\n", Id);
+    if (Labeled) {
+      PrintIndented("L%d: do {\n", Id);
+    } else {
+      PrintIndented("do {\n");
+    }
     Indenter::Indent();
   }
 }
@@ -213,7 +222,11 @@ void MultipleShape::Render() {
 // LoopShape
 
 void LoopShape::Render() {
-  PrintIndented("L%d: while(1) {\n", Id);
+  if (Labeled) {
+    PrintIndented("L%d: while(1) {\n", Id);
+  } else {
+    PrintIndented("while(1) {\n");
+  }
   Indenter::Indent();
   Inner->Render();
   Indenter::Unindent();
@@ -655,7 +668,9 @@ void Relooper::Calculate(Block *Entry) {
 
   struct Optimizer {
     Relooper *Parent;
-    Optimizer(Relooper *ParentInit) : Parent(ParentInit) {}
+    void *Closure;
+
+    Optimizer(Relooper *ParentInit) : Parent(ParentInit), Closure(NULL) {}
 
     #define SHAPE_SWITCH(var, simple, multiple, loop) \
       if (SimpleShape *Simple = dynamic_cast<SimpleShape*>(var)) { \
@@ -665,6 +680,14 @@ void Relooper::Calculate(Block *Entry) {
       } else if (LoopShape *Loop = dynamic_cast<LoopShape*>(var)) { \
         loop; \
       }
+
+    #define RECURSE_MULTIPLE_MANUAL(func, manual) \
+      for (BlockShapeMap::iterator iter = manual->InnerMap.begin(); iter != manual->InnerMap.end(); iter++) { \
+        func(iter->second); \
+      }
+    #define RECURSE_MULTIPLE(func) RECURSE_MULTIPLE_MANUAL(func, Multiple);
+    #define RECURSE_LOOP(func) \
+      func(Loop->Inner);
 
     // Remove unneeded breaks and continues.
     // A flow operation is trivially unneeded if the shape we naturally get to by normal code
@@ -702,8 +725,71 @@ void Relooper::Calculate(Block *Entry) {
       });
     }
 
+    // After we know which loops exist, we can calculate which need to be labeled
+    void FindLabeledLoops(Shape *Root) {
+      bool First = Closure == NULL;
+      if (First) {
+        Closure = (void*)(new std::stack<Shape*>);
+      }
+      std::stack<Shape*> &LoopStack = *((std::stack<Shape*>*)Closure);
+
+      SHAPE_SWITCH(Root, {
+        PrintDebug("At Simple %d\n", Simple->Inner->Id);
+        MultipleShape *Fused = dynamic_cast<MultipleShape*>(Root->Next);
+        // If we are fusing a Multiple with a loop into this Simple, then visit it now
+        if (Fused && Fused->NeedLoop) {
+          LoopStack.push(Fused);
+          RECURSE_MULTIPLE_MANUAL(FindLabeledLoops, Fused);
+        }
+        for (BlockBranchMap::iterator iter = Simple->Inner->ProcessedBranchesOut.begin(); iter != Simple->Inner->ProcessedBranchesOut.end(); iter++) {
+          Block *Target = iter->first;
+          Branch *Details = iter->second;
+          if (Details->Type != Branch::Direct) {
+            PrintDebug("At %d -> %d, consider %p %p\n", Simple->Inner->Id, Target->Id, Details->Ancestor, LoopStack.top());
+            assert(LoopStack.size() > 0);
+            if (Details->Ancestor != LoopStack.top()) {
+              LabeledShape *Labeled = dynamic_cast<LabeledShape*>(Details->Ancestor);
+              Labeled->Labeled = true;
+              Details->Labeled = true;
+            } else {
+              Details->Labeled = false;
+            }
+          }
+        }
+        if (Fused && Fused->NeedLoop) {
+          LoopStack.pop();
+          if (Fused->Next) FindLabeledLoops(Fused->Next);
+        } else {
+          if (Root->Next) FindLabeledLoops(Root->Next);
+        }
+      }, {
+        if (Multiple->NeedLoop) {
+          PrintDebug("Pushing Multiple %p\n", Multiple);
+          LoopStack.push(Multiple);
+        }
+        RECURSE_MULTIPLE(FindLabeledLoops);
+        if (Multiple->NeedLoop) {
+          PrintDebug("Popping Multiple %p\n", Multiple);
+          LoopStack.pop();
+        }
+        if (Root->Next) FindLabeledLoops(Root->Next);
+      }, {
+        LoopStack.push(Loop);
+        PrintDebug("Pushing Loop %p\n", Loop);
+        RECURSE_LOOP(FindLabeledLoops);
+        LoopStack.pop();
+        PrintDebug("Popping Loop %p\n", Loop);
+        if (Root->Next) FindLabeledLoops(Root->Next);
+      });
+
+      if (First) {
+        delete (std::stack<Shape*>*)Closure;
+      }
+    }
+
     void Process(Shape *Root) {
       RemoveUnneededFlows(Root);
+      FindLabeledLoops(Root);
     }
   };
 
