@@ -5,10 +5,8 @@ do {
     /* direct */
     LBB1
     if (LBB1 -> LBB2) {
-      label = 2;
       /* direct */
     } else {
-      label = 3;
       break;
     }
     LBB2
@@ -25,19 +23,15 @@ L5: do {
     /* direct */
     LBB4
     if (LBB4 -> LBB5) {
-      label = 5;
       /* direct */
     } else {
-      label = 6;
       break;
     }
     while(1) {
       LBB5
       if (LBB5 -> LBB6) {
-        label = 6;
         break L5;
       } else {
-        label = 5;
         /* direct */
       }
     }

@@ -51,10 +51,8 @@ L5: do {
       }
       code 14
       if (i2 != 0) {
-        label = 5;
         /* direct */
       } else {
-        label = 15;
         break L5;
       }
     }
@@ -353,10 +351,8 @@ L26: do {
       }
       code 101
       if (i2 != 0) {
-        label = 20;
         /* direct */
       } else {
-        label = 102;
         break L26;
       }
     }
@@ -585,10 +581,8 @@ L143: do {
       }
       code 167
       if (i2 != 0) {
-        label = 107;
         /* direct */
       } else {
-        label = 168;
         break L143;
       }
     }
@@ -647,10 +641,8 @@ L232: do {
       }
       code 182
       if (i2 != 0) {
-        label = 173;
         /* direct */
       } else {
-        label = 183;
         break L232;
       }
     }

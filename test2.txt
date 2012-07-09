@@ -5,10 +5,8 @@ do {
     /* direct */
     LBB1
     if (LBB1 -> LBB2) {
-      label = 2;
       /* direct */
     } else {
-      label = 3;
       break;
     }
     LBB2

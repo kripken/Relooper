@@ -46,7 +46,7 @@ int Indenter::CurrIndent = 0;
 
 // Branch
 
-Branch::Branch(const char *ConditionInit) : Ancestor(NULL), Set(true), Labeled(false) {
+Branch::Branch(const char *ConditionInit) : Ancestor(NULL), Labeled(false) {
   Condition = ConditionInit ? strdup(ConditionInit) : NULL;
 }
 
@@ -54,8 +54,8 @@ Branch::~Branch() {
   if (Condition) free((void*)Condition);
 }
 
-void Branch::Render(Block *Target) {
-  if (Set) PrintIndented("label = %d;\n", Target->Id);
+void Branch::Render(Block *Target, bool SetLabel) {
+  if (SetLabel) PrintIndented("label = %d;\n", Target->Id);
   if (Ancestor) {
     if (Type == Direct) {
       PrintIndented("/* direct */\n");
@@ -73,7 +73,7 @@ void Branch::Render(Block *Target) {
 
 int Block::IdCounter = 0;
 
-Block::Block(const char *CodeInit) : Parent(NULL), Reachable(false), Id(Block::IdCounter++), DefaultTarget(NULL) {
+Block::Block(const char *CodeInit) : Parent(NULL), Reachable(false), Id(Block::IdCounter++), DefaultTarget(NULL), IsMultipleEntry(false) {
   Code = strdup(CodeInit);
 }
 
@@ -132,6 +132,30 @@ void Block::Render() {
     }
   }
 
+  // A setting of the label variable (label = x) is necessary if it can
+  // make an impact. The main case is where we set label to x, then elsewhere
+  // we check if label is equal to that value, i.e., that label is an entry
+  // in a multiple block. A secondary case is if a particular branch site
+  // has some settings necessary by the main criterion, and others that are
+  // seemingly unimportant. However, they still matter if we are in a loop,
+  //
+  //    while (1) {
+  //      if (check) label = 1; else label = 2;
+  //      if (label == 1) { .. }
+  //    }
+  //
+  // (Note that this case is impossible due to fusing, but that is not
+  // material here.) So setting to 2 is important just to clear the 1 for
+  // future iterations. (An alternative approach could be to clear the
+  // label variable after it is used, unclear which leads to smaller
+  // code.) TODO: reserve block ID 0 for settings that are really clearings.
+  bool HasMultipleEntries = false;
+  for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
+    Block *Target = iter->first;
+    HasMultipleEntries = HasMultipleEntries || Target->IsMultipleEntry;
+  }
+  if (!HasMultipleEntries) SetLabel = false;
+
   if (!DefaultTarget) { // If no default specified, it is the last
     for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
       if (!iter->second->Condition) {
@@ -151,8 +175,7 @@ void Block::Render() {
     PrintIndented("%sif (%s) {\n", First ? "" : "} else ", Details->Condition);
     First = false;
     Indenter::Indent();
-    if (!SetLabel) Details->Set = false;
-    Details->Render(Target);
+    Details->Render(Target, SetLabel);
     if (Fused && Fused->InnerMap.find(Target) != Fused->InnerMap.end()) {
       Fused->InnerMap.find(Target)->second->Render();
     }
@@ -164,8 +187,7 @@ void Block::Render() {
       Indenter::Indent();
     }
     Branch *Details = ProcessedBranchesOut[DefaultTarget];
-    if (!SetLabel) Details->Set = false;
-    Details->Render(DefaultTarget);
+    Details->Render(DefaultTarget, SetLabel);
     if (Fused && Fused->InnerMap.find(DefaultTarget) != Fused->InnerMap.end()) {
       Fused->InnerMap.find(DefaultTarget)->second->Render();
     }
@@ -367,7 +389,6 @@ void Relooper::Calculate(Block *Entry) {
         }
         Simple->Next = Process(Blocks, Entries, Simple);
       }
-      Simple->Prev = Prev;
       return Simple;
     }
 
@@ -427,7 +448,6 @@ void Relooper::Calculate(Block *Entry) {
       Shape *Inner = Process(InnerBlocks, Entries, NULL);
       Loop->Inner = Inner;
       Loop->Next = Process(Blocks, NextEntries, Loop);
-      Loop->Prev = Prev;
       return Loop;
     }
 
@@ -580,6 +600,7 @@ void Relooper::Calculate(Block *Entry) {
           }
         }
         Multiple->InnerMap[CurrEntry] = Process(CurrBlocks, CurrEntries, NULL);
+        CurrEntry->IsMultipleEntry = true;
       }
       Debugging::Dump(Blocks, "  remaining blocks after multiple:");
       // Add entries not handled as next entries, they are deferred
@@ -590,7 +611,6 @@ void Relooper::Calculate(Block *Entry) {
         }
       }
       Multiple->Next = Process(Blocks, NextEntries, Multiple);
-      Multiple->Prev = Prev;
       return Multiple;
     }
 
@@ -675,6 +695,14 @@ void Relooper::Calculate(Block *Entry) {
 
     Optimizer(Relooper *ParentInit) : Parent(ParentInit), Closure(NULL) {}
 
+    #define RECURSE_MULTIPLE_MANUAL(func, manual) \
+      for (BlockShapeMap::iterator iter = manual->InnerMap.begin(); iter != manual->InnerMap.end(); iter++) { \
+        func(iter->second); \
+      }
+    #define RECURSE_MULTIPLE(func) RECURSE_MULTIPLE_MANUAL(func, Multiple);
+    #define RECURSE_LOOP(func) \
+      func(Loop->Inner);
+
     #define SHAPE_SWITCH(var, simple, multiple, loop) \
       if (SimpleShape *Simple = dynamic_cast<SimpleShape*>(var)) { \
         simple; \
@@ -684,13 +712,19 @@ void Relooper::Calculate(Block *Entry) {
         loop; \
       }
 
-    #define RECURSE_MULTIPLE_MANUAL(func, manual) \
-      for (BlockShapeMap::iterator iter = manual->InnerMap.begin(); iter != manual->InnerMap.end(); iter++) { \
-        func(iter->second); \
+    #define SHAPE_SWITCH_AUTO(var, simple, multiple, loop, func) \
+      if (SimpleShape *Simple = dynamic_cast<SimpleShape*>(var)) { \
+        simple; \
+        func(Simple->Next); \
+      } else if (MultipleShape *Multiple = dynamic_cast<MultipleShape*>(var)) { \
+        multiple; \
+        RECURSE_MULTIPLE(func) \
+        func(Multiple->Next); \
+      } else if (LoopShape *Loop = dynamic_cast<LoopShape*>(var)) { \
+        loop; \
+        RECURSE_LOOP(func); \
+        func(Loop->Next); \
       }
-    #define RECURSE_MULTIPLE(func) RECURSE_MULTIPLE_MANUAL(func, Multiple);
-    #define RECURSE_LOOP(func) \
-      func(Loop->Inner);
 
     // Remove unneeded breaks and continues.
     // A flow operation is trivially unneeded if the shape we naturally get to by normal code

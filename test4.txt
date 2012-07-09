@@ -12,7 +12,6 @@ do {
       break;
     }
     //21
-    label = 4;
     break;
   } else {
     label = 3;

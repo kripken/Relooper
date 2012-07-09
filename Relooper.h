@@ -31,7 +31,6 @@ struct Branch {
   };
   Shape *Ancestor; // If not NULL, this shape is the relevant one for purposes of getting to the target block. We break or continue on it
   Branch::FlowType Type; // If Ancestor is not NULL, this says whether to break or continue
-  bool Set; // Set the label variable
   bool Labeled; // If a break or continue, whether we need to use a label
   const char *Condition; // The condition for which we branch. For example, "my_var == 1". Conditions are checked one by one. One of the conditions should have NULL as the condition, in which case it is the default
 
@@ -39,7 +38,7 @@ struct Branch {
   ~Branch();
 
   // Prints out the branch
-  void Render(Block *Target); // We do not store the target permanently to save memory, it is only used here
+  void Render(Block *Target, bool SetLabel);
 };
 
 typedef std::map<Block*, Branch*> BlockBranchMap;
@@ -59,10 +58,10 @@ struct Block {
   Shape *Parent; // The shape we are directly inside
   bool Reachable; // Whether we can reach this from the entry
   int Id; // A unique identifier
-
   const char *Code; // The string representation of the code in this block. Owning pointer (we copy the input)
   Block *DefaultTarget; // The block we branch to without checking the condition, if none of the other conditions held.
                         // Since each block *must* branch somewhere, this must be set
+  bool IsMultipleEntry; // If true, we are a multiple entry, so reaching us requires setting the label variable
 
   Block(const char *CodeInit);
   ~Block();
@@ -96,9 +95,8 @@ struct Block {
 struct Shape {
   int Id; // A unique identifier. Used to identify loops, labels are Lx where x is the Id.
   Shape *Next; // The shape that will appear in the code right after this one
-  Shape *Prev;
 
-  Shape() : Id(Shape::IdCounter++), Next(NULL), Prev(NULL) {}
+  Shape() : Id(Shape::IdCounter++), Next(NULL) {}
   virtual ~Shape() {}
 
   virtual void Render() = 0;

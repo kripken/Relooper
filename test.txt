@@ -46,10 +46,8 @@ while(1) {
   /* direct */
   // block B
   if (check == 41) {
-    label = 7;
     /* direct */
   } else {
-    label = 9;
     break;
   }
 }
