@@ -3,9 +3,9 @@ import random, subprocess, difflib
 
 while True:
   # Random decisions
-  num = random.randint(2, 250)
+  num = random.randint(2, 15)
   density = random.random() * random.random()
-  decisions = [random.randint(1, num-1) for x in range(num*3)]
+  decisions = [random.randint(1, num*20) for x in range(num*3)]
   branches = [0]*num
   defaults = [0]*num
   for i in range(num):
@@ -13,7 +13,8 @@ while True:
     bs = random.randint(1, max(1, round(density*random.random()*(num-1))))
     for j in range(bs):
       b.add(random.randint(1, num-1))
-    defaults[i] = random.choice(list(b))
+    b = list(b)
+    defaults[i] = random.choice(b)
     b.remove(defaults[i])
     branches[i] = b
   print num, density
@@ -30,8 +31,8 @@ while True:
   slow = entry + '\n'
   for i in range(len(branches[0])):
     if i > 0: slow += 'else '
-    b = list(branches[0])
-    slow += 'if (state == %d) { label = %d; }\n' % (b[i], b[i]) # TODO: split range 1-n into these options
+    b = branches[0]
+    slow += 'if (state %% %d == %d) { label = %d; }\n' % (len(b)+1, i, b[i]) # TODO: split range 1-n into these options
   if len(branches[0]): slow += 'else '
   slow += 'label = %d;\n' % defaults[0]
 
@@ -53,8 +54,9 @@ int main() {
 
   for i in range(1, num):
     slow += '  case %d: print(%d); state = check(); \n' % (i, i)
-    for b in branches[i]:
-      slow += '    if (state == %d) { label = %d; break }\n' % (b, b) # TODO: split range 1-n into these fastions
+    b = branches[i]
+    for j in range(len(b)):
+      slow += '    if (state %% %d == %d) { label = %d; break }\n' % (len(b)+1, j, b[j]) # TODO: split range 1-n into these options
     slow += '    label = %d; break\n' % defaults[i]
 
   for i in range(num):
@@ -67,9 +69,10 @@ int main() {
 ''' % (i, i)
 
   for i in range(num):
-    for b in branches[i]:
-      fast += '''  b%d->AddBranchTo(b%d, "state == %d");
-''' % (i, b, b)
+    b = branches[i]
+    for j in range(len(b)):
+      fast += '''  b%d->AddBranchTo(b%d, "state %% %d == %d");
+''' % (i, b[j], len(b)+1, j)
     fast += '''  b%d->AddBranchTo(b%d, NULL);
 ''' % (i, defaults[i])
 
