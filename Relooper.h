@@ -61,7 +61,7 @@ struct Block {
   const char *Code; // The string representation of the code in this block. Owning pointer (we copy the input)
   Block *DefaultTarget; // The block we branch to without checking the condition, if none of the other conditions held.
                         // Since each block *must* branch somewhere, this must be set
-  bool IsMultipleEntry; // If true, we are a multiple entry, so reaching us requires setting the label variable
+  bool IsCheckedMultipleEntry; // If true, we are a multiple entry, so reaching us requires setting the label variable
 
   Block(const char *CodeInit);
   ~Block();

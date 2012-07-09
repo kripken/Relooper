@@ -1,7 +1,6 @@
 ep
 do {
   if (ep -> LBB1) {
-    label = 1;
     /* direct */
     LBB1
     if (LBB1 -> LBB2) {
@@ -12,7 +11,6 @@ do {
     LBB2
     /* direct */
   } else {
-    label = 3;
     /* direct */
   }
 } while(0);

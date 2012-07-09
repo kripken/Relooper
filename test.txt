@@ -6,12 +6,10 @@
 
 // block A
 if (check == 10) {
-  label = 1;
   /* direct */
   // block B
   /* direct */
 } else {
-  label = 2;
   /* direct */
 }
 // block C

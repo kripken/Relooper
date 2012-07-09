@@ -73,7 +73,7 @@ void Branch::Render(Block *Target, bool SetLabel) {
 
 int Block::IdCounter = 0;
 
-Block::Block(const char *CodeInit) : Parent(NULL), Reachable(false), Id(Block::IdCounter++), DefaultTarget(NULL), IsMultipleEntry(false) {
+Block::Block(const char *CodeInit) : Parent(NULL), Reachable(false), Id(Block::IdCounter++), DefaultTarget(NULL), IsCheckedMultipleEntry(false) {
   Code = strdup(CodeInit);
 }
 
@@ -152,7 +152,7 @@ void Block::Render() {
   bool HasMultipleEntries = false;
   for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
     Block *Target = iter->first;
-    HasMultipleEntries = HasMultipleEntries || Target->IsMultipleEntry;
+    HasMultipleEntries = HasMultipleEntries || Target->IsCheckedMultipleEntry;
   }
   if (!HasMultipleEntries) SetLabel = false;
 
@@ -572,6 +572,7 @@ void Relooper::Calculate(Block *Entry) {
 
     Shape *MakeMultiple(BlockSet &Blocks, BlockSet& Entries, BlockBlockSetMap& IndependentGroups, Shape *Prev) {
       PrintDebug("creating multiple block with %d inner groups\n", IndependentGroups.size());
+      bool Fused = !!(dynamic_cast<SimpleShape*>(Prev));
       MultipleShape *Multiple = new MultipleShape();
       Notice(Multiple);
       BlockSet NextEntries, CurrEntries;
@@ -600,7 +601,10 @@ void Relooper::Calculate(Block *Entry) {
           }
         }
         Multiple->InnerMap[CurrEntry] = Process(CurrBlocks, CurrEntries, NULL);
-        CurrEntry->IsMultipleEntry = true;
+        // If we are not fused, then our entries will actually be checked
+        if (!Fused) {
+          CurrEntry->IsCheckedMultipleEntry = true;
+        }
       }
       Debugging::Dump(Blocks, "  remaining blocks after multiple:");
       // Add entries not handled as next entries, they are deferred

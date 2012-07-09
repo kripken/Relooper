@@ -11,10 +11,8 @@ if (uint(i4) >= uint(i5)) {
 code 3
 L5: do {
   if (i2 == 0) {
-    label = 15;
     /* direct */
   } else {
-    label = 4;
     /* direct */
     code 4
     /* direct */
@@ -71,10 +69,8 @@ if (uint(i4) >= uint(i5)) {
 code 18
 L26: do {
   if (i2 == 0) {
-    label = 102;
     /* direct */
   } else {
-    label = 19;
     /* direct */
     code 19
     /* direct */
@@ -371,10 +367,8 @@ if (uint(i4) >= uint(i5)) {
 code 105
 L143: do {
   if (i2 == 0) {
-    label = 168;
     /* direct */
   } else {
-    label = 106;
     /* direct */
     code 106
     /* direct */
@@ -601,10 +595,8 @@ if (uint(i4) >= uint(i5)) {
 code 171
 L232: do {
   if (i2 == 0) {
-    label = 183;
     /* direct */
   } else {
-    label = 172;
     /* direct */
     code 172
     /* direct */
