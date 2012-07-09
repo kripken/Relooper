@@ -45,6 +45,10 @@ echo "test fuzz4"
 g++ test_fuzz4.cpp -c -o test_fuzz4.o -g
 g++ Relooper.o test_fuzz4.o -o test_fuzz4
 
+echo "test fuzz5"
+g++ test_fuzz5.cpp -c -o test_fuzz5.o -g
+g++ Relooper.o test_fuzz5.o -o test_fuzz5
+
 echo
 echo "============================="
 echo

@@ -1,0 +1,61 @@
+
+
+print('entry'); var label; var state; var decisions = [133, 98, 134, 143, 162, 187, 130, 87, 91, 49, 102, 47, 9, 132, 179, 176, 157, 25, 64, 161, 57, 107, 16, 167, 185, 45, 191, 180, 23, 131]; var index = 0; function check() { if (index == decisions.length) throw 'HALT'; return decisions[index++] }
+/* direct */
+L1: while(1) {
+  print(7); state = check();
+  L3: do {
+    if (state % 3 == 1) {
+      label = 2;
+      /* direct */
+    } else if (state % 3 == 0) {
+      label = 8;
+      /* direct */
+      print(8); state = check();
+      if (state % 2 == 0) {
+        label = 4;
+        break L3;
+      } else {
+        label = 6;
+        break L3;
+      }
+    } else {
+      label = 3;
+      break L1;
+    }
+  } while(0);
+  L5: while(1) {
+    if (label == 2) {
+      print(2); state = check();
+      /* direct */
+      print(1); state = check();
+      if (state % 2 == 0) {
+        label = 4;
+        continue L5;
+      } else {
+        label = 6;
+        continue L5;
+      }
+    }
+    else if (label == 4) {
+      print(4); state = check();
+      label = 2;
+      continue L5;
+    }
+    else if (label == 6) {
+      print(6); state = check();
+      if (state % 2 == 0) {
+        label = 7;
+        continue L1;
+      } else {
+        label = 6;
+        continue L5;
+      }
+    }
+  }
+}
+L11: while(1) {
+  print(3); state = check();
+  /* direct */
+}
+

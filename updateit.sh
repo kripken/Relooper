@@ -9,4 +9,5 @@
 ./test_fuzz2 &> test_fuzz2.txt
 ./test_fuzz3 &> test_fuzz3.txt
 ./test_fuzz4 &> test_fuzz4.txt
+./test_fuzz5 &> test_fuzz5.txt
 
