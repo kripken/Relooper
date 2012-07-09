@@ -71,7 +71,7 @@ void Branch::Render(Block *Target) {
 
 // Block
 
-int Block::IdCounter = 1; // 0 is reserved
+int Block::IdCounter = 0;
 
 Block::Block(const char *CodeInit) : Parent(NULL), Reachable(false), Id(Block::IdCounter++), DefaultTarget(NULL) {
   Code = strdup(CodeInit);
