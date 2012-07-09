@@ -7,50 +7,50 @@ print(5); state = check();
 print(6); state = check();
 do {
   if (state == 7) {
-    label = 7;
+    label = 8;
     /* direct */
     print(7); state = check();
-    label = 2;
+    label = 3;
     break;
   } else {
-    label = 1;
+    label = 2;
     /* direct */
   }
 } while(0);
 L5: while(1) {
-  if (label == 1) {
+  if (label == 2) {
     print(1); state = check();
     /* direct */
     while(1) {
       print(3); state = check();
       if (state == 8) {
-        label = 8;
+        label = 9;
         /* direct */
       } else {
-        label = 1;
+        label = 2;
         continue L5;
       }
       print(8); state = check();
       if (state == 4) {
+        label = 5;
+        /* direct */
+      } else {
+        label = 3;
+        continue L5;
+      }
+      print(4); state = check();
+      if (state == 3) {
         label = 4;
         /* direct */
       } else {
         label = 2;
         continue L5;
       }
-      print(4); state = check();
-      if (state == 3) {
-        label = 3;
-        /* direct */
-      } else {
-        label = 1;
-        continue L5;
-      }
     }
   }
-  else if (label == 2) {
+  else if (label == 3) {
     print(2); state = check();
-    label = 1;
+    label = 2;
     continue;
   }
 }

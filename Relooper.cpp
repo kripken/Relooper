@@ -71,7 +71,7 @@ void Branch::Render(Block *Target) {
 
 // Block
 
-int Block::IdCounter = 0;
+int Block::IdCounter = 1; // 0 is reserved
 
 Block::Block(const char *CodeInit) : Parent(NULL), Reachable(false), Id(Block::IdCounter++), DefaultTarget(NULL) {
   Code = strdup(CodeInit);
@@ -349,7 +349,7 @@ void Relooper::Calculate(Block *Entry) {
       }
     }
 
-    Shape *MakeSimple(BlockSet &Blocks, Block *Inner) {
+    Shape *MakeSimple(BlockSet &Blocks, Block *Inner, Shape *Prev) {
       PrintDebug("creating simple block with block #%d\n", Inner->Id);
       SimpleShape *Simple = new SimpleShape;
       Notice(Simple);
@@ -365,12 +365,13 @@ void Relooper::Calculate(Block *Entry) {
         for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
           Solipsize(*iter, Branch::Direct, Simple, JustInner);
         }
-        Simple->Next = Process(Blocks, Entries);
+        Simple->Next = Process(Blocks, Entries, Simple);
       }
+      Simple->Prev = Prev;
       return Simple;
     }
 
-    Shape *MakeLoop(BlockSet &Blocks, BlockSet& Entries) {
+    Shape *MakeLoop(BlockSet &Blocks, BlockSet& Entries, Shape *Prev) {
       // Find the inner blocks in this loop. Proceed backwards from the entries until
       // you reach a seen block, collecting as you go.
       BlockSet InnerBlocks;
@@ -423,9 +424,10 @@ void Relooper::Calculate(Block *Entry) {
         Solipsize(*iter, Branch::Break, Loop, InnerBlocks);
       }
       // Finish up
-      Shape *Inner = Process(InnerBlocks, Entries);
+      Shape *Inner = Process(InnerBlocks, Entries, NULL);
       Loop->Inner = Inner;
-      Loop->Next = Process(Blocks, NextEntries);
+      Loop->Next = Process(Blocks, NextEntries, Loop);
+      Loop->Prev = Prev;
       return Loop;
     }
 
@@ -548,7 +550,7 @@ void Relooper::Calculate(Block *Entry) {
       }
     }
 
-    Shape *MakeMultiple(BlockSet &Blocks, BlockSet& Entries, BlockBlockSetMap& IndependentGroups) {
+    Shape *MakeMultiple(BlockSet &Blocks, BlockSet& Entries, BlockBlockSetMap& IndependentGroups, Shape *Prev) {
       PrintDebug("creating multiple block with %d inner groups\n", IndependentGroups.size());
       MultipleShape *Multiple = new MultipleShape();
       Notice(Multiple);
@@ -577,7 +579,7 @@ void Relooper::Calculate(Block *Entry) {
             iter = Next; // increment carefully because Solipsize can remove us
           }
         }
-        Multiple->InnerMap[CurrEntry] = Process(CurrBlocks, CurrEntries);
+        Multiple->InnerMap[CurrEntry] = Process(CurrBlocks, CurrEntries, NULL);
       }
       Debugging::Dump(Blocks, "  remaining blocks after multiple:");
       // Add entries not handled as next entries, they are deferred
@@ -587,13 +589,14 @@ void Relooper::Calculate(Block *Entry) {
           NextEntries.insert(Entry);
         }
       }
-      Multiple->Next = Process(Blocks, NextEntries);
+      Multiple->Next = Process(Blocks, NextEntries, Multiple);
+      Multiple->Prev = Prev;
       return Multiple;
     }
 
     // Main function.
     // Process a set of blocks with specified entries, returns a shape
-    Shape *Process(BlockSet &Blocks, BlockSet& Entries) {
+    Shape *Process(BlockSet &Blocks, BlockSet& Entries, Shape *Prev) {
       PrintDebug("Process() called\n");
       Debugging::Dump(Blocks, "  blocks : ");
       Debugging::Dump(Entries, "  entries: ");
@@ -603,10 +606,10 @@ void Relooper::Calculate(Block *Entry) {
         Block *Curr = *(Entries.begin());
         if (Curr->BranchesIn.size() == 0) {
           // One entry, no looping ==> Simple
-          return MakeSimple(Blocks, Curr);
+          return MakeSimple(Blocks, Curr, Prev);
         }
         // One entry, looping ==> Loop
-        return MakeLoop(Blocks, Entries);
+        return MakeLoop(Blocks, Entries, Prev);
       }
       // More than one entry, try to eliminate through a Multiple groups of
       // independent blocks from an entry/ies. It is important to remove through
@@ -639,11 +642,11 @@ void Relooper::Calculate(Block *Entry) {
 
         if (IndependentGroups.size() > 0) {
           // Some groups removable ==> Multiple
-          return MakeMultiple(Blocks, Entries, IndependentGroups);
+          return MakeMultiple(Blocks, Entries, IndependentGroups, Prev);
         }
       }
       // No independent groups, must be loopable ==> Loop
-      return MakeLoop(Blocks, Entries);
+      return MakeLoop(Blocks, Entries, Prev);
     }
   };
 
@@ -662,7 +665,7 @@ void Relooper::Calculate(Block *Entry) {
   BlockSet Entries;
 
   Entries.insert(Entry);
-  Root = Analyzer(this).Process(AllBlocks, Entries);
+  Root = Analyzer(this).Process(AllBlocks, Entries, NULL);
 
   // Optimizations
 
@@ -694,7 +697,6 @@ void Relooper::Calculate(Block *Entry) {
     // execution is the same as the flow forces us to.
     void RemoveUnneededFlows(Shape *Root, Shape *Natural=NULL) {
       SHAPE_SWITCH(Root, {
-        PrintDebug("At %d, %d, natural: %d\n", Simple->Id, Simple->Inner->Id, Natural ? Natural->Id : -1);
         // If there is a next block, we already know at Simple creation time to make direct branches,
         // and we can do nothing more. If there is no next however, then Natural is where we will
         // go to by doing nothing, so we can potentially optimize some branches to direct.
@@ -704,9 +706,7 @@ void Relooper::Calculate(Block *Entry) {
           for (BlockBranchMap::iterator iter = Simple->Inner->ProcessedBranchesOut.begin(); iter != Simple->Inner->ProcessedBranchesOut.end(); iter++) {
             Block *Target = iter->first;
             Branch *Details = iter->second;
-            PrintDebug("At branch %d (type %d)\n", Target->Id, Details->Type);
             if (Details->Type != Branch::Direct && Target->Parent == Natural) {
-              PrintDebug("Simplifying to direct branch %d\n", Branch::Direct);
               Details->Type = Branch::Direct;
               if (MultipleShape *Multiple = dynamic_cast<MultipleShape*>(Details->Ancestor)) {
                 Multiple->NeedLoop--;
@@ -734,7 +734,6 @@ void Relooper::Calculate(Block *Entry) {
       std::stack<Shape*> &LoopStack = *((std::stack<Shape*>*)Closure);
 
       SHAPE_SWITCH(Root, {
-        PrintDebug("At Simple %d\n", Simple->Inner->Id);
         MultipleShape *Fused = dynamic_cast<MultipleShape*>(Root->Next);
         // If we are fusing a Multiple with a loop into this Simple, then visit it now
         if (Fused && Fused->NeedLoop) {
@@ -745,7 +744,6 @@ void Relooper::Calculate(Block *Entry) {
           Block *Target = iter->first;
           Branch *Details = iter->second;
           if (Details->Type != Branch::Direct) {
-            PrintDebug("At %d -> %d, consider %p %p\n", Simple->Inner->Id, Target->Id, Details->Ancestor, LoopStack.top());
             assert(LoopStack.size() > 0);
             if (Details->Ancestor != LoopStack.top()) {
               LabeledShape *Labeled = dynamic_cast<LabeledShape*>(Details->Ancestor);
@@ -764,21 +762,17 @@ void Relooper::Calculate(Block *Entry) {
         }
       }, {
         if (Multiple->NeedLoop) {
-          PrintDebug("Pushing Multiple %p\n", Multiple);
           LoopStack.push(Multiple);
         }
         RECURSE_MULTIPLE(FindLabeledLoops);
         if (Multiple->NeedLoop) {
-          PrintDebug("Popping Multiple %p\n", Multiple);
           LoopStack.pop();
         }
         if (Root->Next) FindLabeledLoops(Root->Next);
       }, {
         LoopStack.push(Loop);
-        PrintDebug("Pushing Loop %p\n", Loop);
         RECURSE_LOOP(FindLabeledLoops);
         LoopStack.pop();
-        PrintDebug("Popping Loop %p\n", Loop);
         if (Root->Next) FindLabeledLoops(Root->Next);
       });
 

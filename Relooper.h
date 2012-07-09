@@ -96,8 +96,9 @@ struct Block {
 struct Shape {
   int Id; // A unique identifier. Used to identify loops, labels are Lx where x is the Id.
   Shape *Next; // The shape that will appear in the code right after this one
+  Shape *Prev;
 
-  Shape() : Id(Shape::IdCounter++), Next(NULL) {}
+  Shape() : Id(Shape::IdCounter++), Next(NULL), Prev(NULL) {}
   virtual ~Shape() {}
 
   virtual void Render() = 0;

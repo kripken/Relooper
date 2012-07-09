@@ -6,49 +6,49 @@ L1: while(1) {
   print(7); state = check();
   do {
     if (state % 3 == 1) {
-      label = 2;
+      label = 3;
       /* direct */
     } else if (state % 3 == 0) {
-      label = 8;
+      label = 9;
       /* direct */
       print(8); state = check();
       if (state % 2 == 0) {
-        label = 4;
+        label = 5;
         break;
       } else {
-        label = 6;
+        label = 7;
         break;
       }
     } else {
-      label = 3;
+      label = 4;
       break L1;
     }
   } while(0);
   while(1) {
-    if (label == 2) {
+    if (label == 3) {
       print(2); state = check();
       /* direct */
       print(1); state = check();
       if (state % 2 == 0) {
-        label = 4;
+        label = 5;
         continue;
       } else {
-        label = 6;
+        label = 7;
         continue;
       }
     }
-    else if (label == 4) {
+    else if (label == 5) {
       print(4); state = check();
-      label = 2;
+      label = 3;
       continue;
     }
-    else if (label == 6) {
+    else if (label == 7) {
       print(6); state = check();
       if (state % 2 == 0) {
-        label = 7;
+        label = 8;
         continue L1;
       } else {
-        label = 6;
+        label = 7;
         continue;
       }
     }

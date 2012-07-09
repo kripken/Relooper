@@ -11,10 +11,10 @@ if (uint(i4) >= uint(i5)) {
 code 3
 L5: do {
   if (i2 == 0) {
-    label = 15;
+    label = 16;
     /* direct */
   } else {
-    label = 4;
+    label = 5;
     /* direct */
     code 4
     /* direct */
@@ -51,10 +51,10 @@ L5: do {
       }
       code 14
       if (i2 != 0) {
-        label = 5;
+        label = 6;
         /* direct */
       } else {
-        label = 15;
+        label = 16;
         break L5;
       }
     }
@@ -73,10 +73,10 @@ if (uint(i4) >= uint(i5)) {
 code 18
 L26: do {
   if (i2 == 0) {
-    label = 102;
+    label = 103;
     /* direct */
   } else {
-    label = 19;
+    label = 20;
     /* direct */
     code 19
     /* direct */
@@ -353,10 +353,10 @@ L26: do {
       }
       code 101
       if (i2 != 0) {
-        label = 20;
+        label = 21;
         /* direct */
       } else {
-        label = 102;
+        label = 103;
         break L26;
       }
     }
@@ -375,10 +375,10 @@ if (uint(i4) >= uint(i5)) {
 code 105
 L143: do {
   if (i2 == 0) {
-    label = 168;
+    label = 169;
     /* direct */
   } else {
-    label = 106;
+    label = 107;
     /* direct */
     code 106
     /* direct */
@@ -585,10 +585,10 @@ L143: do {
       }
       code 167
       if (i2 != 0) {
-        label = 107;
+        label = 108;
         /* direct */
       } else {
-        label = 168;
+        label = 169;
         break L143;
       }
     }
@@ -607,10 +607,10 @@ if (uint(i4) >= uint(i5)) {
 code 171
 L232: do {
   if (i2 == 0) {
-    label = 183;
+    label = 184;
     /* direct */
   } else {
-    label = 172;
+    label = 173;
     /* direct */
     code 172
     /* direct */
@@ -647,10 +647,10 @@ L232: do {
       }
       code 182
       if (i2 != 0) {
-        label = 173;
+        label = 174;
         /* direct */
       } else {
-        label = 183;
+        label = 184;
         break L232;
       }
     }
