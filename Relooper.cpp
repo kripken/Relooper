@@ -129,7 +129,10 @@ void Block::Render(bool InLoop) {
   // material here.) So setting to 2 is important just to clear the 1 for
   // future iterations. (An alternative approach could be to clear the
   // label variable after it is used, unclear which leads to smaller
-  // code.) TODO: reserve block ID 0 for settings that are really clearings.
+  // code.)
+  // TODO: When inside a loop, if necessary clear the label variable
+  //       once on the top, and never do settings that are in effect clears
+  // TODO: reserve&use block ID 0 for settings that are really clearings.
 
   // Fusing: If the next is a Multiple, we can fuse it with this block. Note
   // that we must be the Inner of a Simple, so fusing means joining a Simple
