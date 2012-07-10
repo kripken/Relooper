@@ -70,7 +70,7 @@ void Branch::Render(Block *Target, bool SetLabel) {
 
 // Block
 
-int Block::IdCounter = 0;
+int Block::IdCounter = 1; // 0 is reserved for clearings
 
 Block::Block(const char *CodeInit) : Parent(NULL), Id(Block::IdCounter++), DefaultTarget(NULL), IsCheckedMultipleEntry(false) {
   Code = strdup(CodeInit);
@@ -92,6 +92,10 @@ void Block::AddBranchTo(Block *Target, const char *Condition) {
 }
 
 void Block::Render(bool InLoop) {
+  if (IsCheckedMultipleEntry && InLoop) {
+    PrintIndented("label = 0;\n");
+  }
+
   if (Code) {
     // Print code in an indented manner, even over multiple lines
     char *Start = const_cast<char*>(Code);
@@ -115,23 +119,19 @@ void Block::Render(bool InLoop) {
   // A setting of the label variable (label = x) is necessary if it can
   // make an impact. The main case is where we set label to x, then elsewhere
   // we check if label is equal to that value, i.e., that label is an entry
-  // in a multiple block. A secondary case is if a particular branch site
-  // has some settings necessary by the main criterion, and others that are
-  // seemingly unimportant. However, they still matter if we are in a loop,
+  // in a multiple block. We also need to reset the label when we enter
+  // that block, so that each setting is a one-time action: consider
   //
   //    while (1) {
-  //      if (check) label = 1; else label = 2;
-  //      if (label == 1) { .. }
+  //      if (check) label = 1;
+  //      if (label == 1) { label = 0 }
   //    }
   //
   // (Note that this case is impossible due to fusing, but that is not
-  // material here.) So setting to 2 is important just to clear the 1 for
-  // future iterations. (An alternative approach could be to clear the
-  // label variable after it is used, unclear which leads to smaller
-  // code.)
+  // material here.) So setting to 0 is important just to clear the 1 for
+  // future iterations.
   // TODO: When inside a loop, if necessary clear the label variable
   //       once on the top, and never do settings that are in effect clears
-  // TODO: reserve&use block ID 0 for settings that are really clearings.
 
   // Fusing: If the next is a Multiple, we can fuse it with this block. Note
   // that we must be the Inner of a Simple, so fusing means joining a Simple
@@ -151,14 +151,6 @@ void Block::Render(bool InLoop) {
       SetLabel = false;
     }
   }
-
-  // If we are in a loop, we must set all labels, see comment before.
-  bool HasMultipleEntries = false;
-  for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
-    Block *Target = iter->first;
-    HasMultipleEntries = HasMultipleEntries || Target->IsCheckedMultipleEntry;
-  }
-  if (!HasMultipleEntries) SetLabel = false;
 
   if (!DefaultTarget) { // If no default specified, it is the last
     for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
@@ -184,7 +176,7 @@ void Block::Render(bool InLoop) {
       Target = DefaultTarget;
       Details = ProcessedBranchesOut[DefaultTarget];
     }
-    bool SetCurrLabel = SetLabel && !(!InLoop && !Target->IsCheckedMultipleEntry);
+    bool SetCurrLabel = SetLabel && Target->IsCheckedMultipleEntry;
     bool HasContent = SetCurrLabel || Details->Type != Branch::Direct || Fused;
     if (iter != ProcessedBranchesOut.end()) {
       // If there is nothing to show in this branch, omit the condition

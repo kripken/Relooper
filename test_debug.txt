@@ -4,9 +4,6 @@ int main() {
   rl_set_output_buffer(buffer);
   void *block_map[10000];
   void *rl = rl_new_relooper();
-  void *b0 = rl_new_block("// code 0");
-  block_map[0] = b0;
-  rl_relooper_add_block(rl, block_map[0]);
   void *b1 = rl_new_block("// code 1");
   block_map[1] = b1;
   rl_relooper_add_block(rl, block_map[1]);
@@ -16,66 +13,69 @@ int main() {
   void *b3 = rl_new_block("// code 3");
   block_map[3] = b3;
   rl_relooper_add_block(rl, block_map[3]);
-  rl_block_add_branch_to(block_map[0], block_map[1], "ep -> LBB1");
-  rl_block_add_branch_to(block_map[0], block_map[3], NULL);
-  rl_block_add_branch_to(block_map[1], block_map[2], "LBB1 -> LBB2");
-  rl_block_add_branch_to(block_map[1], block_map[3], NULL);
-  rl_block_add_branch_to(block_map[2], block_map[3], NULL);
-  rl_relooper_calculate(rl, block_map[0]);
+  void *b4 = rl_new_block("// code 4");
+  block_map[4] = b4;
+  rl_relooper_add_block(rl, block_map[4]);
+  rl_block_add_branch_to(block_map[1], block_map[2], "ep -> LBB1");
+  rl_block_add_branch_to(block_map[1], block_map[4], NULL);
+  rl_block_add_branch_to(block_map[2], block_map[3], "LBB1 -> LBB2");
+  rl_block_add_branch_to(block_map[2], block_map[4], NULL);
+  rl_block_add_branch_to(block_map[3], block_map[4], NULL);
+  rl_relooper_calculate(rl, block_map[1]);
   rl_relooper_render(rl);
   rl_delete_relooper(rl);
   puts(buffer);
   return 0;
 }
-// Adding block 0 (ep)
-//   with branch out to 1
-//   with branch out to 3
-// Adding block 1 (LBB1)
+// Adding block 1 (ep)
 //   with branch out to 2
+//   with branch out to 4
+// Adding block 2 (LBB1)
 //   with branch out to 3
-// Adding block 2 (LBB2)
-//   with branch out to 3
-// Adding block 3 (LBB3)
+//   with branch out to 4
+// Adding block 3 (LBB2)
+//   with branch out to 4
+// Adding block 4 (LBB3)
 // Process() called
-  blocks :  0 1 2 3 
-  entries:  0 
-// creating simple block with block #0
-// Solipsizing branches into 1
-  relevant to solipsize:  0 
-//   eliminated branch from 0
-// Solipsizing branches into 3
-  relevant to solipsize:  0 
-//   eliminated branch from 0
-// Process() called
-  blocks :  1 2 3 
-  entries:  1 3 
-// Investigated independent groups:
- group:  1 2 
-// Independent groups: 1
-// Handleable independent groups: 1
-// creating multiple block with 1 inner groups
-//   multiple group with entry 1:
-     1 2 
-// Solipsizing branches into 3
-  relevant to solipsize:  1 2 
-//   eliminated branch from 1
-//   eliminated branch from 2
-// Process() called
-  blocks :  1 2 
+  blocks :  1 2 3 4 
   entries:  1 
 // creating simple block with block #1
 // Solipsizing branches into 2
   relevant to solipsize:  1 
 //   eliminated branch from 1
+// Solipsizing branches into 4
+  relevant to solipsize:  1 
+//   eliminated branch from 1
 // Process() called
-  blocks :  2 
+  blocks :  2 3 4 
+  entries:  2 4 
+// Investigated independent groups:
+ group:  2 3 
+// Independent groups: 1
+// Handleable independent groups: 1
+// creating multiple block with 1 inner groups
+//   multiple group with entry 2:
+     2 3 
+// Solipsizing branches into 4
+  relevant to solipsize:  2 3 
+//   eliminated branch from 2
+//   eliminated branch from 3
+// Process() called
+  blocks :  2 3 
   entries:  2 
 // creating simple block with block #2
-  remaining blocks after multiple: 3 
+// Solipsizing branches into 3
+  relevant to solipsize:  2 
+//   eliminated branch from 2
 // Process() called
   blocks :  3 
   entries:  3 
 // creating simple block with block #3
+  remaining blocks after multiple: 4 
+// Process() called
+  blocks :  4 
+  entries:  4 
+// creating simple block with block #4
 // === Optimizing shapes ===
 // Fusing Multiple to Simple
 ep
