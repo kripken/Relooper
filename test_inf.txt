@@ -29,8 +29,7 @@ L5: do {
         code 12
       }
       code 14
-      if (i2 != 0) {
-      } else {
+      if (!(i2 != 0)) {
         break L5;
       }
     }
@@ -211,8 +210,7 @@ L26: do {
         code 99
       }
       code 101
-      if (i2 != 0) {
-      } else {
+      if (!(i2 != 0)) {
         break L26;
       }
     }
@@ -351,8 +349,7 @@ L143: do {
         code 165
       }
       code 167
-      if (i2 != 0) {
-      } else {
+      if (!(i2 != 0)) {
         break L143;
       }
     }
@@ -389,8 +386,7 @@ if (i2 == 0) {
       code 180
     }
     code 182
-    if (i2 != 0) {
-    } else {
+    if (!(i2 != 0)) {
       break;
     }
   }

@@ -22,15 +22,15 @@ int main() {
   void *b5 = rl_new_block("//5");
   rl_relooper_add_block(r, b5);
 
-  rl_block_add_branch_to(b0, b1, "check()");
+  rl_block_add_branch_to(b0, b1, "check(0)");
   rl_block_add_branch_to(b0, b4, NULL);
-  rl_block_add_branch_to(b1, b1, "check()");
+  rl_block_add_branch_to(b1, b1, "check(1)");
   rl_block_add_branch_to(b1, b2, NULL);
-  rl_block_add_branch_to(b2, b2, "check()");
+  rl_block_add_branch_to(b2, b2, "check(2)");
   rl_block_add_branch_to(b2, b3, NULL);
-  rl_block_add_branch_to(b4, b4, "check()");
+  rl_block_add_branch_to(b4, b4, "check(4)");
   rl_block_add_branch_to(b4, b5, NULL);
-  rl_block_add_branch_to(b5, b3, "check()");
+  rl_block_add_branch_to(b5, b3, "check(5)");
   rl_block_add_branch_to(b5, b5, NULL);
 
   rl_relooper_calculate(r, b0);

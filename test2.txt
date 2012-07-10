@@ -2,8 +2,7 @@ ep
 do {
   if (ep -> LBB1) {
     LBB1
-    if (LBB1 -> LBB2) {
-    } else {
+    if (!(LBB1 -> LBB2)) {
       break;
     }
     LBB2

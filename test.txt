@@ -35,8 +35,7 @@ while(1) {
   // block A
   var check = maybe();
   // block B
-  if (check == 41) {
-  } else {
+  if (!(check == 41)) {
     break;
   }
 }

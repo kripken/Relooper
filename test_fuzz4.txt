@@ -8,8 +8,7 @@ if (state == 2) {
 } else {
   while(1) {
     print(4); state = check();
-    if (state == 4) {
-    } else {
+    if (!(state == 4)) {
       break;
     }
   }

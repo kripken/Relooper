@@ -2,8 +2,7 @@
 do {
   if ( 1 ) {
     //20
-    if ( 1 ) {
-    } else {
+    if (!( 1 )) {
       label = 3;
       break;
     }

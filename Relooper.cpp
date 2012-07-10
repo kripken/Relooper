@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <list>
 #include <stack>
+#include <string>
 
 // TODO: move all set to unorderedset
 
@@ -169,6 +170,7 @@ void Block::Render(bool InLoop) {
   }
   assert(DefaultTarget); // Must be a default
 
+  std::string RemainingConditions;
   bool First = true;
   for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin();; iter++) {
     Block *Target;
@@ -178,17 +180,39 @@ void Block::Render(bool InLoop) {
       if (Target == DefaultTarget) continue; // done at the end
       Details = iter->second;
       assert(Details->Condition); // must have a condition if this is not the default target
-      PrintIndented("%sif (%s) {\n", First ? "" : "} else ", Details->Condition);
-      First = false;
     } else {
       Target = DefaultTarget;
       Details = ProcessedBranchesOut[DefaultTarget];
-      if (!First) {
-        PrintIndented("} else {\n");
+    }
+    bool SetCurrLabel = SetLabel && !(!InLoop && !Target->IsCheckedMultipleEntry);
+    bool HasContent = SetCurrLabel || Details->Type != Branch::Direct || Fused;
+    if (iter != ProcessedBranchesOut.end()) {
+      // If there is nothing to show in this branch, omit the condition
+      if (HasContent) {
+        PrintIndented("%sif (%s) {\n", First ? "" : "} else ", Details->Condition);
+        First = false;
+      } else {
+        if (RemainingConditions.size() > 0) RemainingConditions += " && ";
+        RemainingConditions += "!(";
+        RemainingConditions += Details->Condition;
+        RemainingConditions += ")";
+      }
+    } else {
+      if (HasContent) {
+        if (RemainingConditions.size() > 0) {
+          if (First) {
+            PrintIndented("if (%s) {\n", RemainingConditions.c_str());
+            First = false;
+          } else {
+            PrintIndented("} else if (%s) {\n", RemainingConditions.c_str());
+          }
+        } else if (!First) {
+          PrintIndented("} else {\n");
+        }
       }
     }
     if (!First) Indenter::Indent();
-    Details->Render(Target, SetLabel && !(!InLoop && !Target->IsCheckedMultipleEntry));
+    Details->Render(Target, SetCurrLabel);
     if (Fused && Fused->InnerMap.find(Target) != Fused->InnerMap.end()) {
       Fused->InnerMap.find(Target)->second->Render(InLoop);
     }
