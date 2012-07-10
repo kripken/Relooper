@@ -65,8 +65,8 @@ int main() {
   Block *b%d = new Block("%s");
 ''' % (i, entry)
     else:
-      fast += '''  Block *b%d = new Block("print(%d); state = check();");
-''' % (i, i)
+      fast += '''  Block *b%d = new Block("print(%d); state = check();%s");
+''' % (i, i, '// ' + ('.' * int(random.expovariate(0.5/num))))
 
   for i in range(num):
     b = branches[i]
