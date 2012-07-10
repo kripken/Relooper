@@ -57,9 +57,7 @@ Branch::~Branch() {
 void Branch::Render(Block *Target, bool SetLabel) {
   if (SetLabel) PrintIndented("label = %d;\n", Target->Id);
   if (Ancestor) {
-    if (Type == Direct) {
-      PrintIndented("/* direct */\n");
-    } else {
+    if (Type != Direct) {
       if (Labeled) {
         PrintIndented("%s L%d;\n", Type == Break ? "break" : "continue", Ancestor->Id);
       } else {

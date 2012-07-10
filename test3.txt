@@ -1,26 +1,20 @@
 ep
 do {
   if (ep -> LBB1) {
-    /* direct */
     LBB1
     if (LBB1 -> LBB2) {
-      /* direct */
     } else {
       break;
     }
     LBB2
-    /* direct */
   } else {
-    /* direct */
   }
 } while(0);
 LBB3
 L5: do {
   if (LBB3 -> LBB4) {
-    /* direct */
     LBB4
     if (LBB4 -> LBB5) {
-      /* direct */
     } else {
       break;
     }
@@ -29,11 +23,9 @@ L5: do {
       if (LBB5 -> LBB6) {
         break L5;
       } else {
-        /* direct */
       }
     }
   } else {
-    /* direct */
   }
 } while(0);
 LBB6

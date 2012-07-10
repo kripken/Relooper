@@ -1,10 +1,8 @@
 //19
 do {
   if ( 1 ) {
-    /* direct */
     //20
     if ( 1 ) {
-      /* direct */
     } else {
       label = 3;
       break;
@@ -13,19 +11,15 @@ do {
     break;
   } else {
     label = 3;
-    /* direct */
   }
 } while(0);
 if (label == 3) {
   //22
-  /* direct */
 }
 //23
 if ( 1 ) {
-  /* direct */
   //24
 } else {
-  /* direct */
   //28
 }
 

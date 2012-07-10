@@ -6,11 +6,8 @@
 
 // block A
 if (check == 10) {
-  /* direct */
   // block B
-  /* direct */
 } else {
-  /* direct */
 }
 // block C
 
@@ -22,13 +19,9 @@ if (check == 10) {
 
 // block A
 if (check == 15) {
-  /* direct */
   // block B
-  /* direct */
 } else {
-  /* direct */
   // block C
-  /* direct */
 }
 // block D
 
@@ -41,10 +34,8 @@ if (check == 15) {
 while(1) {
   // block A
   var check = maybe();
-  /* direct */
   // block B
   if (check == 41) {
-    /* direct */
   } else {
     break;
   }
