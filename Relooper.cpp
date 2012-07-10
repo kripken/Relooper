@@ -304,36 +304,42 @@ struct RelooperRecursor {
 void Relooper::Calculate(Block *Entry) {
   Shapes.reserve(Blocks.size()); // vague heuristic, better than nothing
 
-  // Find live blocks (reachable from the entry)
-  struct LiveScanner : public RelooperRecursor {
-    LiveScanner(Relooper *Parent) : RelooperRecursor(Parent) {}
-    BlockSet Blocks;
-    void Scan(Block *Curr) {
-      if (Blocks.find(Curr) != Blocks.end()) return;
-      Blocks.insert(Curr);
+  // Scan and optimize the input
+  struct PreOptimizer : public RelooperRecursor {
+    PreOptimizer(Relooper *Parent) : RelooperRecursor(Parent) {}
+    BlockSet Live;
+
+    void FindLive(Block *Curr) {
+      if (Live.find(Curr) != Live.end()) return;
+      Live.insert(Curr);
       for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
-        Scan(iter->first);
+        FindLive(iter->first);
       }
     }
+
+    // If a block has multiple entries but no exits, and it is small enough, it is useful to split it.
+    // A common example is a C++ function where everything ends up at a final exit block and does some
+    // RAII cleanup. Without splitting, we will be forced to introduce labelled loops to allow
+    // reaching the final block
+    void SplitDeadEnds() {
+    }
+
+    void Process(Block *Entry) {
+      FindLive(Entry);
+      SplitDeadEnds();
+    }
   };
-  LiveScanner Live(this);
-  Live.Scan(Entry);
+  PreOptimizer Pre(this);
+  Pre.Process(Entry);
 
   // Add incoming branches from live blocks, ignoring dead code
   for (int i = 0; i < Blocks.size(); i++) {
     Block *Curr = Blocks[i];
-    if (Live.Blocks.find(Curr) == Live.Blocks.end()) continue;
+    if (Pre.Live.find(Curr) == Pre.Live.end()) continue;
     for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
       iter->first->BranchesIn[Curr] = new Branch(iter->second->Condition);
     }
   }
-
-  // Optimize the input blocks
-  struct PreOptimizer : public RelooperRecursor {
-    PreOptimizer(Relooper *Parent) : RelooperRecursor(Parent) {}
-    void Process(Block *Root) {}
-  };
-  PreOptimizer(this).Process(Entry);
 
   // Recursively process the graph
 
