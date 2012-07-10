@@ -170,33 +170,30 @@ void Block::Render(bool InLoop) {
   assert(DefaultTarget); // Must be a default
 
   bool First = true;
-  for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
-    Block *Target = iter->first;
-    Branch *Details = iter->second;
-    if (Target == DefaultTarget) continue; // done at the end
-    assert(Details->Condition); // must have a condition if this is not the default target
-    PrintIndented("%sif (%s) {\n", First ? "" : "} else ", Details->Condition);
-    First = false;
-    Indenter::Indent();
+  for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin();; iter++) {
+    Block *Target;
+    Branch *Details;
+    if (iter != ProcessedBranchesOut.end()) {
+      Target = iter->first;
+      if (Target == DefaultTarget) continue; // done at the end
+      Details = iter->second;
+      assert(Details->Condition); // must have a condition if this is not the default target
+      PrintIndented("%sif (%s) {\n", First ? "" : "} else ", Details->Condition);
+      First = false;
+    } else {
+      Target = DefaultTarget;
+      Details = ProcessedBranchesOut[DefaultTarget];
+      if (!First) {
+        PrintIndented("} else {\n");
+      }
+    }
+    if (!First) Indenter::Indent();
     Details->Render(Target, SetLabel && !(!InLoop && !Target->IsCheckedMultipleEntry));
     if (Fused && Fused->InnerMap.find(Target) != Fused->InnerMap.end()) {
       Fused->InnerMap.find(Target)->second->Render(InLoop);
     }
-    Indenter::Unindent();
-  }
-  if (DefaultTarget) {
-    if (!First) {
-      PrintIndented("} else {\n");
-      Indenter::Indent();
-    }
-    Branch *Details = ProcessedBranchesOut[DefaultTarget];
-    Details->Render(DefaultTarget, SetLabel && !(!InLoop && !DefaultTarget->IsCheckedMultipleEntry));
-    if (Fused && Fused->InnerMap.find(DefaultTarget) != Fused->InnerMap.end()) {
-      Fused->InnerMap.find(DefaultTarget)->second->Render(InLoop);
-    }
-    if (!First) {
-      Indenter::Unindent();
-    }
+    if (!First) Indenter::Unindent();
+    if (iter == ProcessedBranchesOut.end()) break;
   }
   if (!First) PrintIndented("}\n");
 
