@@ -52,7 +52,7 @@ struct Block {
   // processed branches.
   // Blocks own the Branch objects they use, and destroy them when done.
   BlockBranchMap BranchesOut;
-  BlockBranchMap BranchesIn;
+  BlockBranchMap BranchesIn; // TODO: make this just a list of Incoming, without branch info - should be just on BranchesOut
   BlockBranchMap ProcessedBranchesOut;
   BlockBranchMap ProcessedBranchesIn;
   Shape *Parent; // The shape we are directly inside

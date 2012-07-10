@@ -1,36 +1,35 @@
 //0
-L1: do {
-  if (check()) {
-    while(1) {
-      //1
-      if (check()) {
-      } else {
-        break;
-      }
-    }
-    while(1) {
-      //2
-      if (check()) {
-      } else {
-        break L1;
-      }
-    }
-  } else {
-    while(1) {
-      //4
-      if (check()) {
-      } else {
-        break;
-      }
-    }
-    while(1) {
-      //5
-      if (check()) {
-        break L1;
-      } else {
-      }
+if (check()) {
+  while(1) {
+    //1
+    if (check()) {
+    } else {
+      break;
     }
   }
-} while(0);
-//3
+  while(1) {
+    //2
+    if (check()) {
+    } else {
+      break;
+    }
+  }
+  //3
+} else {
+  while(1) {
+    //4
+    if (check()) {
+    } else {
+      break;
+    }
+  }
+  while(1) {
+    //5
+    if (check()) {
+      break;
+    } else {
+    }
+  }
+  //3
+}
 

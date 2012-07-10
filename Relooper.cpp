@@ -322,24 +322,42 @@ void Relooper::Calculate(Block *Entry) {
     // RAII cleanup. Without splitting, we will be forced to introduce labelled loops to allow
     // reaching the final block
     void SplitDeadEnds() {
-    }
+      int TotalCodeSize = 0;
+      for (BlockSet::iterator iter = Live.begin(); iter != Live.end(); iter++) {
+        Block *Curr = *iter;
+        TotalCodeSize += strlen(Curr->Code);
+      }
 
-    void Process(Block *Entry) {
-      FindLive(Entry);
-      SplitDeadEnds();
+      for (BlockSet::iterator iter = Live.begin(); iter != Live.end(); iter++) {
+        Block *Original = *iter;
+        if (Original->BranchesIn.size() <= 1 || Original->BranchesOut.size() > 0) continue;
+        if (strlen(Original->Code)*(Original->BranchesIn.size()-1) > TotalCodeSize/5) continue; // if splitting increases raw code size by a significant amount, abort
+        // Split the node (for simplicity, we replace all the blocks, even though we could have reused the original)
+        for (BlockBranchMap::iterator iter = Original->BranchesIn.begin(); iter != Original->BranchesIn.end(); iter++) {
+          Block *Prior = iter->first;
+          Block *Split = new Block(Original->Code);
+          Split->BranchesIn[Prior] = new Branch(NULL);
+          Prior->BranchesOut[Split] = new Branch(Prior->BranchesOut[Original]->Condition);
+          Prior->BranchesOut.erase(Original);
+          Parent->AddBlock(Split);
+          Live.insert(Split);
+        }
+      }
     }
   };
   PreOptimizer Pre(this);
-  Pre.Process(Entry);
+  Pre.FindLive(Entry);
 
   // Add incoming branches from live blocks, ignoring dead code
   for (int i = 0; i < Blocks.size(); i++) {
     Block *Curr = Blocks[i];
     if (Pre.Live.find(Curr) == Pre.Live.end()) continue;
     for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
-      iter->first->BranchesIn[Curr] = new Branch(iter->second->Condition);
+      iter->first->BranchesIn[Curr] = new Branch(NULL);
     }
   }
+
+  Pre.SplitDeadEnds();
 
   // Recursively process the graph
 
