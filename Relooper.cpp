@@ -71,7 +71,7 @@ void Branch::Render(Block *Target, bool SetLabel) {
 
 int Block::IdCounter = 0;
 
-Block::Block(const char *CodeInit) : Parent(NULL), Reachable(false), Id(Block::IdCounter++), DefaultTarget(NULL), IsCheckedMultipleEntry(false) {
+Block::Block(const char *CodeInit) : Parent(NULL), Id(Block::IdCounter++), DefaultTarget(NULL), IsCheckedMultipleEntry(false) {
   Code = strdup(CodeInit);
 }
 
@@ -387,7 +387,6 @@ void Relooper::Calculate(Block *Entry) {
       Notice(Simple);
       Simple->Inner = Inner;
       Inner->Parent = Simple;
-      Inner->Reachable = true;
       if (Blocks.size() > 1) {
         Blocks.erase(Inner);
         BlockSet Entries;
