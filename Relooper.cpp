@@ -328,6 +328,13 @@ void Relooper::Calculate(Block *Entry) {
     }
   }
 
+  // Optimize the input blocks
+  struct PreOptimizer : public RelooperRecursor {
+    PreOptimizer(Relooper *Parent) : RelooperRecursor(Parent) {}
+    void Process(Block *Root) {}
+  };
+  PreOptimizer(this).Process(Entry);
+
   // Recursively process the graph
 
   struct Analyzer : public RelooperRecursor {
@@ -694,13 +701,13 @@ void Relooper::Calculate(Block *Entry) {
   Entries.insert(Entry);
   Root = Analyzer(this).Process(AllBlocks, Entries, NULL);
 
-  // Optimizations
+  // Post optimizations
 
-  struct Optimizer {
+  struct PostOptimizer {
     Relooper *Parent;
     void *Closure;
 
-    Optimizer(Relooper *ParentInit) : Parent(ParentInit), Closure(NULL) {}
+    PostOptimizer(Relooper *ParentInit) : Parent(ParentInit), Closure(NULL) {}
 
     #define RECURSE_MULTIPLE_MANUAL(func, manual) \
       for (BlockShapeMap::iterator iter = manual->InnerMap.begin(); iter != manual->InnerMap.end(); iter++) { \
@@ -830,7 +837,7 @@ void Relooper::Calculate(Block *Entry) {
 
   PrintDebug("=== Optimizing shapes ===\n");
 
-  Optimizer(this).Process(Root);
+  PostOptimizer(this).Process(Root);
 }
 
 void Relooper::SetOutputBuffer(char *Buffer) {
