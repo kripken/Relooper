@@ -7,7 +7,6 @@
 // block A
 if (check == 10) {
   // block B
-} else {
 }
 // block C
 

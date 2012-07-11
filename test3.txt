@@ -6,7 +6,6 @@ do {
       break;
     }
     LBB2
-  } else {
   }
 } while(0);
 LBB3
@@ -22,7 +21,6 @@ L5: do {
         break L5;
       }
     }
-  } else {
   }
 } while(0);
 LBB6

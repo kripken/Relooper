@@ -86,7 +86,6 @@ do {
       break;
     }
     LBB2
-  } else {
   }
 } while(0);
 LBB3

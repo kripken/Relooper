@@ -6,8 +6,7 @@ if (uint(i4) >= uint(i5)) {
 }
 code 3
 L5: do {
-  if (i2 == 0) {
-  } else {
+  if (!(i2 == 0)) {
     code 4
     while(1) {
       code 5
@@ -43,8 +42,7 @@ if (uint(i4) >= uint(i5)) {
 }
 code 18
 L26: do {
-  if (i2 == 0) {
-  } else {
+  if (!(i2 == 0)) {
     code 19
     while(1) {
       code 20
@@ -224,8 +222,7 @@ if (uint(i4) >= uint(i5)) {
 }
 code 105
 L143: do {
-  if (i2 == 0) {
-  } else {
+  if (!(i2 == 0)) {
     code 106
     while(1) {
       code 107

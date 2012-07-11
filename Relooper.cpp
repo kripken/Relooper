@@ -177,7 +177,8 @@ void Block::Render(bool InLoop) {
       Details = ProcessedBranchesOut[DefaultTarget];
     }
     bool SetCurrLabel = SetLabel && Target->IsCheckedMultipleEntry;
-    bool HasContent = SetCurrLabel || Details->Type != Branch::Direct || Fused;
+    bool HasFusedContent = Fused && Fused->InnerMap.find(Target) != Fused->InnerMap.end();
+    bool HasContent = SetCurrLabel || Details->Type != Branch::Direct || HasFusedContent;
     if (iter != ProcessedBranchesOut.end()) {
       // If there is nothing to show in this branch, omit the condition
       if (HasContent) {
@@ -205,7 +206,7 @@ void Block::Render(bool InLoop) {
     }
     if (!First) Indenter::Indent();
     Details->Render(Target, SetCurrLabel);
-    if (Fused && Fused->InnerMap.find(Target) != Fused->InnerMap.end()) {
+    if (HasFusedContent) {
       Fused->InnerMap.find(Target)->second->Render(InLoop);
     }
     if (!First) Indenter::Unindent();
