@@ -26,6 +26,10 @@ echo "test 5"
 ./test5 &> test5.out
 diff -U 5 test5.txt test5.out
 
+echo "test 6"
+./test6 &> test6.out
+diff -U 5 test6.txt test6.out
+
 echo "test inf"
 ./test_inf &> test_inf.out
 diff -U 5 test_inf.txt test_inf.out

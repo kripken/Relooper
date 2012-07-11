@@ -29,6 +29,10 @@ echo "test 5"
 g++ test5.cpp -c -o test5.o -g
 g++ Relooper.o test5.o -o test5
 
+echo "test 6"
+g++ test6.cpp -c -o test6.o -g
+g++ Relooper.o test6.o -o test6
+
 echo "test inf"
 g++ test_inf.cpp -c -o test_inf.o -g
 g++ Relooper.o test_inf.o -o test_inf
