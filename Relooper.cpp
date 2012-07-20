@@ -139,7 +139,7 @@ void Block::Render(bool InLoop) {
   // *must* appear in the Simple (the Simple is the only one reaching the
   // Multiple), so we can remove the Multiple and add its independent groups
   // into the Simple's branches.
-  MultipleShape *Fused = dynamic_cast<MultipleShape*>(Parent->Next);
+  MultipleShape *Fused = Shape::IsMultiple(Parent->Next);
   if (Fused) {
     PrintDebug("Fusing Multiple to Simple\n");
     Parent->Next = Parent->Next->Next;
@@ -407,7 +407,7 @@ void Relooper::Calculate(Block *Entry) {
         Branch *PriorOut = Prior->BranchesOut[Target];
         PriorOut->Ancestor = Ancestor; // Do we need this info
         PriorOut->Type = Type;         // on TargetIn too?
-        if (MultipleShape *Multiple = dynamic_cast<MultipleShape*>(Ancestor)) {
+        if (MultipleShape *Multiple = Shape::IsMultiple(Ancestor)) {
           Multiple->NeedLoop++; // We are breaking out of this Multiple, so need a loop
         }
         iter++; // carefully increment iter before erasing
@@ -619,7 +619,7 @@ void Relooper::Calculate(Block *Entry) {
 
     Shape *MakeMultiple(BlockSet &Blocks, BlockSet& Entries, BlockBlockSetMap& IndependentGroups, Shape *Prev) {
       PrintDebug("creating multiple block with %d inner groups\n", IndependentGroups.size());
-      bool Fused = !!(dynamic_cast<SimpleShape*>(Prev));
+      bool Fused = !!(Shape::IsSimple(Prev));
       MultipleShape *Multiple = new MultipleShape();
       Notice(Multiple);
       BlockSet NextEntries, CurrEntries;
@@ -755,23 +755,23 @@ void Relooper::Calculate(Block *Entry) {
       func(Loop->Inner);
 
     #define SHAPE_SWITCH(var, simple, multiple, loop) \
-      if (SimpleShape *Simple = dynamic_cast<SimpleShape*>(var)) { \
+      if (SimpleShape *Simple = Shape::IsSimple(var)) { \
         simple; \
-      } else if (MultipleShape *Multiple = dynamic_cast<MultipleShape*>(var)) { \
+      } else if (MultipleShape *Multiple = Shape::IsMultiple(var)) { \
         multiple; \
-      } else if (LoopShape *Loop = dynamic_cast<LoopShape*>(var)) { \
+      } else if (LoopShape *Loop = Shape::IsLoop(var)) { \
         loop; \
       }
 
     #define SHAPE_SWITCH_AUTO(var, simple, multiple, loop, func) \
-      if (SimpleShape *Simple = dynamic_cast<SimpleShape*>(var)) { \
+      if (SimpleShape *Simple = Shape::IsSimple(var)) { \
         simple; \
         func(Simple->Next); \
-      } else if (MultipleShape *Multiple = dynamic_cast<MultipleShape*>(var)) { \
+      } else if (MultipleShape *Multiple = Shape::IsMultiple(var)) { \
         multiple; \
         RECURSE_MULTIPLE(func) \
         func(Multiple->Next); \
-      } else if (LoopShape *Loop = dynamic_cast<LoopShape*>(var)) { \
+      } else if (LoopShape *Loop = Shape::IsLoop(var)) { \
         loop; \
         RECURSE_LOOP(func); \
         func(Loop->Next); \
@@ -793,7 +793,7 @@ void Relooper::Calculate(Block *Entry) {
             Branch *Details = iter->second;
             if (Details->Type != Branch::Direct && Target->Parent == Natural) {
               Details->Type = Branch::Direct;
-              if (MultipleShape *Multiple = dynamic_cast<MultipleShape*>(Details->Ancestor)) {
+              if (MultipleShape *Multiple = Shape::IsMultiple(Details->Ancestor)) {
                 Multiple->NeedLoop--;
               }
             }
@@ -819,7 +819,7 @@ void Relooper::Calculate(Block *Entry) {
       std::stack<Shape*> &LoopStack = *((std::stack<Shape*>*)Closure);
 
       SHAPE_SWITCH(Root, {
-        MultipleShape *Fused = dynamic_cast<MultipleShape*>(Root->Next);
+        MultipleShape *Fused = Shape::IsMultiple(Root->Next);
         // If we are fusing a Multiple with a loop into this Simple, then visit it now
         if (Fused && Fused->NeedLoop) {
           LoopStack.push(Fused);

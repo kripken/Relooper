@@ -91,14 +91,30 @@ struct Block {
 //            flow is not known until runtime (indirect branches,
 //            setjmp returns, etc.)
 //
+
+class SimpleShape;
+class MultipleShape;
+class LoopShape;
+
 struct Shape {
   int Id; // A unique identifier. Used to identify loops, labels are Lx where x is the Id.
   Shape *Next; // The shape that will appear in the code right after this one
 
-  Shape() : Id(Shape::IdCounter++), Next(NULL) {}
+  enum ShapeType {
+    Simple,
+    Multiple,
+    Loop
+  };
+  ShapeType Type;
+
+  Shape(ShapeType TypeInit) : Id(Shape::IdCounter++), Next(NULL), Type(TypeInit) {}
   virtual ~Shape() {}
 
   virtual void Render(bool InLoop) = 0;
+
+  static SimpleShape *IsSimple(Shape *It) { return It && It->Type == Simple ? (SimpleShape*)It : NULL; };
+  static MultipleShape *IsMultiple(Shape *It) { return It && It->Type == Multiple ? (MultipleShape*)It : NULL; };
+  static LoopShape *IsLoop(Shape *It) { return It && It->Type == Loop ? (LoopShape*)It : NULL; };
 
   // INTERNAL
   static int IdCounter;
@@ -107,7 +123,7 @@ struct Shape {
 struct SimpleShape : public Shape {
   Block *Inner;
 
-  SimpleShape() : Inner(NULL) {}
+  SimpleShape() : Shape(Simple), Inner(NULL) {}
   void Render(bool InLoop) {
     Inner->Render(InLoop);
     if (Next) Next->Render(InLoop);
@@ -120,7 +136,7 @@ typedef std::map<Block*, Shape*> BlockShapeMap;
 struct LabeledShape : public Shape {
   bool Labeled; // If we have a loop, whether it needs to be labeled
 
-  LabeledShape() : Labeled(false) {}
+  LabeledShape(ShapeType TypeInit) : Shape(TypeInit), Labeled(false) {}
 };
 
 struct MultipleShape : public LabeledShape {
@@ -128,7 +144,7 @@ struct MultipleShape : public LabeledShape {
   int NeedLoop; // If we have branches, we need a loop. This is a counter of loop requirements,
                 // if we optimize it to 0, the loop is unneeded
 
-  MultipleShape() : NeedLoop(0) {}
+  MultipleShape() : LabeledShape(Multiple), NeedLoop(0) {}
 
   void RenderLoopPrefix();
   void RenderLoopPostfix();
@@ -139,7 +155,7 @@ struct MultipleShape : public LabeledShape {
 struct LoopShape : public LabeledShape {
   Shape *Inner;
 
-  LoopShape() : Inner(NULL) {}
+  LoopShape() : LabeledShape(Loop), Inner(NULL) {}
   void Render(bool InLoop);
 };
 
