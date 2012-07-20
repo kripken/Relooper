@@ -831,7 +831,7 @@ void Relooper::Calculate(Block *Entry) {
           if (Details->Type != Branch::Direct) {
             assert(LoopStack.size() > 0);
             if (Details->Ancestor != LoopStack.top()) {
-              LabeledShape *Labeled = dynamic_cast<LabeledShape*>(Details->Ancestor);
+              LabeledShape *Labeled = Shape::IsLabeled(Details->Ancestor);
               Labeled->Labeled = true;
               Details->Labeled = true;
             } else {
