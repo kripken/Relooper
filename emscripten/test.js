@@ -7,12 +7,13 @@ function test() {
   var b_b = new Module.Block("// block B\n", "check");
   var b_c = new Module.Block("// block C\n", "check");
 
-  b_a.AddBranchTo(b_b, 10);
-  b_a.AddBranchTo(b_c, 20);
+  b_a.AddBranchTo(b_b, "check == 10");
+  b_a.AddBranchTo(b_c, 0);
 
-  b_b.AddBranchTo(b_c, 30);
+  b_b.AddBranchTo(b_c, 0);
 
   var r = new Module.Relooper();
+  r.MakeOutputBuffer(10000);
 
   r.AddBlock(b_a);
   r.AddBlock(b_b);
