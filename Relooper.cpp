@@ -27,16 +27,24 @@ static int OutputBufferSize = 0;
 
 void PrintIndented(const char *Format, ...) {
   assert(OutputBuffer);
+  assert(OutputBuffer + Indenter::CurrIndent*2 - OutputBufferRoot < OutputBufferSize);
   for (int i = 0; i < Indenter::CurrIndent*2; i++, OutputBuffer++) *OutputBuffer = ' ';
   va_list Args;
   va_start(Args, Format);
-  OutputBuffer += vsprintf(OutputBuffer, Format, Args);
+  int left = OutputBufferSize - (OutputBuffer - OutputBufferRoot);
+  int written = vsnprintf(OutputBuffer, left, Format, Args);
+  assert(written < left);
+  OutputBuffer += written;
   va_end(Args);
 }
 
 void PutIndented(const char *String) {
   assert(OutputBuffer);
+  assert(OutputBuffer + Indenter::CurrIndent*2 - OutputBufferRoot < OutputBufferSize);
   for (int i = 0; i < Indenter::CurrIndent*2; i++, OutputBuffer++) *OutputBuffer = ' ';
+  int left = OutputBufferSize - (OutputBuffer - OutputBufferRoot);
+  int needed = strlen(String)+1;
+  assert(needed < left);
   strcpy(OutputBuffer, String);
   OutputBuffer += strlen(String);
   *OutputBuffer++ = '\n';
