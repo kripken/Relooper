@@ -3,26 +3,21 @@
 function test() {
   print("-- If shape --\n");
 
-  var b_a = new Module.Block("// block A\n", "check");
-  var b_b = new Module.Block("// block B\n", "check");
-  var b_c = new Module.Block("// block C\n", "check");
+  //Relooper.setDebug(1);
 
-  b_a.AddBranchTo(b_b, "check == 10");
-  b_a.AddBranchTo(b_c, 0);
+  Relooper.init();
 
-  b_b.AddBranchTo(b_c, 0);
+  var b_a = Relooper.addBlock("// block A\n");
+  var b_b = Relooper.addBlock("// block B\n");
+  var b_c = Relooper.addBlock("// block C\n");
 
-  var r = new Module.Relooper();
-  r.MakeOutputBuffer(10000);
+  Relooper.addBranch(b_a, b_b, "check == 10");
+  Relooper.addBranch(b_a, b_c, 0);
 
-  r.AddBlock(b_a);
-  r.AddBlock(b_b);
-  r.AddBlock(b_c);
+  Relooper.addBranch(b_b, b_c, 0);
 
-  r.Calculate(b_a);
-  r.Render();
-
-  Module.destroy(r);
+  var output = Relooper.render(b_a);
+  print(output);
 }
 
 test();
