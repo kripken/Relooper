@@ -5,19 +5,37 @@ function test() {
 
   //Relooper.setDebug(1);
 
-  Relooper.init();
+  {
+    Relooper.init();
 
-  var b_a = Relooper.addBlock("// block A\n");
-  var b_b = Relooper.addBlock("// block B\n");
-  var b_c = Relooper.addBlock("// block C\n");
+    var b_a = Relooper.addBlock("// block A\n");
+    var b_b = Relooper.addBlock("// block B\n");
+    var b_c = Relooper.addBlock("// block C\n");
 
-  Relooper.addBranch(b_a, b_b, "check == 10");
-  Relooper.addBranch(b_a, b_c, 0);
+    Relooper.addBranch(b_a, b_b, "check == 10");
+    Relooper.addBranch(b_a, b_c, 0);
 
-  Relooper.addBranch(b_b, b_c, 0);
+    Relooper.addBranch(b_b, b_c, 0);
 
-  var output = Relooper.render(b_a);
-  print(output);
+    var output = Relooper.render(b_a);
+    print(output);
+  }
+
+  {
+    Relooper.init();
+
+    var b_a = Relooper.addBlock("// block A\n");
+    var b_b = Relooper.addBlock("// block B\n");
+    var b_c = Relooper.addBlock("// block C\n");
+
+    Relooper.addBranch(b_a, b_b, "check == fee()");
+    Relooper.addBranch(b_a, b_c, 0);
+
+    Relooper.addBranch(b_c, b_b, 0);
+
+    var output = Relooper.render(b_a);
+    print(output);
+  }
 }
 
 test();
