@@ -7,7 +7,7 @@ int main() {
   char buffer[10000];
 
   if (1) {
-    Relooper::SetOutputBuffer(buffer);
+    Relooper::SetOutputBuffer(buffer, sizeof(buffer));
 
     printf("\n\n-- If pattern --\n\n");
 
@@ -33,7 +33,7 @@ int main() {
   }
 
   if (1) {
-    Relooper::SetOutputBuffer(buffer);
+    Relooper::SetOutputBuffer(buffer, sizeof(buffer));
 
     printf("\n\n-- If-else pattern --\n\n");
 
@@ -63,7 +63,7 @@ int main() {
   }
 
   if (1) {
-    Relooper::SetOutputBuffer(buffer);
+    Relooper::SetOutputBuffer(buffer, sizeof(buffer));
 
     printf("\n\n-- Loop + tail pattern --\n\n");
 

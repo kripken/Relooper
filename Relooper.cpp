@@ -21,24 +21,26 @@ struct Indenter {
 static void PrintIndented(const char *Format, ...);
 static void PutIndented(const char *String);
 
-static char *__OutputBuffer__ = NULL;
+static char *OutputBufferRoot = NULL;
+static char *OutputBuffer = NULL;
+static int OutputBufferSize = 0;
 
 void PrintIndented(const char *Format, ...) {
-  assert(__OutputBuffer__);
-  for (int i = 0; i < Indenter::CurrIndent*2; i++, __OutputBuffer__++) *__OutputBuffer__ = ' ';
+  assert(OutputBuffer);
+  for (int i = 0; i < Indenter::CurrIndent*2; i++, OutputBuffer++) *OutputBuffer = ' ';
   va_list Args;
   va_start(Args, Format);
-  __OutputBuffer__ += vsprintf(__OutputBuffer__, Format, Args);
+  OutputBuffer += vsprintf(OutputBuffer, Format, Args);
   va_end(Args);
 }
 
 void PutIndented(const char *String) {
-  assert(__OutputBuffer__);
-  for (int i = 0; i < Indenter::CurrIndent*2; i++, __OutputBuffer__++) *__OutputBuffer__ = ' ';
-  strcpy(__OutputBuffer__, String);
-  __OutputBuffer__ += strlen(String);
-  *__OutputBuffer__++ = '\n';
-  *__OutputBuffer__ = 0;
+  assert(OutputBuffer);
+  for (int i = 0; i < Indenter::CurrIndent*2; i++, OutputBuffer++) *OutputBuffer = ' ';
+  strcpy(OutputBuffer, String);
+  OutputBuffer += strlen(String);
+  *OutputBuffer++ = '\n';
+  *OutputBuffer = 0;
 }
 
 // Indenter
@@ -877,8 +879,19 @@ void Relooper::Calculate(Block *Entry) {
   PostOptimizer(this).Process(Root);
 }
 
-void Relooper::SetOutputBuffer(char *Buffer) {
-  __OutputBuffer__ = Buffer;
+void Relooper::Render() {
+  OutputBuffer = OutputBufferRoot;
+  Root->Render(false);
+}
+
+void Relooper::SetOutputBuffer(char *Buffer, int Size) {
+  OutputBufferRoot = OutputBuffer = Buffer;
+  OutputBufferSize = Size;
+}
+
+void Relooper::MakeOutputBuffer(int Size) {
+  OutputBufferRoot = OutputBuffer = (char*)malloc(Size);
+  OutputBufferSize = Size;
 }
 
 // Debugging
@@ -913,14 +926,18 @@ VoidIntMap __blockDebugMap__; // maps block pointers in currently running code t
 
 extern "C" {
 
-void rl_set_output_buffer(char *buffer) {
+void rl_set_output_buffer(char *buffer, int size) {
   if (Debugging::On) {
     printf("#include \"Relooper.h\"\n");
     printf("int main() {\n");
     printf("  char buffer[100000];\n");
     printf("  rl_set_output_buffer(buffer);\n");
   }
-  Relooper::SetOutputBuffer(buffer);
+  Relooper::SetOutputBuffer(buffer, size);
+}
+
+void rl_make_output_buffer(int size) {
+  Relooper::SetOutputBuffer((char*)malloc(size), size);
 }
 
 void *rl_new_block(const char *text) {

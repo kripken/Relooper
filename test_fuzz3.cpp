@@ -6,8 +6,9 @@
 int main() {
   Debugging::On = 0;
 
-  char *buffer = (char*)malloc(10*1024*1024);
-  Relooper::SetOutputBuffer(buffer);
+  #define SIZE (10*1024*1024)
+  char *buffer = (char*)malloc(SIZE);
+  Relooper::SetOutputBuffer(buffer, SIZE);
 
   Block *b0 = new Block("print('entry'); var label; var state; var decisions = [3, 3, 4, 1, 2, 1, 2, 4, 4, 4, 2, 3, 3, 1, 2]; var index = 0; function check() { if (index == decisions.length) throw 'HALT'; return decisions[index++] }");
   Block *b1 = new Block("print(1); state = check();");

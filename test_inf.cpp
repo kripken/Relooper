@@ -3,7 +3,7 @@ int main() {
   void *block_map[10000];
   void *rl = rl_new_relooper();
   char buffer[100000];
-  rl_set_output_buffer(buffer);
+  rl_set_output_buffer(buffer, sizeof(buffer));
   void *b0 = rl_new_block("code 0");
   block_map[0] = b0;
   rl_relooper_add_block(rl, block_map[0]);

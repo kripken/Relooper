@@ -6,7 +6,7 @@ int main() {
 
   char buffer[10000];
 
-  Relooper::SetOutputBuffer(buffer);
+  Relooper::SetOutputBuffer(buffer, sizeof(buffer));
 
   printf("\n\n-- If pattern --\n\n");
 

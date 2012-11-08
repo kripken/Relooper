@@ -6,7 +6,7 @@ int main() {
   //rl_set_debugging(1);
 
   char buffer[10000];
-  rl_set_output_buffer(buffer);
+  rl_set_output_buffer(buffer, sizeof(buffer));
 
   void *r = rl_new_relooper();
   void *ep = rl_new_block("ep");

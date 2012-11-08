@@ -191,10 +191,13 @@ struct Relooper {
   void Calculate(Block *Entry);
 
   // Renders the result.
-  void Render() { Root->Render(false); }
+  void Render();
 
-  // Sets the global buffer all printing goes to. XXX Note no size checks on the buffer! Make sure it is big enough
-  static void SetOutputBuffer(char *Buffer);
+  // Sets the global buffer all printing goes to. Must call this or MakeOutputBuffer.
+  static void SetOutputBuffer(char *Buffer, int Size);
+
+  // Creates an output buffer. Must call this or SetOutputBuffer.
+  static void MakeOutputBuffer(int Size);
 };
 
 typedef std::set<Block*> BlockSet;
@@ -223,7 +226,8 @@ struct Debugging {
 extern "C" {
 #endif
 
-RELOOPERDLL_API void  rl_set_output_buffer(char *buffer);
+RELOOPERDLL_API void  rl_set_output_buffer(char *buffer, int size);
+RELOOPERDLL_API void  rl_make_output_buffer(int size);
 RELOOPERDLL_API void *rl_new_block(const char *text);
 RELOOPERDLL_API void  rl_delete_block(void *block);
 RELOOPERDLL_API void  rl_block_add_branch_to(void *from, void *to, const char *condition);
