@@ -7,7 +7,7 @@ all: relooper.js
 #relooper.exe
 
 combined.bc: ../Relooper.h ../Relooper.cpp
-	$(BINDINGS_GENERATOR) bindings ../Relooper.h > /dev/null
+	$(BINDINGS_GENERATOR) bindings ../Relooper.h -- '{ "ignored": "Shape::IdCounter,LabeledShape,Block::IdCounter,Shape::Type" }' > /dev/null
 	$(EMCC) -include ../Relooper.h bindings.cpp -o bindings.bc
 	$(EMCC) ../Relooper.cpp -I.. -o relooper.bc
 	$(EMCC) bindings.bc relooper.bc -o combined.bc
