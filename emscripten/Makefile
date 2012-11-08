@@ -6,7 +6,7 @@ NATIVIZER = $(EMSCRIPTEN)/tools/nativize_llvm.py
 all: relooper.js
 
 relooper.js:
-	$(EMCC) -O2 --closure 0 ../Relooper.cpp -I.. --post-js glue.js -o relooper.raw.js -s TOTAL_MEMORY=52428800 -s DEFAULT_LIBRARY_FUNCS_TO_INCLUDE='["memcpy", "memset", "malloc", "free", "puts"]'
+	$(EMCC) -O2 --closure 1 ../Relooper.cpp -I.. --post-js glue.js -o relooper.raw.js -s TOTAL_MEMORY=52428800 -s DEFAULT_LIBRARY_FUNCS_TO_INCLUDE='["memcpy", "memset", "malloc", "free", "puts"]'
 	echo "var Relooper = (function() {" > relooper.js
 	cat relooper.raw.js >> relooper.js
 	echo "  return Module.Relooper;" >> relooper.js
