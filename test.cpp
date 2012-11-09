@@ -130,5 +130,38 @@ int main() {
     rl_delete_relooper(rl);
     puts(buffer);
   }
+
+  if (1) {
+    Relooper::SetOutputBuffer(buffer, sizeof(buffer));
+
+    printf("\n\n-- phi on split dead ends --\n\n");
+
+    Block *b_a = new Block("// block A...................................................................................................\n");
+    Block *b_b = new Block("// block B...................................................................................................\n");
+    Block *b_c = new Block("// block C...................................................................................................\n");
+    Block *b_d = new Block("// block D\n"); // small and splittable!
+    Block *b_e = new Block("// block E\n");
+
+    b_a->AddBranchTo(b_b, "chak()", "atob();");
+    b_a->AddBranchTo(b_c, NULL, "atoc();");
+
+    b_b->AddBranchTo(b_d, NULL, "btod();");
+
+    b_c->AddBranchTo(b_d, NULL, "ctod2();");
+
+    Relooper r;
+    r.AddBlock(b_a);
+    r.AddBlock(b_b);
+    r.AddBlock(b_c);
+    r.AddBlock(b_d);
+    r.AddBlock(b_e);
+
+    r.Calculate(b_a);
+    printf("\n\n");
+    r.Render();
+
+    puts(buffer);
+  }
+
 }
 

@@ -368,7 +368,7 @@ void Relooper::Calculate(Block *Entry) {
           Block *Prior = iter->first;
           Block *Split = new Block(Original->Code);
           Split->BranchesIn[Prior] = new Branch(NULL);
-          Prior->BranchesOut[Split] = new Branch(Prior->BranchesOut[Original]->Condition);
+          Prior->BranchesOut[Split] = new Branch(Prior->BranchesOut[Original]->Condition, Prior->BranchesOut[Original]->Code);
           Prior->BranchesOut.erase(Original);
           Parent->AddBlock(Split);
           Live.insert(Split);
