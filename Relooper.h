@@ -33,8 +33,9 @@ struct Branch {
   Branch::FlowType Type; // If Ancestor is not NULL, this says whether to break or continue
   bool Labeled; // If a break or continue, whether we need to use a label
   const char *Condition; // The condition for which we branch. For example, "my_var == 1". Conditions are checked one by one. One of the conditions should have NULL as the condition, in which case it is the default
+  const char *Code; // If provided, code that is run right before the branch is taken. This is useful for phis
 
-  Branch(const char *ConditionInit);
+  Branch(const char *ConditionInit, const char *CodeInit=NULL);
   ~Branch();
 
   // Prints out the branch
@@ -65,7 +66,7 @@ struct Block {
   Block(const char *CodeInit);
   ~Block();
 
-  void AddBranchTo(Block *Target, const char *Condition);
+  void AddBranchTo(Block *Target, const char *Condition, const char *Code=NULL);
 
   // Prints out the instructions code and branchings
   void Render(bool InLoop);
@@ -230,7 +231,7 @@ RELOOPERDLL_API void  rl_set_output_buffer(char *buffer, int size);
 RELOOPERDLL_API void  rl_make_output_buffer(int size);
 RELOOPERDLL_API void *rl_new_block(const char *text);
 RELOOPERDLL_API void  rl_delete_block(void *block);
-RELOOPERDLL_API void  rl_block_add_branch_to(void *from, void *to, const char *condition);
+RELOOPERDLL_API void  rl_block_add_branch_to(void *from, void *to, const char *condition, const char *code);
 RELOOPERDLL_API void *rl_new_relooper();
 RELOOPERDLL_API void  rl_delete_relooper(void *relooper);
 RELOOPERDLL_API void  rl_relooper_add_block(void *relooper, void *block);

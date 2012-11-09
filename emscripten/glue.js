@@ -24,6 +24,8 @@
       assert(condition.length+1 < TBUFFER_SIZE);
       writeStringToMemory(condition, tbuffer);
       condition = tbuffer;
+    } else {
+      condition = 0; // allow undefined, null, etc. as inputs
     }
     _rl_block_add_branch_to(from, to, condition);
   };

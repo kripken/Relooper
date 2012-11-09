@@ -18,11 +18,11 @@ int main() {
   void *LBB3 = rl_new_block("LBB3");
   rl_relooper_add_block(r, LBB3);
 
-  rl_block_add_branch_to(ep, LBB1, "ep -> LBB1");
-  rl_block_add_branch_to(ep, LBB3, NULL);
-  rl_block_add_branch_to(LBB1, LBB2, "LBB1 -> LBB2");
-  rl_block_add_branch_to(LBB1, LBB3, NULL);
-  rl_block_add_branch_to(LBB2, LBB3, NULL);
+  rl_block_add_branch_to(ep, LBB1, "ep -> LBB1", NULL);
+  rl_block_add_branch_to(ep, LBB3, NULL, NULL);
+  rl_block_add_branch_to(LBB1, LBB2, "LBB1 -> LBB2", NULL);
+  rl_block_add_branch_to(LBB1, LBB3, NULL, NULL);
+  rl_block_add_branch_to(LBB2, LBB3, NULL, NULL);
 
   rl_relooper_calculate(r, ep);
   rl_relooper_render(r);

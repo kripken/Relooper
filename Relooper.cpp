@@ -53,19 +53,26 @@ void PutIndented(const char *String) {
 
 // Indenter
 
+#if EMSCRIPTEN
+int Indenter::CurrIndent = 1;
+#else
 int Indenter::CurrIndent = 0;
+#endif
 
 // Branch
 
-Branch::Branch(const char *ConditionInit) : Ancestor(NULL), Labeled(false) {
+Branch::Branch(const char *ConditionInit, const char *CodeInit) : Ancestor(NULL), Labeled(false) {
   Condition = ConditionInit ? strdup(ConditionInit) : NULL;
+  Code = CodeInit ? strdup(CodeInit) : NULL;
 }
 
 Branch::~Branch() {
   if (Condition) free((void*)Condition);
+  if (Code) free((void*)Code);
 }
 
 void Branch::Render(Block *Target, bool SetLabel) {
+  if (Code) PrintIndented("%s\n", Code);
   if (SetLabel) PrintIndented("label = %d;\n", Target->Id);
   if (Ancestor) {
     if (Type != Direct) {
@@ -97,8 +104,8 @@ Block::~Block() {
   // XXX If not reachable, expected to have branches here. But need to clean them up to prevent leaks!
 }
 
-void Block::AddBranchTo(Block *Target, const char *Condition) {
-  BranchesOut[Target] = new Branch(Condition);
+void Block::AddBranchTo(Block *Target, const char *Condition, const char *Code) {
+  BranchesOut[Target] = new Branch(Condition, Code);
 }
 
 void Block::Render(bool InLoop) {
@@ -965,11 +972,11 @@ void rl_delete_block(void *block) {
   delete (Block*)block;
 }
 
-void rl_block_add_branch_to(void *from, void *to, const char *condition) {
+void rl_block_add_branch_to(void *from, void *to, const char *condition, const char *code) {
   if (Debugging::On) {
     printf("  rl_block_add_branch_to(block_map[%d], block_map[%d], %s%s%s);\n", ((Block*)from)->Id, ((Block*)to)->Id, condition ? "\"" : "", condition ? condition : "NULL", condition ? "\"" : "");
   }
-  ((Block*)from)->AddBranchTo((Block*)to, condition);
+  ((Block*)from)->AddBranchTo((Block*)to, condition, code);
 }
 
 void *rl_new_relooper() {
