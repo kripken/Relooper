@@ -87,5 +87,48 @@ int main() {
 
     puts(buffer);
   }
+
+  if (1) {
+    Relooper::SetOutputBuffer(buffer, sizeof(buffer));
+
+    printf("\n\n-- Loop with phi to head \n\n");
+
+    void *block_map[10000];
+    void *rl = rl_new_relooper();
+    void *b1 = rl_new_block("// code 1");
+    block_map[1] = b1;
+    rl_relooper_add_block(rl, block_map[1]);
+    void *b2 = rl_new_block("// code 2");
+    block_map[2] = b2;
+    rl_relooper_add_block(rl, block_map[2]);
+    void *b3 = rl_new_block("// code 3");
+    block_map[3] = b3;
+    rl_relooper_add_block(rl, block_map[3]);
+    void *b4 = rl_new_block("// code 4");
+    block_map[4] = b4;
+    rl_relooper_add_block(rl, block_map[4]);
+    void *b5 = rl_new_block("// code 5");
+    block_map[5] = b5;
+    rl_relooper_add_block(rl, block_map[5]);
+    void *b6 = rl_new_block("// code 6");
+    block_map[6] = b6;
+    rl_relooper_add_block(rl, block_map[6]);
+    void *b7 = rl_new_block("// code 7");
+    block_map[7] = b7;
+    rl_relooper_add_block(rl, block_map[7]);
+    rl_block_add_branch_to(block_map[1], block_map[2], NULL, "var $i_0 = 0;var $x_0 = 5; ");
+    rl_block_add_branch_to(block_map[2], block_map[3], "$2", NULL);
+    rl_block_add_branch_to(block_map[2], block_map[7], NULL, "var $x_1 = $x_0; ");
+    rl_block_add_branch_to(block_map[3], block_map[4], "$6", NULL);
+    rl_block_add_branch_to(block_map[3], block_map[2], NULL, "var $i_0 = $7;var $x_0 = $5; ");
+    rl_block_add_branch_to(block_map[4], block_map[5], "$10", NULL);
+    rl_block_add_branch_to(block_map[4], block_map[6], NULL, NULL);
+    rl_block_add_branch_to(block_map[5], block_map[6], NULL, NULL);
+    rl_block_add_branch_to(block_map[6], block_map[7], NULL, "var $x_1 = $13; ");
+    rl_relooper_calculate(rl, block_map[1]);
+    rl_relooper_render(rl);
+    rl_delete_relooper(rl);
+    puts(buffer);
+  }
 }
 

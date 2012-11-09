@@ -44,3 +44,35 @@ while(1) {
 }
 // block C
 
+
+
+-- Loop with phi to head 
+
+// code 1
+var $i_0 = 0;var $x_0 = 5; 
+while(1) {
+  // code 2
+  if (!($2)) {
+    label = 19;
+    break;
+  }
+  // code 3
+  if ($6) {
+    label = 14;
+    break;
+  } else {
+    var $i_0 = $7;var $x_0 = $5; 
+  }
+}
+if (label == 14) {
+  // code 4
+  if ($10) {
+    // code 5
+  }
+  // code 6
+  // code 7
+}
+else if (label == 19) {
+  // code 7
+}
+

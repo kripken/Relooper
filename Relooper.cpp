@@ -974,7 +974,7 @@ void rl_delete_block(void *block) {
 
 void rl_block_add_branch_to(void *from, void *to, const char *condition, const char *code) {
   if (Debugging::On) {
-    printf("  rl_block_add_branch_to(block_map[%d], block_map[%d], %s%s%s);\n", ((Block*)from)->Id, ((Block*)to)->Id, condition ? "\"" : "", condition ? condition : "NULL", condition ? "\"" : "");
+    printf("  rl_block_add_branch_to(block_map[%d], block_map[%d], %s%s%s, %s%s%s);\n", ((Block*)from)->Id, ((Block*)to)->Id, condition ? "\"" : "", condition ? condition : "NULL", condition ? "\"" : "", code ? "\"" : "", code ? code : "NULL", code ? "\"" : "");
   }
   ((Block*)from)->AddBranchTo((Block*)to, condition, code);
 }
