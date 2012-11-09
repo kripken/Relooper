@@ -105,6 +105,7 @@ Block::~Block() {
 }
 
 void Block::AddBranchTo(Block *Target, const char *Condition, const char *Code) {
+  assert(BranchesOut.find(Target) == BranchesOut.end()); // cannot add more than one branch to the same target
   BranchesOut[Target] = new Branch(Condition, Code);
 }
 

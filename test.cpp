@@ -162,6 +162,5 @@ int main() {
 
     puts(buffer);
   }
-
 }
 
