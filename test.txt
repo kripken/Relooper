@@ -6,7 +6,11 @@
 
 // block A
 if (check == 10) {
+  atob();
   // block B
+  btoc();
+} else {
+  atoc();
 }
 // block C
 

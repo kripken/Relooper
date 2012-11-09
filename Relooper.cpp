@@ -195,7 +195,7 @@ void Block::Render(bool InLoop) {
     }
     bool SetCurrLabel = SetLabel && Target->IsCheckedMultipleEntry;
     bool HasFusedContent = Fused && Fused->InnerMap.find(Target) != Fused->InnerMap.end();
-    bool HasContent = SetCurrLabel || Details->Type != Branch::Direct || HasFusedContent;
+    bool HasContent = SetCurrLabel || Details->Type != Branch::Direct || HasFusedContent || Details->Code;
     if (iter != ProcessedBranchesOut.end()) {
       // If there is nothing to show in this branch, omit the condition
       if (HasContent) {

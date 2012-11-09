@@ -15,10 +15,10 @@ int main() {
     Block *b_b = new Block("// block B\n");
     Block *b_c = new Block("// block C\n");
 
-    b_a->AddBranchTo(b_b, "check == 10");
-    b_a->AddBranchTo(b_c, NULL);
+    b_a->AddBranchTo(b_b, "check == 10", "atob();");
+    b_a->AddBranchTo(b_c, NULL, "atoc();");
 
-    b_b->AddBranchTo(b_c, NULL);
+    b_b->AddBranchTo(b_c, NULL, "btoc();");
 
     Relooper r;
     r.AddBlock(b_a);
