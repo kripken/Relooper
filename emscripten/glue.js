@@ -18,16 +18,23 @@
     _rl_relooper_add_block(this.r, b);
     return b;
   };
-  RelooperGlue['addBranch'] = function(from, to, condition) {
+  RelooperGlue['addBranch'] = function(from, to, condition, code) {
     assert(this.r);
     if (condition) {
-      assert(condition.length+1 < TBUFFER_SIZE);
+      assert(condition.length+1 < TBUFFER_SIZE/2);
       writeStringToMemory(condition, tbuffer);
       condition = tbuffer;
     } else {
       condition = 0; // allow undefined, null, etc. as inputs
     }
-    _rl_block_add_branch_to(from, to, condition);
+    if (code) {
+      assert(code.length+1 < TBUFFER_SIZE/2);
+      writeStringToMemory(code, tbuffer + TBUFFER_SIZE/2);
+      code = tbuffer + TBUFFER_SIZE/2;
+    } else {
+      code = 0; // allow undefined, null, etc. as inputs
+    }
+    _rl_block_add_branch_to(from, to, condition, code);
   };
   RelooperGlue['render'] = function(entry) {
     assert(this.r);
