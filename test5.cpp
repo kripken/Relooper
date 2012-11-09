@@ -23,7 +23,7 @@ int main() {
   rl_relooper_add_block(r, b5);
 
   rl_block_add_branch_to(b0, b1, "check(0)", NULL);
-  rl_block_add_branch_to(b0, b4, NULL, NULL);
+  rl_block_add_branch_to(b0, b4, NULL, "goingFrom0to4();");
   rl_block_add_branch_to(b1, b1, "check(1)", NULL);
   rl_block_add_branch_to(b1, b2, NULL, NULL);
   rl_block_add_branch_to(b2, b2, "check(2)", NULL);
