@@ -161,10 +161,12 @@ struct LoopShape : public LabeledShape {
   void Render(bool InLoop);
 };
 
+/*
 struct EmulatedShape : public Shape {
   std::vector<Block*> Blocks;
   void Render(bool InLoop);
 };
+*/
 
 // Implements the relooper algorithm for a function's blocks.
 //

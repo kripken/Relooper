@@ -292,6 +292,7 @@ void LoopShape::Render(bool InLoop) {
   if (Next) Next->Render(InLoop);
 };
 
+/*
 // EmulatedShape
 
 void EmulatedShape::Render(bool InLoop) {
@@ -314,6 +315,7 @@ void EmulatedShape::Render(bool InLoop) {
   PrintIndented("}\n");
   if (Next) Next->Render(InLoop);
 };
+*/
 
 // Relooper
 
@@ -752,8 +754,8 @@ void Relooper::Calculate(Block *Entry) {
       }
     }
   }
-  BlockSet Entries;
 
+  BlockSet Entries;
   Entries.insert(Entry);
   Root = Analyzer(this).Process(AllBlocks, Entries, NULL);
 
