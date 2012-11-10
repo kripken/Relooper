@@ -15,7 +15,6 @@ LLVM.
 #ifdef __cplusplus
 
 #include <map>
-#include <string>
 #include <vector>
 #include <set>
 

@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <list>
 #include <stack>
-#include <string>
+
+#include "ministring.h"
 
 // TODO: move all set to unorderedset
 
@@ -180,7 +181,7 @@ void Block::Render(bool InLoop) {
   }
   assert(DefaultTarget); // Must be a default
 
-  std::string RemainingConditions;
+  ministring RemainingConditions;
   bool First = true;
   for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin();; iter++) {
     Block *Target;
