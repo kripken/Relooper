@@ -337,8 +337,6 @@ struct RelooperRecursor {
 };
 
 void Relooper::Calculate(Block *Entry) {
-  Shapes.reserve(Blocks.size()); // vague heuristic, better than nothing
-
   // Scan and optimize the input
   struct PreOptimizer : public RelooperRecursor {
     PreOptimizer(Relooper *Parent) : RelooperRecursor(Parent) {}

@@ -15,7 +15,7 @@ LLVM.
 #ifdef __cplusplus
 
 #include <map>
-#include <vector>
+#include <deque>
 #include <set>
 
 struct Block;
@@ -163,7 +163,7 @@ struct LoopShape : public LabeledShape {
 
 /*
 struct EmulatedShape : public Shape {
-  std::vector<Block*> Blocks;
+  std::deque<Block*> Blocks;
   void Render(bool InLoop);
 };
 */
@@ -180,8 +180,8 @@ struct EmulatedShape : public Shape {
 // Implementation details: The Relooper instance has
 // ownership of the blocks and shapes, and frees them when done.
 struct Relooper {
-  std::vector<Block*> Blocks;
-  std::vector<Shape*> Shapes;
+  std::deque<Block*> Blocks;
+  std::deque<Shape*> Shapes;
   Shape *Root;
 
   Relooper();
