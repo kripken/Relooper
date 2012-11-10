@@ -1,5 +1,6 @@
 echo "relooper"
 g++ Relooper.cpp -c -g
+g++ Relooper.cpp -c -g -DDEBUG -o RelooperDebug.o
 
 echo "test"
 g++ test.cpp -c -o test.o -g
@@ -14,8 +15,8 @@ gcc test3.c -c -o test3.o -g
 g++ Relooper.o test3.o -o test3
 
 echo "test debug"
-gcc test_debug.cpp -c -o test_debug.o -g
-g++ Relooper.o test_debug.o -o test_debug
+gcc test_debug.cpp -c -o test_debug.o -g -DDEBUG
+g++ RelooperDebug.o test_debug.o -o test_debug
 
 echo "test dead"
 gcc test_dead.cpp -c -o test_dead.o -g

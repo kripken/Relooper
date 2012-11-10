@@ -2,9 +2,6 @@
 #include "Relooper.h"
 
 int main() {
-  Debugging::On = 1;
-  //rl_set_debugging(1);
-
   char buffer[10000];
   rl_set_output_buffer(buffer, sizeof(buffer));
 

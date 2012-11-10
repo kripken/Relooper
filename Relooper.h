@@ -205,10 +205,11 @@ struct Relooper {
 typedef std::set<Block*> BlockSet;
 typedef std::map<Block*, BlockSet> BlockBlockSetMap;
 
+#if DEBUG
 struct Debugging {
-  static bool On;
   static void Dump(BlockSet &Blocks, const char *prefix=NULL);
 };
+#endif
 
 #endif // __cplusplus
 
@@ -238,8 +239,6 @@ RELOOPERDLL_API void  rl_delete_relooper(void *relooper);
 RELOOPERDLL_API void  rl_relooper_add_block(void *relooper, void *block);
 RELOOPERDLL_API void  rl_relooper_calculate(void *relooper, void *entry);
 RELOOPERDLL_API void  rl_relooper_render(void *relooper);
-
-RELOOPERDLL_API void  rl_set_debugging(int on);
 
 #ifdef __cplusplus
 }

@@ -4,8 +4,6 @@
 #include "Relooper.h"
 
 int main() {
-  Debugging::On = 0;
-
   #define SIZE (10*1024*1024)
   char *buffer = (char*)malloc(SIZE);
   Relooper::SetOutputBuffer(buffer, SIZE);

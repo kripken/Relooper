@@ -2,8 +2,6 @@
 #include "Relooper.h"
 
 int main() {
-  Debugging::On = 0;
-
   char buffer[10000];
 
   Relooper::SetOutputBuffer(buffer, sizeof(buffer));

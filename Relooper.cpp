@@ -10,7 +10,13 @@
 
 // TODO: move all set to unorderedset
 
+#if DEBUG
 static void PrintDebug(const char *Format, ...);
+#define DebugDump(x, ...) Debugging::Dump(x, __VA_ARGS__)
+#else
+#define PrintDebug(x, ...)
+#define DebugDump(x, ...)
+#endif
 
 struct Indenter {
   static int CurrIndent;
@@ -415,7 +421,7 @@ void Relooper::Calculate(Block *Entry) {
     // Converts/processes all branchings to a specific target
     void Solipsize(Block *Target, Branch::FlowType Type, Shape *Ancestor, BlockSet &From) {
       PrintDebug("Solipsizing branches into %d\n", Target->Id);
-      Debugging::Dump(From, "  relevant to solipsize: ");
+      DebugDump(From, "  relevant to solipsize: ");
       for (BlockBranchMap::iterator iter = Target->BranchesIn.begin(); iter != Target->BranchesIn.end();) {
         Block *Prior = iter->first;
         if (From.find(Prior) == From.end()) {
@@ -491,10 +497,10 @@ void Relooper::Calculate(Block *Entry) {
       }
 
       PrintDebug("creating loop block:\n");
-      Debugging::Dump(InnerBlocks, "  inner blocks:");
-      Debugging::Dump(Entries, "  inner entries:");
-      Debugging::Dump(Blocks, "  outer blocks:");
-      Debugging::Dump(NextEntries, "  outer entries:");
+      DebugDump(InnerBlocks, "  inner blocks:");
+      DebugDump(Entries, "  inner entries:");
+      DebugDump(Blocks, "  outer blocks:");
+      DebugDump(NextEntries, "  outer entries:");
 
       // TODO: Optionally hoist additional blocks into the loop
 
@@ -628,12 +634,12 @@ void Relooper::Calculate(Block *Entry) {
         }
       }
 
-      if (Debugging::On) {
-        PrintDebug("Investigated independent groups:\n");
-        for (BlockBlockSetMap::iterator iter = IndependentGroups.begin(); iter != IndependentGroups.end(); iter++) {
-          Debugging::Dump(iter->second, " group: ");
-        }
+#if DEBUG
+      PrintDebug("Investigated independent groups:\n");
+      for (BlockBlockSetMap::iterator iter = IndependentGroups.begin(); iter != IndependentGroups.end(); iter++) {
+        DebugDump(iter->second, " group: ");
       }
+#endif
     }
 
     Shape *MakeMultiple(BlockSet &Blocks, BlockSet& Entries, BlockBlockSetMap& IndependentGroups, Shape *Prev) {
@@ -646,7 +652,7 @@ void Relooper::Calculate(Block *Entry) {
         Block *CurrEntry = iter->first;
         BlockSet &CurrBlocks = iter->second;
         PrintDebug("  multiple group with entry %d:\n", CurrEntry->Id);
-        Debugging::Dump(CurrBlocks, "    ");
+        DebugDump(CurrBlocks, "    ");
         // Create inner block
         CurrEntries.clear();
         CurrEntries.insert(CurrEntry);
@@ -672,7 +678,7 @@ void Relooper::Calculate(Block *Entry) {
           CurrEntry->IsCheckedMultipleEntry = true;
         }
       }
-      Debugging::Dump(Blocks, "  remaining blocks after multiple:");
+      DebugDump(Blocks, "  remaining blocks after multiple:");
       // Add entries not handled as next entries, they are deferred
       for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
         Block *Entry = *iter;
@@ -688,8 +694,8 @@ void Relooper::Calculate(Block *Entry) {
     // Process a set of blocks with specified entries, returns a shape
     Shape *Process(BlockSet &Blocks, BlockSet& Entries, Shape *Prev) {
       PrintDebug("Process() called\n");
-      Debugging::Dump(Blocks, "  blocks : ");
-      Debugging::Dump(Entries, "  entries: ");
+      DebugDump(Blocks, "  blocks : ");
+      DebugDump(Entries, "  entries: ");
 
       if (Entries.size() == 0) return NULL;
       if (Entries.size() == 1) {
@@ -745,12 +751,12 @@ void Relooper::Calculate(Block *Entry) {
   BlockSet AllBlocks;
   for (int i = 0; i < Blocks.size(); i++) {
     AllBlocks.insert(Blocks[i]);
-    if (Debugging::On) {
-      PrintDebug("Adding block %d (%s)\n", Blocks[i]->Id, Blocks[i]->Code);
-      for (BlockBranchMap::iterator iter = Blocks[i]->BranchesOut.begin(); iter != Blocks[i]->BranchesOut.end(); iter++) {
-        PrintDebug("  with branch out to %d\n", iter->first->Id);
-      }
+#if DEBUG
+    PrintDebug("Adding block %d (%s)\n", Blocks[i]->Id, Blocks[i]->Code);
+    for (BlockBranchMap::iterator iter = Blocks[i]->BranchesOut.begin(); iter != Blocks[i]->BranchesOut.end(); iter++) {
+      PrintDebug("  with branch out to %d\n", iter->first->Id);
     }
+#endif
   }
 
   BlockSet Entries;
@@ -911,30 +917,25 @@ void Relooper::MakeOutputBuffer(int Size) {
   OutputBufferSize = Size;
 }
 
+#if DEBUG
 // Debugging
 
-bool Debugging::On = false; // TODO: make this a compile-time #define
-
-void Debugging::Dump(BlockSet &Blocks, const char *prefix) {
-  if (Debugging::On) {
-    if (prefix) printf("%s ", prefix);
-    for (BlockSet::iterator iter = Blocks.begin(); iter != Blocks.end(); iter++) {
-      printf("%d ", (*iter)->Id);
-    }
-    printf("\n");
+void DebugDump(BlockSet &Blocks, const char *prefix) {
+  if (prefix) printf("%s ", prefix);
+  for (BlockSet::iterator iter = Blocks.begin(); iter != Blocks.end(); iter++) {
+    printf("%d ", (*iter)->Id);
   }
+  printf("\n");
 }
 
 static void PrintDebug(const char *Format, ...) {
-  if (Debugging::On) {
-    printf("// ");
-    va_list Args;
-    va_start(Args, Format);
-    vprintf(Format, Args);
-    va_end(Args);
-  }
+  printf("// ");
+  va_list Args;
+  va_start(Args, Format);
+  vprintf(Format, Args);
+  va_end(Args);
 }
-
+#endif
 
 // C API - useful for binding to other languages
 
@@ -944,12 +945,12 @@ VoidIntMap __blockDebugMap__; // maps block pointers in currently running code t
 extern "C" {
 
 void rl_set_output_buffer(char *buffer, int size) {
-  if (Debugging::On) {
-    printf("#include \"Relooper.h\"\n");
-    printf("int main() {\n");
-    printf("  char buffer[100000];\n");
-    printf("  rl_set_output_buffer(buffer);\n");
-  }
+#if DEBUG
+  printf("#include \"Relooper.h\"\n");
+  printf("int main() {\n");
+  printf("  char buffer[100000];\n");
+  printf("  rl_set_output_buffer(buffer);\n");
+#endif
   Relooper::SetOutputBuffer(buffer, size);
 }
 
@@ -959,33 +960,33 @@ void rl_make_output_buffer(int size) {
 
 void *rl_new_block(const char *text) {
   Block *ret = new Block(text);
-  if (Debugging::On) {
-    printf("  void *b%d = rl_new_block(\"// code %d\");\n", ret->Id, ret->Id);
-    __blockDebugMap__[ret] = ret->Id;
-    printf("  block_map[%d] = b%d;\n", ret->Id, ret->Id);
-  }
+#if DEBUG
+  printf("  void *b%d = rl_new_block(\"// code %d\");\n", ret->Id, ret->Id);
+  __blockDebugMap__[ret] = ret->Id;
+  printf("  block_map[%d] = b%d;\n", ret->Id, ret->Id);
+#endif
   return ret;
 }
 
 void rl_delete_block(void *block) {
-  if (Debugging::On) {
-    printf("  rl_delete_block(block_map[%d]);\n", ((Block*)block)->Id);
-  }
+#if DEBUG
+  printf("  rl_delete_block(block_map[%d]);\n", ((Block*)block)->Id);
+#endif
   delete (Block*)block;
 }
 
 void rl_block_add_branch_to(void *from, void *to, const char *condition, const char *code) {
-  if (Debugging::On) {
-    printf("  rl_block_add_branch_to(block_map[%d], block_map[%d], %s%s%s, %s%s%s);\n", ((Block*)from)->Id, ((Block*)to)->Id, condition ? "\"" : "", condition ? condition : "NULL", condition ? "\"" : "", code ? "\"" : "", code ? code : "NULL", code ? "\"" : "");
-  }
+#if DEBUG
+  printf("  rl_block_add_branch_to(block_map[%d], block_map[%d], %s%s%s, %s%s%s);\n", ((Block*)from)->Id, ((Block*)to)->Id, condition ? "\"" : "", condition ? condition : "NULL", condition ? "\"" : "", code ? "\"" : "", code ? code : "NULL", code ? "\"" : "");
+#endif
   ((Block*)from)->AddBranchTo((Block*)to, condition, code);
 }
 
 void *rl_new_relooper() {
-  if (Debugging::On) {
-    printf("  void *block_map[10000];\n");
-    printf("  void *rl = rl_new_relooper();\n");
-  }
+#if DEBUG
+  printf("  void *block_map[10000];\n");
+  printf("  void *rl = rl_new_relooper();\n");
+#endif
   return new Relooper;
 }
 
@@ -994,30 +995,26 @@ void rl_delete_relooper(void *relooper) {
 }
 
 void rl_relooper_add_block(void *relooper, void *block) {
-  if (Debugging::On) {
-    printf("  rl_relooper_add_block(rl, block_map[%d]);\n", ((Block*)block)->Id);
-  }
+#if DEBUG
+  printf("  rl_relooper_add_block(rl, block_map[%d]);\n", ((Block*)block)->Id);
+#endif
   ((Relooper*)relooper)->AddBlock((Block*)block);
 }
 
 void rl_relooper_calculate(void *relooper, void *entry) {
-  if (Debugging::On) {
-    printf("  rl_relooper_calculate(rl, block_map[%d]);\n", ((Block*)entry)->Id);
-    printf("  rl_relooper_render(rl);\n");
-    printf("  rl_delete_relooper(rl);\n");
-    printf("  puts(buffer);\n");
-    printf("  return 0;\n");
-    printf("}\n");
-  }
+#if DEBUG
+  printf("  rl_relooper_calculate(rl, block_map[%d]);\n", ((Block*)entry)->Id);
+  printf("  rl_relooper_render(rl);\n");
+  printf("  rl_delete_relooper(rl);\n");
+  printf("  puts(buffer);\n");
+  printf("  return 0;\n");
+  printf("}\n");
+#endif
   ((Relooper*)relooper)->Calculate((Block*)entry);
 }
 
 void rl_relooper_render(void *relooper) {
   ((Relooper*)relooper)->Render();
-}
-
-void rl_set_debugging(int on) {
-  Debugging::On = on;
 }
 
 }
