@@ -142,7 +142,7 @@ void Block::Render(bool InLoop) {
   }
 
   // A setting of the label variable (label = x) is necessary if it can
-  // make an impact. The main case is where we set label to x, then elsewhere
+  // cause an impact. The main case is where we set label to x, then elsewhere
   // we check if label is equal to that value, i.e., that label is an entry
   // in a multiple block. We also need to reset the label when we enter
   // that block, so that each setting is a one-time action: consider
