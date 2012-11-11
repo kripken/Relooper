@@ -177,12 +177,11 @@ void Block::Render(bool InLoop) {
     }
   }
 
-  if (!DefaultTarget) { // If no default specified, it is the last
-    for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
-      if (!iter->second->Condition) {
-        assert(!DefaultTarget); // Must be exactly one default
-        DefaultTarget = iter->first;
-      }
+  // We must do this here, because blocks can be split and even comparing their Ids is not enough. We must check the conditions.
+  for (BlockBranchMap::iterator iter = ProcessedBranchesOut.begin(); iter != ProcessedBranchesOut.end(); iter++) {
+    if (!iter->second->Condition) {
+      assert(!DefaultTarget); // Must be exactly one default
+      DefaultTarget = iter->first;
     }
   }
   assert(DefaultTarget); // Must be a default
