@@ -164,7 +164,7 @@ int main() {
   if (1) {
     Relooper::SetOutputBuffer(buffer, sizeof(buffer));
 
-    printf("\n\n-- Unbalanced with a ead end --\n\n");
+    printf("\n\n-- Unbalanced with a dead end --\n\n");
 
     Block *b_a = new Block("// block A\n");
     Block *b_b = new Block("// block B\n");
