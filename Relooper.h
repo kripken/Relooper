@@ -1,3 +1,6 @@
+
+" This is no longer where Relooper development takes place. Current work has moved to src/relooper in the Emscripten repo, http://emscripten.org/ "
+
 /*
 This is an optimized C++ implemention of the Relooper algorithm originally
 developed as part of Emscripten. This implementation includes optimizations
