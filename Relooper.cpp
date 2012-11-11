@@ -444,7 +444,7 @@ void Relooper::Calculate(Block *Entry) {
       }
     }
 
-    Shape *MakeSimple(BlockSet &Blocks, Block *Inner, Shape *Prev) {
+    Shape *MakeSimple(BlockSet &Blocks, Block *Inner, BlockSet &NextEntries) {
       PrintDebug("creating simple block with block #%d\n", Inner->Id);
       SimpleShape *Simple = new SimpleShape;
       Notice(Simple);
@@ -452,19 +452,17 @@ void Relooper::Calculate(Block *Entry) {
       Inner->Parent = Simple;
       if (Blocks.size() > 1) {
         Blocks.erase(Inner);
-        BlockSet Entries;
-        GetBlocksOut(Inner, Entries, &Blocks);
+        GetBlocksOut(Inner, NextEntries, &Blocks);
         BlockSet JustInner;
         JustInner.insert(Inner);
-        for (BlockSet::iterator iter = Entries.begin(); iter != Entries.end(); iter++) {
+        for (BlockSet::iterator iter = NextEntries.begin(); iter != NextEntries.end(); iter++) {
           Solipsize(*iter, Branch::Direct, Simple, JustInner);
         }
-        Simple->Next = Process(Blocks, Entries, Simple);
       }
       return Simple;
     }
 
-    Shape *MakeLoop(BlockSet &Blocks, BlockSet& Entries, Shape *Prev) {
+    Shape *MakeLoop(BlockSet &Blocks, BlockSet& Entries, BlockSet &NextEntries) {
       // Find the inner blocks in this loop. Proceed backwards from the entries until
       // you reach a seen block, collecting as you go.
       BlockSet InnerBlocks;
@@ -484,7 +482,6 @@ void Relooper::Calculate(Block *Entry) {
       }
       assert(InnerBlocks.size() > 0);
 
-      BlockSet NextEntries;
       for (BlockSet::iterator iter = InnerBlocks.begin(); iter != InnerBlocks.end(); iter++) {
         Block *Curr = *iter;
         for (BlockBranchMap::iterator iter = Curr->BranchesOut.begin(); iter != Curr->BranchesOut.end(); iter++) {
@@ -519,7 +516,6 @@ void Relooper::Calculate(Block *Entry) {
       // Finish up
       Shape *Inner = Process(InnerBlocks, Entries, NULL);
       Loop->Inner = Inner;
-      Loop->Next = Process(Blocks, NextEntries, Loop);
       return Loop;
     }
 
@@ -642,12 +638,12 @@ void Relooper::Calculate(Block *Entry) {
 #endif
     }
 
-    Shape *MakeMultiple(BlockSet &Blocks, BlockSet& Entries, BlockBlockSetMap& IndependentGroups, Shape *Prev) {
+    Shape *MakeMultiple(BlockSet &Blocks, BlockSet& Entries, BlockBlockSetMap& IndependentGroups, Shape *Prev, BlockSet &NextEntries) {
       PrintDebug("creating multiple block with %d inner groups\n", IndependentGroups.size());
       bool Fused = !!(Shape::IsSimple(Prev));
       MultipleShape *Multiple = new MultipleShape();
       Notice(Multiple);
-      BlockSet NextEntries, CurrEntries;
+      BlockSet CurrEntries;
       for (BlockBlockSetMap::iterator iter = IndependentGroups.begin(); iter != IndependentGroups.end(); iter++) {
         Block *CurrEntry = iter->first;
         BlockSet &CurrBlocks = iter->second;
@@ -686,63 +682,85 @@ void Relooper::Calculate(Block *Entry) {
           NextEntries.insert(Entry);
         }
       }
-      Multiple->Next = Process(Blocks, NextEntries, Multiple);
       return Multiple;
     }
 
     // Main function.
     // Process a set of blocks with specified entries, returns a shape
-    Shape *Process(BlockSet &Blocks, BlockSet& Entries, Shape *Prev) {
+    // The Make* functions receive a NextEntries. If they fill it with data, those are the entries for the
+    //   ->Next block on them, and the blocks are what remains in Blocks (which Make* modify). In this way
+    //   we avoid recursing on Next (imagine a long chain of Simples, if we recursed we could blow the stack).
+    Shape *Process(BlockSet &Blocks, BlockSet& InitialEntries, Shape *Prev) {
       PrintDebug("Process() called\n");
-      DebugDump(Blocks, "  blocks : ");
-      DebugDump(Entries, "  entries: ");
+      BlockSet *Entries = &InitialEntries;
+      BlockSet TempEntries[2];
+      int CurrTempIndex = 0;
+      BlockSet *NextEntries;
+      Shape *Ret = NULL;
+      #define Make(call) \
+        Shape *Temp = call; \
+        if (Prev) Prev->Next = Temp; \
+        if (!Ret) Ret = Temp; \
+        if (!NextEntries->size()) { PrintDebug("Process() returning\n"); return Ret; } \
+        Prev = Temp; \
+        Entries = NextEntries; \
+        continue;
+      while (1) {
+        PrintDebug("Process() running\n");
+        DebugDump(Blocks, "  blocks : ");
+        DebugDump(*Entries, "  entries: ");
 
-      if (Entries.size() == 0) return NULL;
-      if (Entries.size() == 1) {
-        Block *Curr = *(Entries.begin());
-        if (Curr->BranchesIn.size() == 0) {
-          // One entry, no looping ==> Simple
-          return MakeSimple(Blocks, Curr, Prev);
-        }
-        // One entry, looping ==> Loop
-        return MakeLoop(Blocks, Entries, Prev);
-      }
-      // More than one entry, try to eliminate through a Multiple groups of
-      // independent blocks from an entry/ies. It is important to remove through
-      // multiples as opposed to looping since the former is more performant.
-      BlockBlockSetMap IndependentGroups;
-      FindIndependentGroups(Blocks, Entries, IndependentGroups);
+        CurrTempIndex = 1-CurrTempIndex;
+        NextEntries = &TempEntries[CurrTempIndex];
+        NextEntries->clear();
 
-      PrintDebug("Independent groups: %d\n", IndependentGroups.size());
-
-      if (IndependentGroups.size() > 0) {
-        // We can handle a group in a multiple if its entry cannot be reached by another group.
-        // Note that it might be reachable by itself - a loop. But that is fine, we will create
-        // a loop inside the multiple block (which is the performant order to do it).
-        for (BlockBlockSetMap::iterator iter = IndependentGroups.begin(); iter != IndependentGroups.end();) {
-          Block *Entry = iter->first;
-          BlockSet &Group = iter->second;
-          BlockBlockSetMap::iterator curr = iter++; // iterate carefully, we may delete
-          for (BlockBranchMap::iterator iterBranch = Entry->BranchesIn.begin(); iterBranch != Entry->BranchesIn.end(); iterBranch++) {
-            Block *Origin = iterBranch->first;
-            if (Group.find(Origin) == Group.end()) {
-              // Reached from outside the group, so we cannot handle this
-              PrintDebug("Cannot handle group with entry %d because of incoming branch from %d\n", Entry->Id, Origin->Id);
-              IndependentGroups.erase(curr);
-              break;
-            }
+        if (Entries->size() == 0) return Ret;
+        if (Entries->size() == 1) {
+          Block *Curr = *(Entries->begin());
+          if (Curr->BranchesIn.size() == 0) {
+            // One entry, no looping ==> Simple
+            Make(MakeSimple(Blocks, Curr, *NextEntries));
           }
+          // One entry, looping ==> Loop
+          Make(MakeLoop(Blocks, *Entries, *NextEntries));
         }
+        // More than one entry, try to eliminate through a Multiple groups of
+        // independent blocks from an entry/ies. It is important to remove through
+        // multiples as opposed to looping since the former is more performant.
+        BlockBlockSetMap IndependentGroups;
+        FindIndependentGroups(Blocks, *Entries, IndependentGroups);
 
-        PrintDebug("Handleable independent groups: %d\n", IndependentGroups.size());
+        PrintDebug("Independent groups: %d\n", IndependentGroups.size());
 
         if (IndependentGroups.size() > 0) {
-          // Some groups removable ==> Multiple
-          return MakeMultiple(Blocks, Entries, IndependentGroups, Prev);
+          // We can handle a group in a multiple if its entry cannot be reached by another group.
+          // Note that it might be reachable by itself - a loop. But that is fine, we will create
+          // a loop inside the multiple block (which is the performant order to do it).
+          for (BlockBlockSetMap::iterator iter = IndependentGroups.begin(); iter != IndependentGroups.end();) {
+            Block *Entry = iter->first;
+            BlockSet &Group = iter->second;
+            BlockBlockSetMap::iterator curr = iter++; // iterate carefully, we may delete
+            for (BlockBranchMap::iterator iterBranch = Entry->BranchesIn.begin(); iterBranch != Entry->BranchesIn.end(); iterBranch++) {
+              Block *Origin = iterBranch->first;
+              if (Group.find(Origin) == Group.end()) {
+                // Reached from outside the group, so we cannot handle this
+                PrintDebug("Cannot handle group with entry %d because of incoming branch from %d\n", Entry->Id, Origin->Id);
+                IndependentGroups.erase(curr);
+                break;
+              }
+            }
+          }
+
+          PrintDebug("Handleable independent groups: %d\n", IndependentGroups.size());
+
+          if (IndependentGroups.size() > 0) {
+            // Some groups removable ==> Multiple
+            Make(MakeMultiple(Blocks, *Entries, IndependentGroups, Prev, *NextEntries));
+          }
         }
+        // No independent groups, must be loopable ==> Loop
+        Make(MakeLoop(Blocks, *Entries, *NextEntries));
       }
-      // No independent groups, must be loopable ==> Loop
-      return MakeLoop(Blocks, Entries, Prev);
     }
   };
 
