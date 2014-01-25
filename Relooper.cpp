@@ -1,3 +1,7 @@
+// We are implementing the Relooper C API, so always export from this file.
+#ifndef RELOOPERDLL_EXPORTS
+#define RELOOPERDLL_EXPORTS
+#endif
 
 #include "Relooper.h"
 
@@ -961,7 +965,7 @@ VoidIntMap __blockDebugMap__; // maps block pointers in currently running code t
 
 extern "C" {
 
-void rl_set_output_buffer(char *buffer, int size) {
+RELOOPERDLL_API void rl_set_output_buffer(char *buffer, int size) {
 #if DEBUG
   printf("#include \"Relooper.h\"\n");
   printf("int main() {\n");
@@ -971,11 +975,11 @@ void rl_set_output_buffer(char *buffer, int size) {
   Relooper::SetOutputBuffer(buffer, size);
 }
 
-void rl_make_output_buffer(int size) {
+RELOOPERDLL_API void rl_make_output_buffer(int size) {
   Relooper::SetOutputBuffer((char*)malloc(size), size);
 }
 
-void *rl_new_block(const char *text) {
+RELOOPERDLL_API void *rl_new_block(const char *text) {
   Block *ret = new Block(text);
 #if DEBUG
   printf("  void *b%d = rl_new_block(\"// code %d\");\n", ret->Id, ret->Id);
@@ -985,21 +989,21 @@ void *rl_new_block(const char *text) {
   return ret;
 }
 
-void rl_delete_block(void *block) {
+RELOOPERDLL_API void rl_delete_block(void *block) {
 #if DEBUG
   printf("  rl_delete_block(block_map[%d]);\n", ((Block*)block)->Id);
 #endif
   delete (Block*)block;
 }
 
-void rl_block_add_branch_to(void *from, void *to, const char *condition, const char *code) {
+RELOOPERDLL_API void rl_block_add_branch_to(void *from, void *to, const char *condition, const char *code) {
 #if DEBUG
   printf("  rl_block_add_branch_to(block_map[%d], block_map[%d], %s%s%s, %s%s%s);\n", ((Block*)from)->Id, ((Block*)to)->Id, condition ? "\"" : "", condition ? condition : "NULL", condition ? "\"" : "", code ? "\"" : "", code ? code : "NULL", code ? "\"" : "");
 #endif
   ((Block*)from)->AddBranchTo((Block*)to, condition, code);
 }
 
-void *rl_new_relooper() {
+RELOOPERDLL_API void *rl_new_relooper() {
 #if DEBUG
   printf("  void *block_map[10000];\n");
   printf("  void *rl = rl_new_relooper();\n");
@@ -1007,18 +1011,18 @@ void *rl_new_relooper() {
   return new Relooper;
 }
 
-void rl_delete_relooper(void *relooper) {
+RELOOPERDLL_API void rl_delete_relooper(void *relooper) {
   delete (Relooper*)relooper;
 }
 
-void rl_relooper_add_block(void *relooper, void *block) {
+RELOOPERDLL_API void rl_relooper_add_block(void *relooper, void *block) {
 #if DEBUG
   printf("  rl_relooper_add_block(rl, block_map[%d]);\n", ((Block*)block)->Id);
 #endif
   ((Relooper*)relooper)->AddBlock((Block*)block);
 }
 
-void rl_relooper_calculate(void *relooper, void *entry) {
+RELOOPERDLL_API void rl_relooper_calculate(void *relooper, void *entry) {
 #if DEBUG
   printf("  rl_relooper_calculate(rl, block_map[%d]);\n", ((Block*)entry)->Id);
   printf("  rl_relooper_render(rl);\n");
@@ -1030,7 +1034,7 @@ void rl_relooper_calculate(void *relooper, void *entry) {
   ((Relooper*)relooper)->Calculate((Block*)entry);
 }
 
-void rl_relooper_render(void *relooper) {
+RELOOPERDLL_API void rl_relooper_render(void *relooper) {
   ((Relooper*)relooper)->Render();
 }
 
